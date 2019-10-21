@@ -1,0 +1,10 @@
+database:
+  type: mysql
+  sqlite:
+    file: "auctions.sqlite"
+  mysql:
+    host: localhost
+    username: root
+    password: password
+    schema: ""
+  worker-limt: 1
