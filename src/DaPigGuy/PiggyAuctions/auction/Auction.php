@@ -20,7 +20,13 @@ class Auction
     /** @var Item */
     public $item;
     /** @var int */
+    public $startDate;
+    /** @var int */
     public $endDate;
+    /** @var bool */
+    public $claimed;
+    /** @var array|AuctionBid[] */
+    public $unclaimedBids;
     /** @var array|AuctionBid[] */
     public $bids;
 
@@ -29,15 +35,21 @@ class Auction
      * @param int $id
      * @param string $auctioneer
      * @param Item $item
+     * @param int $startDate
      * @param int $endDate
+     * @param bool $claimed
+     * @param array $unclaimedBids
      * @param AuctionBid[] $bids
      */
-    public function __construct(int $id, string $auctioneer, Item $item, int $endDate, array $bids)
+    public function __construct(int $id, string $auctioneer, Item $item, int $startDate, int $endDate, bool $claimed, array $unclaimedBids, array $bids)
     {
         $this->id = $id;
         $this->auctioneer = $auctioneer;
         $this->item = $item;
+        $this->startDate = $startDate;
         $this->endDate = $endDate;
+        $this->claimed = $claimed;
+        $this->unclaimedBids = $unclaimedBids;
         $this->bids = $bids;
     }
 
@@ -68,9 +80,33 @@ class Auction
     /**
      * @return int
      */
+    public function getStartDate(): int
+    {
+        return $this->startDate;
+    }
+
+    /**
+     * @return int
+     */
     public function getEndDate(): int
     {
         return $this->endDate;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isClaimed(): bool
+    {
+        return $this->claimed;
+    }
+
+    /**
+     * @return array|AuctionBid[]
+     */
+    public function getUnclaimedBids()
+    {
+        return $this->unclaimedBids;
     }
 
     /**

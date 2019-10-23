@@ -37,9 +37,20 @@ class AuctionManager
         $this->plugin->getDatabase()->executeSelect("piggyauctions.load", [], function (array $rows, array $columnInfo): void {
             $this->auctionsLoaded = true;
             foreach ($rows as $row) {
-                $this->auctions[] = new Auction($row["id"], $row["auctioneer"], Item::jsonDeserialize(json_decode($row["item"], true)), $row["enddate"], array_map(function (array $bidData) {
-                    return new AuctionBid($bidData["bidder"], $bidData["bidamount"]);
-                }, json_decode($row["bids"], true)));
+                $this->auctions[] = new Auction(
+                    $row["id"],
+                    $row["auctioneer"],
+                    Item::jsonDeserialize(json_decode($row["item"], true)),
+                    $row["startdate"],
+                    $row["enddate"],
+                    (bool)$row["claimed"],
+                    array_map(function (array $bidData) {
+                        return new AuctionBid($bidData["bidder"], $bidData["bidamount"]);
+                    }, json_decode($row["unclaimed_bids"], true)),
+                    array_map(function (array $bidData) {
+                        return new AuctionBid($bidData["bidder"], $bidData["bidamount"]);
+                    }, json_decode($row["bids"], true))
+                );
             }
         });
     }
@@ -92,15 +103,18 @@ class AuctionManager
      * @param int $endDate
      * @param array $bids
      */
-    public function addAuction(string $auctioneer, Item $item, int $endDate): void
+    public function addAuction(string $auctioneer, Item $item, int $startDate, int $endDate): void
     {
         $this->plugin->getDatabase()->executeInsert("piggyauctions.add", [
             "auctioneer" => $auctioneer,
             "item" => json_encode($item->jsonSerialize()),
+            "startdate" => $startDate,
             "enddate" => $endDate,
+            "claimed" => 0,
+            "unclaimed_bids" => json_encode([]),
             "bids" => json_encode([])
-        ], function (int $id) use ($auctioneer, $item, $endDate) {
-            $this->auctions[$id] = new Auction($id, $auctioneer, $item, $endDate, []);
+        ], function (int $id) use ($auctioneer, $item, $startDate, $endDate) {
+            $this->auctions[$id] = new Auction($id, $auctioneer, $item, $startDate, $endDate, false, [], []);
         });
     }
 
@@ -111,6 +125,10 @@ class AuctionManager
     {
         $this->plugin->getDatabase()->executeChange("piggyauctions.update", [
             "id" => $auction->getId(),
+            "claimed" => (int)$auction->isClaimed(),
+            "unclaimed_bids" => json_encode(array_map(function (AuctionBid $bid) {
+                return ["bidder" => $bid->getBidder(), "bidamount" => $bid->getBidAmount()];
+            }, $auction->getUnclaimedBids())),
             "bids" => json_encode(array_map(function (AuctionBid $bid) {
                 return ["bidder" => $bid->getBidder(), "bidamount" => $bid->getBidAmount()];
             }, $auction->getBids()))

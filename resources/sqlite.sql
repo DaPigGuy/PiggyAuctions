@@ -1,17 +1,17 @@
--- #! mysql
+-- #! sqlite
 -- #{ piggyauctions
 
 -- # { init
 CREATE TABLE IF NOT EXISTS auctions
 (
-    id           INTEGER PRIMARY KEY AUTO_INCREMENT,
+    id           INTEGER PRIMARY KEY,
     auctioneer   VARCHAR(15),
-    item         JSON,
+    item         TEXT,
     startdate    INTEGER,
     enddate      INTEGER,
     claimed      INTEGER,
-    unclaimed_bids JSON,
-    bids         JSON
+    unclaimed_bids TEXT,
+    bids         TEXT
 );
 -- # }
 
