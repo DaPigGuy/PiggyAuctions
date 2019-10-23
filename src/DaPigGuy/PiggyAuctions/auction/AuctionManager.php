@@ -46,7 +46,7 @@ class AuctionManager
                     (bool)$row["claimed"],
                     array_map(function (array $bidData) {
                         return new AuctionBid($bidData["bidder"], $bidData["bidamount"]);
-                    }, json_decode($row["unclaimed_bids"], true)),
+                    }, json_decode($row["claimed_bids"], true)),
                     array_map(function (array $bidData) {
                         return new AuctionBid($bidData["bidder"], $bidData["bidamount"]);
                     }, json_decode($row["bids"], true))
@@ -88,13 +88,19 @@ class AuctionManager
     public function getAuctionsHeldBy($player): array
     {
         if ($player instanceof Player) $player = $player->getName();
-        $auctionsHeld = [];
-        foreach ($this->auctions as $auction) {
-            if ($auction->getAuctioneer() === $player) {
-                $auctionsHeld[] = $auction;
-            }
-        }
-        return $auctionsHeld;
+        return array_filter($this->auctions, function (Auction $auction) use ($player): bool {
+            return $auction->getAuctioneer() === $player;
+        });
+    }
+
+    /**
+     * @return array
+     */
+    public function getActiveAuctions(): array
+    {
+        return array_filter($this->auctions, function (Auction $auction): bool {
+            return $auction->hasExpired();
+        });
     }
 
     /**
@@ -111,7 +117,7 @@ class AuctionManager
             "startdate" => $startDate,
             "enddate" => $endDate,
             "claimed" => 0,
-            "unclaimed_bids" => json_encode([]),
+            "claimed_bids" => json_encode([]),
             "bids" => json_encode([])
         ], function (int $id) use ($auctioneer, $item, $startDate, $endDate) {
             $this->auctions[$id] = new Auction($id, $auctioneer, $item, $startDate, $endDate, false, [], []);
@@ -126,9 +132,9 @@ class AuctionManager
         $this->plugin->getDatabase()->executeChange("piggyauctions.update", [
             "id" => $auction->getId(),
             "claimed" => (int)$auction->isClaimed(),
-            "unclaimed_bids" => json_encode(array_map(function (AuctionBid $bid) {
+            "claimed_bids" => json_encode(array_map(function (AuctionBid $bid) {
                 return ["bidder" => $bid->getBidder(), "bidamount" => $bid->getBidAmount()];
-            }, $auction->getUnclaimedBids())),
+            }, $auction->getclaimedBids())),
             "bids" => json_encode(array_map(function (AuctionBid $bid) {
                 return ["bidder" => $bid->getBidder(), "bidamount" => $bid->getBidAmount()];
             }, $auction->getBids()))

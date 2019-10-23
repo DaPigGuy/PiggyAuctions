@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace DaPigGuy\PiggyAuctions\auction;
 
+use DaPigGuy\PiggyAuctions\PiggyAuctions;
 use pocketmine\item\Item;
+use pocketmine\Player;
 
 /**
  * Class Auction
@@ -26,7 +28,7 @@ class Auction
     /** @var bool */
     public $claimed;
     /** @var array|AuctionBid[] */
-    public $unclaimedBids;
+    public $claimedBids;
     /** @var array|AuctionBid[] */
     public $bids;
 
@@ -38,10 +40,10 @@ class Auction
      * @param int $startDate
      * @param int $endDate
      * @param bool $claimed
-     * @param array $unclaimedBids
+     * @param array $claimedBids
      * @param AuctionBid[] $bids
      */
-    public function __construct(int $id, string $auctioneer, Item $item, int $startDate, int $endDate, bool $claimed, array $unclaimedBids, array $bids)
+    public function __construct(int $id, string $auctioneer, Item $item, int $startDate, int $endDate, bool $claimed, array $claimedBids, array $bids)
     {
         $this->id = $id;
         $this->auctioneer = $auctioneer;
@@ -49,7 +51,7 @@ class Auction
         $this->startDate = $startDate;
         $this->endDate = $endDate;
         $this->claimed = $claimed;
-        $this->unclaimedBids = $unclaimedBids;
+        $this->claimedBids = $claimedBids;
         $this->bids = $bids;
     }
 
@@ -96,17 +98,80 @@ class Auction
     /**
      * @return bool
      */
+    public function hasExpired(): bool
+    {
+        $expired = time() > $this->endDate;
+        if ($expired && count($this->getClaimedBids()) === count($this->getBids())) {
+            PiggyAuctions::getInstance()->getAuctionManager()->removeAuction($this);
+            return true;
+        }
+        return $expired;
+    }
+
+    /**
+     * @return bool
+     */
     public function isClaimed(): bool
     {
         return $this->claimed;
     }
 
     /**
-     * @return array|AuctionBid[]
+     * @return AuctionBid[]
      */
-    public function getUnclaimedBids()
+    public function getClaimedBids(): array
     {
-        return $this->unclaimedBids;
+        return $this->claimedBids;
+    }
+
+    /**
+     * @return AuctionBid[]
+     */
+    public function getUnclaimedBids(): array
+    {
+        return array_filter($this->bids, function (AuctionBid $bid): bool {
+            return !in_array($bid, $this->claimedBids);
+        });
+    }
+
+    /**
+     * @param string $player
+     * @return AuctionBid[]
+     */
+    public function getUnclaimedBidsHeldBy(string $player): array
+    {
+        return array_filter($this->getUnclaimedBids(), function (AuctionBid $bid) use ($player): bool {
+            return $bid->getBidder() === $player;
+        });
+    }
+
+    /**
+     * @param Player $player
+     */
+    public function bidderClaim(Player $player): void
+    {
+        $highestBidValue = 0;
+        $bids = $this->getUnclaimedBidsHeldBy($player->getName());
+        foreach ($bids as $bid) {
+            $this->claimedBids[] = $bid;
+            if ($bid->getBidAmount() > $highestBidValue) {
+                $highestBidValue = $bid->getBidAmount();
+            }
+        }
+        PiggyAuctions::getInstance()->getAuctionManager()->updateAuction($this);
+        if (in_array($this->getTopBid(), $bids)) {
+            $player->getInventory()->addItem($this->getItem());
+            return;
+        }
+        //TODO: Give money to player
+    }
+
+    /**
+     * @param Player $player
+     */
+    public function claim(Player $player): void
+    {
+        //TODO: Give money to auctioneer
     }
 
     /**

@@ -18,6 +18,9 @@ use poggit\libasynql\libasynql;
  */
 class PiggyAuctions extends PluginBase
 {
+    /** @var */
+    public static $instance;
+
     /** @var DataConnector */
     private $database;
 
@@ -26,6 +29,8 @@ class PiggyAuctions extends PluginBase
 
     public function onEnable(): void
     {
+        self::$instance = $this;
+
         if (!InvMenuHandler::isRegistered()) {
             InvMenuHandler::register($this);
         }
@@ -39,9 +44,17 @@ class PiggyAuctions extends PluginBase
         $this->auctionManager = new AuctionManager($this);
         $this->auctionManager->init();
 
-        $this->auctionManager->addAuction("Aericio", Item::get(Item::PORKCHOP, 0, 1)->setCustomName("Pig"), time() + 500);
+        $this->auctionManager->addAuction("Aericio", Item::get(Item::PORKCHOP, 0, 1, "{ench:[]}")->setCustomName("Pig"), time(), time() + 500);
 
         $this->getServer()->getCommandMap()->register("piggyauctions", new AuctionHouseCommand($this, "auctionhouse", "Open the auction house", ["ah"]));
+    }
+
+    /**
+     * @return PiggyAuctions
+     */
+    public static function getInstance(): PiggyAuctions
+    {
+        return self::$instance;
     }
 
     /**
