@@ -8,3 +8,5 @@ database:
     password: password
     schema: ""
   worker-limt: 1
+economy:
+  provider: EconomyS

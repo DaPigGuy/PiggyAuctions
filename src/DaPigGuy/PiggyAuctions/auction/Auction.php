@@ -150,20 +150,15 @@ class Auction
      */
     public function bidderClaim(Player $player): void
     {
-        $highestBidValue = 0;
         $bids = $this->getUnclaimedBidsHeldBy($player->getName());
-        foreach ($bids as $bid) {
-            $this->claimedBids[] = $bid;
-            if ($bid->getBidAmount() > $highestBidValue) {
-                $highestBidValue = $bid->getBidAmount();
-            }
-        }
+        foreach ($bids as $bid) $this->claimedBids[] = $bid;
         PiggyAuctions::getInstance()->getAuctionManager()->updateAuction($this);
         if (in_array($this->getTopBid(), $bids)) {
             $player->getInventory()->addItem($this->getItem());
             return;
         }
-        //TODO: Give money to player
+        PiggyAuctions::getInstance()->getEconomyProvider()->giveMoney($player, $this->getTopBidBy($player->getName())->getBidAmount());
+        //TODO: Add claimed message
     }
 
     /**
@@ -171,7 +166,8 @@ class Auction
      */
     public function claim(Player $player): void
     {
-        //TODO: Give money to auctioneer
+        PiggyAuctions::getInstance()->getEconomyProvider()->giveMoney($player, $this->getTopBid()->getBidAmount());
+        //TODO: Add claimed message
     }
 
     /**
@@ -191,6 +187,23 @@ class Auction
         $highestBidAmount = 0;
         foreach ($this->bids as $bid) {
             if ($bid->getBidAmount() > $highestBidAmount) {
+                $highestBid = $bid;
+                $highestBidAmount = $bid->getBidAmount();
+            }
+        }
+        return $highestBid;
+    }
+
+    /**
+     * @param string $player
+     * @return AuctionBid|null
+     */
+    public function getTopBidBy(string $player): ?AuctionBid
+    {
+        $highestBid = null;
+        $highestBidAmount = 0;
+        foreach ($this->bids as $bid) {
+            if ($player === $bid->getBidder() && $bid->getBidAmount() > $highestBidAmount) {
                 $highestBid = $bid;
                 $highestBidAmount = $bid->getBidAmount();
             }

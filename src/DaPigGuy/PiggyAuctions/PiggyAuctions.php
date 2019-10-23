@@ -6,6 +6,8 @@ namespace DaPigGuy\PiggyAuctions;
 
 use DaPigGuy\PiggyAuctions\auction\AuctionManager;
 use DaPigGuy\PiggyAuctions\commands\AuctionHouseCommand;
+use DaPigGuy\PiggyAuctions\economy\EconomyProvider;
+use DaPigGuy\PiggyAuctions\economy\EconomySProvider;
 use muqsit\invmenu\InvMenuHandler;
 use pocketmine\item\Item;
 use pocketmine\plugin\PluginBase;
@@ -23,7 +25,8 @@ class PiggyAuctions extends PluginBase
 
     /** @var DataConnector */
     private $database;
-
+    /** @var EconomyProvider */
+    private $economyProvider;
     /** @var AuctionManager */
     private $auctionManager;
 
@@ -40,6 +43,17 @@ class PiggyAuctions extends PluginBase
             "sqlite" => "sqlite.sql", //TODO: Add SQLite3 prepared statement file
             "mysql" => "mysql.sql"
         ]);
+
+        switch ($this->getConfig()->getNested("economy.provider")) {
+            default:
+            case "EconomyS":
+                if ($this->getServer()->getPluginManager()->getPlugin("EconomyAPI") === null) {
+                    $this->getLogger()->error("EconomyAPI is required for your selected economy provider.");
+                    $this->getServer()->getPluginManager()->disablePlugin($this);
+                    return;
+                }
+                $this->economyProvider = new EconomySProvider();
+        }
 
         $this->auctionManager = new AuctionManager($this);
         $this->auctionManager->init();
@@ -63,6 +77,14 @@ class PiggyAuctions extends PluginBase
     public function getDatabase(): DataConnector
     {
         return $this->database;
+    }
+
+    /**
+     * @return EconomyProvider
+     */
+    public function getEconomyProvider(): EconomyProvider
+    {
+        return $this->economyProvider;
     }
 
     /**
