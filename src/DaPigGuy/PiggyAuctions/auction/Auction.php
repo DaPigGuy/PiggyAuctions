@@ -210,4 +210,12 @@ class Auction
         }
         return $highestBid;
     }
+
+    /**
+     * @param AuctionBid $bid
+     */
+    public function addBid(AuctionBid $bid): void
+    {
+        $this->bids[] = $bid;
+    }
 }

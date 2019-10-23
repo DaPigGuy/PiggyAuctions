@@ -20,6 +20,8 @@ use pocketmine\utils\TextFormat;
  */
 class AuctionHouseCommand extends BaseCommand
 {
+    const TF_RESET = TextFormat::RESET . TextFormat::GRAY;
+
     /** @var PiggyAuctions */
     private $plugin;
 
@@ -50,7 +52,14 @@ class AuctionHouseCommand extends BaseCommand
         $menu->setName("Auction House");
         foreach ($this->plugin->getAuctionManager()->getAuctions() as $auction) {
             $item = clone $auction->getItem();
-            $item->setLore(array_merge($item->getLore(), ["", "Sold By: " . $auction->getAuctioneer()]));
+            $item->setLore(array_merge($item->getLore(), [
+                "",
+                self::TF_RESET . "Seller: " . $auction->getAuctioneer(),
+                self::TF_RESET . "Bids: " . TextFormat::GREEN . count($auction->getBids()),
+                "",
+                self::TF_RESET . "Top Bid: " . TextFormat::GOLD . $auction->getTopBid()->getBidAmount(),
+                self::TF_RESET . "Bidder: " . TextFormat::GOLD . $auction->getTopBid()->getBidder()
+            ]));
             $item->setNamedTagEntry(new IntTag("AuctionID", $auction->getId()));
             $menu->getInventory()->addItem($item);
         }
