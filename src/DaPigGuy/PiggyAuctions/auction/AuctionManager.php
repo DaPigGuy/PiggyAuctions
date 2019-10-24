@@ -37,7 +37,7 @@ class AuctionManager
         $this->plugin->getDatabase()->executeSelect("piggyauctions.load", [], function (array $rows): void {
             $this->auctionsLoaded = true;
             foreach ($rows as $row) {
-                $this->auctions[] = new Auction(
+                $this->auctions[$row["id"]] = new Auction(
                     $row["id"],
                     $row["auctioneer"],
                     Item::jsonDeserialize(json_decode($row["item"], true)),
@@ -147,6 +147,6 @@ class AuctionManager
     public function removeAuction(Auction $auction): void
     {
         unset($this->auctions[$auction->getId()]);
-        $this->plugin->getDatabase()->executeGeneric("piggyauctions.remove", ["id" => $auction->getId()]);
+        $this->plugin->getDatabase()->executeChange("piggyauctions.remove", ["id" => $auction->getId()]);
     }
 }
