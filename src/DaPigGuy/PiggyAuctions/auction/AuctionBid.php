@@ -14,16 +14,20 @@ class AuctionBid
     public $bidder;
     /** @var int */
     public $bidAmount;
+    /** @var int */
+    public $timestamp;
 
     /**
      * AuctionBid constructor.
      * @param string $bidder
      * @param int $bidAmount
+     * @param int $timestamp
      */
-    public function __construct(string $bidder, int $bidAmount)
+    public function __construct(string $bidder, int $bidAmount, int $timestamp)
     {
         $this->bidder = $bidder;
         $this->bidAmount = $bidAmount;
+        $this->timestamp = $timestamp;
     }
 
     /**
@@ -40,5 +44,13 @@ class AuctionBid
     public function getBidAmount(): int
     {
         return $this->bidAmount;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTimestamp(): int
+    {
+        return $this->timestamp;
     }
 }

@@ -35,7 +35,7 @@ VALUES (:auctioneer, :item, :startdate, :enddate, :claimed, :claimed_bids, :bids
 -- # { update
 -- #    :id int
 -- #    :claimed int
--- #    :claimed_bods string
+-- #    :claimed_bids string
 -- #    :bids string
 UPDATE auctions
 SET claimed      = :claimed,

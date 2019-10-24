@@ -34,7 +34,7 @@ class AuctionManager
     public function init(): void
     {
         $this->plugin->getDatabase()->executeGeneric("piggyauctions.init");
-        $this->plugin->getDatabase()->executeSelect("piggyauctions.load", [], function (array $rows, array $columnInfo): void {
+        $this->plugin->getDatabase()->executeSelect("piggyauctions.load", [], function (array $rows): void {
             $this->auctionsLoaded = true;
             foreach ($rows as $row) {
                 $this->auctions[] = new Auction(
@@ -45,10 +45,10 @@ class AuctionManager
                     $row["enddate"],
                     (bool)$row["claimed"],
                     array_map(function (array $bidData) {
-                        return new AuctionBid($bidData["bidder"], $bidData["bidamount"]);
+                        return new AuctionBid($bidData["bidder"], $bidData["bidamount"], $bidData["timestamp"]);
                     }, json_decode($row["claimed_bids"], true)),
                     array_map(function (array $bidData) {
-                        return new AuctionBid($bidData["bidder"], $bidData["bidamount"]);
+                        return new AuctionBid($bidData["bidder"], $bidData["bidamount"], $bidData["timestamp"]);
                     }, json_decode($row["bids"], true))
                 );
             }
@@ -99,15 +99,15 @@ class AuctionManager
     public function getActiveAuctions(): array
     {
         return array_filter($this->auctions, function (Auction $auction): bool {
-            return $auction->hasExpired();
+            return !$auction->hasExpired();
         });
     }
 
     /**
      * @param string $auctioneer
      * @param Item $item
+     * @param int $startDate
      * @param int $endDate
-     * @param array $bids
      */
     public function addAuction(string $auctioneer, Item $item, int $startDate, int $endDate): void
     {
@@ -133,10 +133,10 @@ class AuctionManager
             "id" => $auction->getId(),
             "claimed" => (int)$auction->isClaimed(),
             "claimed_bids" => json_encode(array_map(function (AuctionBid $bid) {
-                return ["bidder" => $bid->getBidder(), "bidamount" => $bid->getBidAmount()];
+                return ["bidder" => $bid->getBidder(), "bidamount" => $bid->getBidAmount(), "timestamp" => $bid->getTimestamp()];
             }, $auction->getclaimedBids())),
             "bids" => json_encode(array_map(function (AuctionBid $bid) {
-                return ["bidder" => $bid->getBidder(), "bidamount" => $bid->getBidAmount()];
+                return ["bidder" => $bid->getBidder(), "bidamount" => $bid->getBidAmount(), "timestamp" => $bid->getTimestamp()];
             }, $auction->getBids()))
         ]);
     }
