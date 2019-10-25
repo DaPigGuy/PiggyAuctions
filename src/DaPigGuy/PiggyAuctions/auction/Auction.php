@@ -29,6 +29,8 @@ class Auction
     public $claimed;
     /** @var array|AuctionBid[] */
     public $claimedBids;
+    /** @var int */
+    public $startingBid;
     /** @var array|AuctionBid[] */
     public $bids;
 
@@ -41,9 +43,10 @@ class Auction
      * @param int $endDate
      * @param bool $claimed
      * @param array $claimedBids
+     * @param int $startingBid
      * @param AuctionBid[] $bids
      */
-    public function __construct(int $id, string $auctioneer, Item $item, int $startDate, int $endDate, bool $claimed, array $claimedBids, array $bids)
+    public function __construct(int $id, string $auctioneer, Item $item, int $startDate, int $endDate, bool $claimed, array $claimedBids, int $startingBid, array $bids)
     {
         $this->id = $id;
         $this->auctioneer = $auctioneer;
@@ -52,6 +55,7 @@ class Auction
         $this->endDate = $endDate;
         $this->claimed = $claimed;
         $this->claimedBids = $claimedBids;
+        $this->startingBid = $startingBid;
         $this->bids = $bids;
     }
 
@@ -114,6 +118,13 @@ class Auction
     public function isClaimed(): bool
     {
         return $this->claimed;
+    }
+
+    /**
+     * @return int
+     */
+    public function getStartingBid(): int{
+        return $this->startingBid;
     }
 
     /**

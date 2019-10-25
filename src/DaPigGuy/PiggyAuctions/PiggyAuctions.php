@@ -59,7 +59,7 @@ class PiggyAuctions extends PluginBase
         $this->auctionManager->init();
 
         for ($i = 0; $i < 25; $i++) {
-            $this->auctionManager->addAuction("Aericio", Item::get(Item::PORKCHOP, 0, mt_rand(1, 64))->setCustomName("Pig"), time(), time() + mt_rand(60, 6000));
+            $this->auctionManager->addAuction("Aericio", Item::get(Item::PORKCHOP, 0, mt_rand(1, 64))->setCustomName("Pig"), time(), time() + mt_rand(60, 6000), mt_rand(50, 500));
         }
 
         $this->getServer()->getCommandMap()->register("piggyauctions", new AuctionHouseCommand($this, "auctionhouse", "Open the auction house", ["ah"]));

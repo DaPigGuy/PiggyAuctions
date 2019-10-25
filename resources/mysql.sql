@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS auctions
     enddate      INTEGER,
     claimed      INTEGER,
     claimed_bids JSON,
+    starting_bid INTEGER,
     bids         JSON
 );
 -- # }
@@ -27,9 +28,10 @@ FROM auctions;
 -- #    :enddate int
 -- #    :claimed int
 -- #    :claimed_bids string
+-- #    :starting_bid int
 -- #    :bids string
-INSERT INTO auctions (auctioneer, item, startdate, enddate, claimed, claimed_bids, bids)
-VALUES (:auctioneer, :item, :startdate, :enddate, :claimed, :claimed_bids, :bids);
+INSERT INTO auctions (auctioneer, item, startdate, enddate, claimed, claimed_bids, starting_bid, bids)
+VALUES (:auctioneer, :item, :startdate, :enddate, :claimed, :claimed_bids, :starting_bid, :bids);
 -- # }
 
 -- # { update
