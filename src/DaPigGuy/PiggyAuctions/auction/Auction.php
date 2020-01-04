@@ -105,7 +105,7 @@ class Auction
     public function hasExpired(): bool
     {
         $expired = time() > $this->endDate;
-        if ($expired && count($this->getClaimedBids()) === count($this->getBids())) {
+        if ($expired && count($this->getClaimedBids()) === count($this->getBids()) && $this->claimed) {
             PiggyAuctions::getInstance()->getAuctionManager()->removeAuction($this);
             return true;
         }
@@ -178,7 +178,11 @@ class Auction
      */
     public function claim(Player $player): void
     {
-        PiggyAuctions::getInstance()->getEconomyProvider()->giveMoney($player, $this->getTopBid()->getBidAmount());
+        if ($this->getTopBid() === null) {
+            $player->getInventory()->addItem($this->getItem());
+        } else {
+            PiggyAuctions::getInstance()->getEconomyProvider()->giveMoney($player, $this->getTopBid()->getBidAmount());
+        }
         $this->claimed = true;
         if (!$this->hasExpired()) PiggyAuctions::getInstance()->getAuctionManager()->updateAuction($this);
         //TODO: Add claimed message
