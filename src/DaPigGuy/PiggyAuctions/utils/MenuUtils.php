@@ -39,7 +39,7 @@ class MenuUtils
             13 => Item::get(Item::GOLDEN_CARROT)->setCustomName(TextFormat::RESET . TextFormat::WHITE . "View Bids"),
             15 => Item::get(Item::GOLDEN_HORSE_ARMOR)->setCustomName(TextFormat::RESET . TextFormat::WHITE . "Manage Auctions")
         ]);
-        $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool {
+        $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($menu): bool {
             $player->removeWindow($action->getInventory());
             switch ($itemClicked->getId()) {
                 case Item::GOLD_BLOCK:
@@ -50,7 +50,7 @@ class MenuUtils
                     break;
                 case Item::GOLDEN_HORSE_ARMOR:
                     if (count(PiggyAuctions::getInstance()->getAuctionManager()->getAuctionsHeldBy($player)) < 1) {
-                        self::displayAuctionCreator($player, true);
+                        self::displayAuctionCreator($player, $menu);
                         break;
                     }
                     self::displayAuctionManager($player);
@@ -120,29 +120,7 @@ class MenuUtils
         }); //TODO: Changeable sort type
         /** @var Auction $auction */
         foreach (array_slice($activeAuctions, ($page - 1) * 45, 45) as $slot => $auction) {
-            $item = clone $auction->getItem();
-
-            $lore = array_merge($item->getLore(), [
-                "",
-                self::TF_RESET . "Seller: " . $auction->getAuctioneer(),
-                self::TF_RESET . "Bids: " . TextFormat::GREEN . count($auction->getBids()),
-                ""
-            ]);
-            if ($auction->getTopBid() !== null) {
-                $lore = array_merge($lore, [
-                    self::TF_RESET . "Top Bid: " . TextFormat::GOLD . $auction->getTopBid()->getBidAmount(),
-                    self::TF_RESET . "Bidder: " . TextFormat::GOLD . $auction->getTopBid()->getBidder(),
-                ]);
-            } else {
-                $lore[] = self::TF_RESET . "Starting Bid: " . TextFormat::GOLD . $auction->getStartingBid();
-            }
-            $lore = array_merge($lore, [
-                "",
-                self::TF_RESET . "Ends in " . self::formatDuration($auction->getEndDate() - time())
-            ]);
-
-            $item->setNamedTagEntry(new IntTag("AuctionID", $auction->getId()));
-            $inventory->setItem($slot, $item->setLore($lore), false);
+            $inventory->setItem($slot, self::getDisplayItem($auction), false);
         }
         if ($page > 1) {
             $previousPage = Item::get(Item::ARROW, 0, 1)->setCustomName("Previous Page\n(" . ($page - 1) . "/" . ceil(count($activeAuctions) / 45) . ")");
@@ -159,9 +137,9 @@ class MenuUtils
 
     /**
      * @param Player $player
-     * @param bool $fromMainMenu
+     * @param InvMenu $previousMenu
      */
-    public static function displayAuctionCreator(Player $player, bool $fromMainMenu = false)
+    public static function displayAuctionCreator(Player $player, InvMenu $previousMenu)
     {
         $menu = InvMenu::create(DoubleChestInventory::class);
         $menu->setName("Create Auction");
@@ -171,7 +149,7 @@ class MenuUtils
         $menu->getInventory()->setItem(31, Item::get(Item::GOLD_INGOT));
         $menu->getInventory()->setItem(33, Item::get(Item::CLOCK));
         $menu->getInventory()->setItem(49, Item::get(Item::ARROW));
-        $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use($fromMainMenu): bool {
+        $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($previousMenu): bool {
             switch ($action->getSlot()) {
                 case 13:
                     $action->getInventory()->setItem(13, $itemClickedWith);
@@ -191,12 +169,8 @@ class MenuUtils
                     break;
                 case 49:
                     $player->removeWindow($action->getInventory());
-                    PiggyAuctions::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function () use ($player, $fromMainMenu): void {
-                        if ($fromMainMenu) {
-                            self::displayMainMenu($player);
-                            return;
-                        }
-                        self::displayAuctionManager($player);
+                    PiggyAuctions::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function () use ($player, $previousMenu): void {
+                        $previousMenu->send($player);
                     }), 1);
                     break;
             }
@@ -217,13 +191,62 @@ class MenuUtils
     {
         $menu = InvMenu::create(ChestInventory::class);
         $menu->setName("Auction Manager");
-        for ($i = 0; $i < $menu->getInventory()->getSize(); $i++) $menu->getInventory()->setItem($i, Item::get(Item::BLEACH)->setCustomName(" "));
         $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool {
             return false;
         });
         PiggyAuctions::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function () use ($menu, $player): void {
             $menu->send($player);
         }), 1);
+    }
+
+    /**
+     * @param Player $player
+     * @param string $auctioneer
+     */
+    public static function displayAuctioneerPage(Player $player, string $auctioneer): void
+    {
+        $menu = InvMenu::create(ChestInventory::class);
+        $menu->setName($auctioneer . "'s Auctions");
+        foreach (array_slice(PiggyAuctions::getInstance()->getAuctionManager()->getActiveAuctionsHeldBy($auctioneer), 0, 7) as $index => $auction) {
+            $menu->getInventory()->setItem(10 + $index, self::getDisplayItem($auction));
+        }
+        $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool {
+            return false;
+        });
+        PiggyAuctions::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function () use ($menu, $player): void {
+            $menu->send($player);
+        }), 1);
+    }
+
+    /**
+     * @param Auction $auction
+     * @return Item
+     */
+    public static function getDisplayItem(Auction $auction): Item
+    {
+        $item = clone $auction->getItem();
+
+        $lore = array_merge($item->getLore(), [
+            "",
+            self::TF_RESET . "Seller: " . $auction->getAuctioneer(),
+            self::TF_RESET . "Bids: " . TextFormat::GREEN . count($auction->getBids()),
+            ""
+        ]);
+        if ($auction->getTopBid() !== null) {
+            $lore = array_merge($lore, [
+                self::TF_RESET . "Top Bid: " . TextFormat::GOLD . $auction->getTopBid()->getBidAmount(),
+                self::TF_RESET . "Bidder: " . TextFormat::GOLD . $auction->getTopBid()->getBidder(),
+            ]);
+        } else {
+            $lore[] = self::TF_RESET . "Starting Bid: " . TextFormat::GOLD . $auction->getStartingBid();
+        }
+        $lore = array_merge($lore, [
+            "",
+            self::TF_RESET . "Ends in " . self::formatDuration($auction->getEndDate() - time())
+        ]);
+
+        $item->setNamedTagEntry(new IntTag("AuctionID", $auction->getId()));
+        return $item->setLore($lore);
     }
 
     /**

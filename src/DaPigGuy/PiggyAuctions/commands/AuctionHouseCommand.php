@@ -47,11 +47,12 @@ class AuctionHouseCommand extends BaseCommand
             return;
         }
         if (isset($args["player"])) {
+            if (!is_string($args["player"])) return; //Shut PHPStorm up
             if (count($this->plugin->getAuctionManager()->getActiveAuctionsHeldBy($args["player"])) < 0) {
                 $sender->sendMessage(TextFormat::RED . "Player '" . $args["player"] . "' does not exist or has no active auctions.");
                 return;
             }
-            //TODO: Show player auctions page
+            MenuUtils::displayAuctioneerPage($sender, $args["player"]);
         }
         MenuUtils::displayMainMenu($sender);
     }
