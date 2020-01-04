@@ -50,7 +50,7 @@ class MenuUtils
                     break;
                 case Item::GOLDEN_HORSE_ARMOR:
                     if (count(PiggyAuctions::getInstance()->getAuctionManager()->getAuctionsHeldBy($player)) < 1) {
-                        self::displayAuctionCreator($player);
+                        self::displayAuctionCreator($player, true);
                         break;
                     }
                     self::displayAuctionManager($player);
@@ -159,8 +159,9 @@ class MenuUtils
 
     /**
      * @param Player $player
+     * @param bool $fromMainMenu
      */
-    public static function displayAuctionCreator(Player $player)
+    public static function displayAuctionCreator(Player $player, bool $fromMainMenu = false)
     {
         $menu = InvMenu::create(DoubleChestInventory::class);
         $menu->setName("Create Auction");
@@ -169,20 +170,34 @@ class MenuUtils
         $menu->getInventory()->setItem(29, Item::get(Item::STAINED_CLAY, 14));
         $menu->getInventory()->setItem(31, Item::get(Item::GOLD_INGOT));
         $menu->getInventory()->setItem(33, Item::get(Item::CLOCK));
-        $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool {
+        $menu->getInventory()->setItem(49, Item::get(Item::ARROW));
+        $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use($fromMainMenu): bool {
             switch ($action->getSlot()) {
                 case 13:
-                    $player->getInventory()->removeItem($itemClickedWith);
-                    $player->getInventory()->addItem($itemClicked);
                     $action->getInventory()->setItem(13, $itemClickedWith);
                     $action->getInventory()->setItem(29, Item::get(Item::STAINED_CLAY, $itemClickedWith->getId() === Item::AIR ? 14 : 13));
-                    break;
+                    return true;
                 case 29:
                     if ($itemClicked->getDamage() === 13) {
                         //TODO: Customizable duration/start bid
                         PiggyAuctions::getInstance()->getAuctionManager()->addAuction($player->getName(), $action->getInventory()->getItem(13), time(), time() + 500, 50);
                         $action->getInventory()->clear(13);
+                        $player->removeWindow($action->getInventory());
+                        self::displayAuctionManager($player);
                     }
+                    break;
+                case 31: //TODO: Implement
+                case 33:
+                    break;
+                case 49:
+                    $player->removeWindow($action->getInventory());
+                    PiggyAuctions::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function () use ($player, $fromMainMenu): void {
+                        if ($fromMainMenu) {
+                            self::displayMainMenu($player);
+                            return;
+                        }
+                        self::displayAuctionManager($player);
+                    }), 1);
                     break;
             }
             return false;
