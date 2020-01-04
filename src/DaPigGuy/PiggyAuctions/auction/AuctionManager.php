@@ -81,7 +81,6 @@ class AuctionManager
         return $this->auctions[$id] ?? null;
     }
 
-
     /**
      * @param Player|string $player
      * @return Auction[]
@@ -93,6 +92,19 @@ class AuctionManager
             return $auction->getAuctioneer() === $player;
         });
     }
+
+    /**
+     * @param Player|string $player
+     * @return Auction[]
+     */
+    public function getActiveAuctionsHeldBy($player): array
+    {
+        if ($player instanceof Player) $player = $player->getName();
+        return array_filter($this->auctions, function (Auction $auction) use ($player): bool {
+            return $auction->getAuctioneer() === $player && !$auction->hasExpired();
+        });
+    }
+
 
     /**
      * @return array

@@ -4,3 +4,15 @@ version: 1.0.0
 api: 3.2.0
 load: POSTWORLD
 author: DaPigGuy
+permissions:
+  piggyauctions:
+    default: op
+    description: "Allow usage of all PiggyAuctions features"
+    children:
+      piggyauctions.command:
+        default: op
+        description: "Allow usage of all PiggyAuctions commands"
+        children:
+          piggyauctions.command.auctionhouse:
+            default: true
+            description: "Allow usage of the /auctionhouse command"

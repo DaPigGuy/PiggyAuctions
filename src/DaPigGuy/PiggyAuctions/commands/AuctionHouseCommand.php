@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace DaPigGuy\PiggyAuctions\commands;
 
 use CortexPE\Commando\args\BaseArgument;
+use CortexPE\Commando\args\RawStringArgument;
 use CortexPE\Commando\BaseCommand;
+use CortexPE\Commando\exception\ArgumentOrderException;
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
 use DaPigGuy\PiggyAuctions\utils\MenuUtils;
 use pocketmine\command\CommandSender;
@@ -44,11 +46,22 @@ class AuctionHouseCommand extends BaseCommand
             $sender->sendMessage(TextFormat::RED . "Please use this in-game.");
             return;
         }
+        if (isset($args["player"])) {
+            if (count($this->plugin->getAuctionManager()->getActiveAuctionsHeldBy($args["player"])) < 0) {
+                $sender->sendMessage(TextFormat::RED . "Player '" . $args["player"] . "' does not exist or has no active auctions.");
+                return;
+            }
+            //TODO: Show player auctions page
+        }
         MenuUtils::displayMainMenu($sender);
     }
 
+    /**
+     * @throws ArgumentOrderException
+     */
     protected function prepare(): void
     {
-        //TODO: Permissions & Subcommands
+        $this->setPermission("piggyauctions.command.auctionhouse");
+        $this->registerArgument(0, new RawStringArgument("player", true));
     }
 }
