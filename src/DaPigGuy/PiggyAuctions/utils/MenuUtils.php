@@ -6,6 +6,7 @@ namespace DaPigGuy\PiggyAuctions\utils;
 
 use DaPigGuy\PiggyAuctions\auction\Auction;
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
+use jojoe77777\FormAPI\CustomForm;
 use muqsit\invmenu\inventories\BaseFakeInventory;
 use muqsit\invmenu\inventories\ChestInventory;
 use muqsit\invmenu\inventories\DoubleChestInventory;
@@ -71,7 +72,7 @@ class MenuUtils
         $menu->setName("Auction Browser");
         $pageAuctions = self::displayPageAuctions($menu->getInventory(), $page);
 
-        $updateTask = new ClosureTask(function (int $currentTick) use ($menu, $page) : void {
+        $updateTask = new ClosureTask(function () use ($menu, $page) : void {
             foreach ($menu->getInventory()->getContents() as $slot => $content) {
                 if ($content->getNamedTagEntry("AuctionID") !== null) {
                     $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction($content->getNamedTagEntry("AuctionID")->getValue());
@@ -88,7 +89,7 @@ class MenuUtils
         });
         PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask($updateTask, 1);
 
-        $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($menu, $page, $pageAuctions): bool {
+        $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($page, $pageAuctions): bool {
             if (isset($pageAuctions[$action->getSlot()])) {
                 $auction = $pageAuctions[$action->getSlot()];
                 self::displayItemPage($player, $auction, $page);
@@ -102,7 +103,9 @@ class MenuUtils
         $menu->setInventoryCloseListener(function () use ($updateTask): void {
             if ($updateTask->getHandler() !== null) $updateTask->getHandler()->cancel();
         });
-        $menu->send($player);
+        PiggyAuctions::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function () use ($menu, $player): void {
+            $menu->send($player);
+        }), 1);
     }
 
     /**
@@ -149,7 +152,7 @@ class MenuUtils
         $menu->getInventory()->setItem(31, Item::get(Item::GOLD_INGOT));
         $menu->getInventory()->setItem(33, Item::get(Item::CLOCK));
         $menu->getInventory()->setItem(49, Item::get(Item::ARROW));
-        $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($previousMenu): bool {
+        $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($menu, $previousMenu): bool {
             switch ($action->getSlot()) {
                 case 13:
                     $action->getInventory()->setItem(13, $itemClickedWith);
@@ -158,14 +161,28 @@ class MenuUtils
                 case 29:
                     if ($itemClicked->getDamage() === 13) {
                         //TODO: Customizable duration/start bid
-                        PiggyAuctions::getInstance()->getAuctionManager()->addAuction($player->getName(), $action->getInventory()->getItem(13), time(), time() + 500, 50);
+                        PiggyAuctions::getInstance()->getAuctionManager()->addAuction($player->getName(), $action->getInventory()->getItem(13), time(), time() + ($action->getInventory()->getItem(33)->getNamedTagEntry("Duration") ? $action->getInventory()->getItem(33)->getNamedTagEntry("Duration")->getValue() : 60 * 60 * 2), 50);
                         $action->getInventory()->clear(13);
                         $player->removeWindow($action->getInventory());
                         self::displayAuctionManager($player);
                     }
                     break;
                 case 31: //TODO: Implement
+                    break;
                 case 33:
+                    $player->removeWindow($action->getInventory());
+                    $form = new CustomForm(function (Player $player, ?array $data = null) use ($menu): void {
+                        if ($data !== null && is_numeric($data[0])) {
+                            $menu->send($player);
+
+                            $item = $menu->getInventory()->getItem(33);
+                            $item->setNamedTagEntry(new IntTag("Duration", (int)$data[0]));
+                            $menu->getInventory()->setItem(33, $item);
+                        }
+                    });
+                    $form->setTitle("Create Auction");
+                    $form->addInput("Duration (Seconds)");
+                    $player->sendForm($form);
                     break;
                 case 49:
                     $player->removeWindow($action->getInventory());
