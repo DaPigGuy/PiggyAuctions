@@ -6,6 +6,7 @@ namespace DaPigGuy\PiggyAuctions\utils;
 
 use DaPigGuy\PiggyAuctions\auction\Auction;
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
+use muqsit\invmenu\inventories\ChestInventory;
 use muqsit\invmenu\inventories\DoubleChestInventory;
 use muqsit\invmenu\InvMenu;
 use pocketmine\inventory\Inventory;
@@ -23,6 +24,32 @@ use pocketmine\utils\TextFormat;
 class MenuUtils
 {
     const TF_RESET = TextFormat::RESET . TextFormat::GRAY;
+
+    /**
+     * @param Player $player
+     */
+    public static function displayMainMenu(Player $player): void
+    {
+        $menu = InvMenu::create(ChestInventory::class);
+        $menu->setName("Auction House");
+        $menu->getInventory()->setContents([
+            11 => Item::get(Item::GOLD_BLOCK)->setCustomName(TextFormat::RESET . TextFormat::WHITE . "Browse Auctions"),
+            15 => Item::get(Item::GOLDEN_HORSE_ARMOR)->setCustomName(TextFormat::RESET . TextFormat::WHITE . "Manage Auctions")
+        ]);
+        $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool {
+            $player->removeWindow($action->getInventory());
+            switch ($itemClicked->getId()) {
+                case Item::GOLD_BLOCK:
+                    self::displayAuctionBrowser($player);
+                    break;
+                case Item::GOLDEN_HORSE_ARMOR:
+                    self::displayAuctionManager($player);
+                    break;
+            }
+            return false;
+        });
+        $menu->send($player);
+    }
 
     /**
      * @param Player $player
@@ -97,7 +124,7 @@ class MenuUtils
                     self::TF_RESET . "Bidder: " . TextFormat::GOLD . $auction->getTopBid()->getBidder(),
                 ]);
             } else {
-                $lore[] = self::TF_RESET . "Starting Bid: " . TextFormat::GOLD . $auction->getStartingBid(); //TODO: Add start bid cuz im stupid and forgot
+                $lore[] = self::TF_RESET . "Starting Bid: " . TextFormat::GOLD . $auction->getStartingBid();
             }
             $lore = array_merge($lore, [
                 "",
@@ -118,6 +145,22 @@ class MenuUtils
             $inventory->setItem(53, $nextPage);
         }
         return array_slice($activeAuctions, ($page - 1) * 45, 45);
+    }
+
+    /**
+     * @param Player $player
+     */
+    public static function displayAuctionManager(Player $player): void
+    {
+        $menu = InvMenu::create(ChestInventory::class);
+        $menu->setName("Auction Manager");
+        for ($i = 0; $i < $menu->getInventory()->getSize(); $i++) $menu->getInventory()->setItem($i, Item::get(Item::BLEACH)->setCustomName(" "));
+        $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool {
+            return false;
+        });
+        PiggyAuctions::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function () use ($menu, $player): void {
+            $menu->send($player);
+        }), 1);
     }
 
     /**

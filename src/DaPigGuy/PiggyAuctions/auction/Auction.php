@@ -123,7 +123,8 @@ class Auction
     /**
      * @return int
      */
-    public function getStartingBid(): int{
+    public function getStartingBid(): int
+    {
         return $this->startingBid;
     }
 
@@ -163,7 +164,7 @@ class Auction
     {
         $bids = $this->getUnclaimedBidsHeldBy($player->getName());
         foreach ($bids as $bid) $this->claimedBids[] = $bid;
-        PiggyAuctions::getInstance()->getAuctionManager()->updateAuction($this);
+        if (!$this->hasExpired()) PiggyAuctions::getInstance()->getAuctionManager()->updateAuction($this);
         if (in_array($this->getTopBid(), $bids)) {
             $player->getInventory()->addItem($this->getItem());
             return;
@@ -178,6 +179,8 @@ class Auction
     public function claim(Player $player): void
     {
         PiggyAuctions::getInstance()->getEconomyProvider()->giveMoney($player, $this->getTopBid()->getBidAmount());
+        $this->claimed = true;
+        if (!$this->hasExpired()) PiggyAuctions::getInstance()->getAuctionManager()->updateAuction($this);
         //TODO: Add claimed message
     }
 
@@ -228,5 +231,6 @@ class Auction
     public function addBid(AuctionBid $bid): void
     {
         $this->bids[] = $bid;
+        PiggyAuctions::getInstance()->getAuctionManager()->updateAuction($this);
     }
 }

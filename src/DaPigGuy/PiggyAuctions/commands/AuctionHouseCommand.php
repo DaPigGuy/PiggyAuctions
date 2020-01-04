@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace DaPigGuy\PiggyAuctions\commands;
 
 use CortexPE\Commando\args\BaseArgument;
-use CortexPE\Commando\args\IntegerArgument;
 use CortexPE\Commando\BaseCommand;
-use CortexPE\Commando\exception\ArgumentOrderException;
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
 use DaPigGuy\PiggyAuctions\utils\MenuUtils;
 use pocketmine\command\CommandSender;
@@ -46,15 +44,11 @@ class AuctionHouseCommand extends BaseCommand
             $sender->sendMessage(TextFormat::RED . "Please use this in-game.");
             return;
         }
-        MenuUtils::displayAuctionBrowser($sender); //TODO: Display main menu instead
+        MenuUtils::displayMainMenu($sender);
     }
 
-    /**
-     * @throws ArgumentOrderException
-     */
     protected function prepare(): void
     {
-        $this->registerArgument(0, new IntegerArgument("page", true));
         //TODO: Permissions & Subcommands
     }
 }

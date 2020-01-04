@@ -20,7 +20,7 @@ use poggit\libasynql\libasynql;
  */
 class PiggyAuctions extends PluginBase
 {
-    /** @var */
+    /** @var self */
     public static $instance;
 
     /** @var DataConnector */
@@ -40,7 +40,7 @@ class PiggyAuctions extends PluginBase
 
         $this->saveDefaultConfig();
         $this->database = libasynql::create($this, $this->getConfig()->get("database"), [
-            "sqlite" => "sqlite.sql", //TODO: Add SQLite3 prepared statement file
+            "sqlite" => "sqlite.sql",
             "mysql" => "mysql.sql"
         ]);
 
