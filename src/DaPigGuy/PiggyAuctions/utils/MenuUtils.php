@@ -160,14 +160,26 @@ class MenuUtils
                     return true;
                 case 29:
                     if ($itemClicked->getDamage() === 13) {
-                        //TODO: Customizable duration/start bid
-                        PiggyAuctions::getInstance()->getAuctionManager()->addAuction($player->getName(), $action->getInventory()->getItem(13), time(), time() + ($action->getInventory()->getItem(33)->getNamedTagEntry("Duration") ? $action->getInventory()->getItem(33)->getNamedTagEntry("Duration")->getValue() : 60 * 60 * 2), 50);
+                        PiggyAuctions::getInstance()->getAuctionManager()->addAuction($player->getName(), $action->getInventory()->getItem(13), time(), time() + ($action->getInventory()->getItem(33)->getNamedTagEntry("Duration") ? $action->getInventory()->getItem(33)->getNamedTagEntry("Duration")->getValue() : 60 * 60 * 2), $action->getInventory()->getItem(31)->getNamedTagEntry("StartingBid") ? $action->getInventory()->getItem(31)->getNamedTagEntry("StartingBid")->getValue() : 50);
                         $action->getInventory()->clear(13);
                         $player->removeWindow($action->getInventory());
                         self::displayAuctionManager($player);
                     }
                     break;
-                case 31: //TODO: Implement
+                case 31:
+                    $player->removeWindow($action->getInventory());
+                    $form = new CustomForm(function (Player $player, ?array $data = null) use ($menu): void {
+                        if ($data !== null && is_numeric($data[0])) {
+                            $menu->send($player);
+
+                            $item = $menu->getInventory()->getItem(31);
+                            $item->setNamedTagEntry(new IntTag("StartingBid", (int)$data[0]));
+                            $menu->getInventory()->setItem(31, $item);
+                        }
+                    });
+                    $form->setTitle("Create Auction");
+                    $form->addInput("Starting Bid");
+                    $player->sendForm($form);
                     break;
                 case 33:
                     $player->removeWindow($action->getInventory());
