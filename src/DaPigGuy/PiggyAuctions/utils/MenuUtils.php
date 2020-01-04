@@ -6,6 +6,7 @@ namespace DaPigGuy\PiggyAuctions\utils;
 
 use DaPigGuy\PiggyAuctions\auction\Auction;
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
+use muqsit\invmenu\inventories\BaseFakeInventory;
 use muqsit\invmenu\inventories\ChestInventory;
 use muqsit\invmenu\inventories\DoubleChestInventory;
 use muqsit\invmenu\InvMenu;
@@ -32,8 +33,10 @@ class MenuUtils
     {
         $menu = InvMenu::create(ChestInventory::class);
         $menu->setName("Auction House");
+        //TODO: More detailed menu item lore/name
         $menu->getInventory()->setContents([
             11 => Item::get(Item::GOLD_BLOCK)->setCustomName(TextFormat::RESET . TextFormat::WHITE . "Browse Auctions"),
+            13 => Item::get(Item::GOLDEN_CARROT)->setCustomName(TextFormat::RESET . TextFormat::WHITE . "View Bids"),
             15 => Item::get(Item::GOLDEN_HORSE_ARMOR)->setCustomName(TextFormat::RESET . TextFormat::WHITE . "Manage Auctions")
         ]);
         $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool {
@@ -42,7 +45,14 @@ class MenuUtils
                 case Item::GOLD_BLOCK:
                     self::displayAuctionBrowser($player);
                     break;
+                case Item::GOLDEN_CARROT:
+                    //TODO: Implement
+                    break;
                 case Item::GOLDEN_HORSE_ARMOR:
+                    if (count(PiggyAuctions::getInstance()->getAuctionManager()->getAuctionsHeldBy($player)) < 1) {
+                        self::displayAuctionCreator($player);
+                        break;
+                    }
                     self::displayAuctionManager($player);
                     break;
             }
@@ -145,6 +155,44 @@ class MenuUtils
             $inventory->setItem(53, $nextPage);
         }
         return array_slice($activeAuctions, ($page - 1) * 45, 45);
+    }
+
+    /**
+     * @param Player $player
+     */
+    public static function displayAuctionCreator(Player $player)
+    {
+        $menu = InvMenu::create(DoubleChestInventory::class);
+        $menu->setName("Create Auction");
+        for ($i = 0; $i < $menu->getInventory()->getSize(); $i++) $menu->getInventory()->setItem($i, Item::get(Item::BLEACH)->setCustomName(" "));
+        $menu->getInventory()->setItem(13, Item::get(Item::AIR));
+        $menu->getInventory()->setItem(29, Item::get(Item::STAINED_CLAY, 14));
+        $menu->getInventory()->setItem(31, Item::get(Item::GOLD_INGOT));
+        $menu->getInventory()->setItem(33, Item::get(Item::CLOCK));
+        $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool {
+            switch ($action->getSlot()) {
+                case 13:
+                    $player->getInventory()->removeItem($itemClickedWith);
+                    $player->getInventory()->addItem($itemClicked);
+                    $action->getInventory()->setItem(13, $itemClickedWith);
+                    $action->getInventory()->setItem(29, Item::get(Item::STAINED_CLAY, $itemClickedWith->getId() === Item::AIR ? 14 : 13));
+                    break;
+                case 29:
+                    if ($itemClicked->getDamage() === 13) {
+                        //TODO: Customizable duration/start bid
+                        PiggyAuctions::getInstance()->getAuctionManager()->addAuction($player->getName(), $action->getInventory()->getItem(13), time(), time() + 500, 50);
+                        $action->getInventory()->clear(13);
+                    }
+                    break;
+            }
+            return false;
+        });
+        $menu->setInventoryCloseListener(function (Player $player, BaseFakeInventory $inventory) {
+            $player->getInventory()->addItem($inventory->getItem(13));
+        });
+        PiggyAuctions::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function () use ($menu, $player): void {
+            $menu->send($player);
+        }), 1);
     }
 
     /**
