@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace DaPigGuy\PiggyAuctions;
 
+use DaPigGuy\libPiggyEconomy\exceptions\MissingProviderDependencyException;
+use DaPigGuy\libPiggyEconomy\exceptions\UnknownProviderException;
+use DaPigGuy\libPiggyEconomy\libPiggyEconomy;
+use DaPigGuy\libPiggyEconomy\providers\EconomyProvider;
 use DaPigGuy\PiggyAuctions\auction\AuctionManager;
 use DaPigGuy\PiggyAuctions\commands\AuctionHouseCommand;
-use DaPigGuy\PiggyAuctions\economy\EconomyProvider;
-use DaPigGuy\PiggyAuctions\economy\EconomySProvider;
 use muqsit\invmenu\InvMenuHandler;
 use pocketmine\item\Item;
 use pocketmine\plugin\PluginBase;
@@ -30,6 +32,10 @@ class PiggyAuctions extends PluginBase
     /** @var AuctionManager */
     private $auctionManager;
 
+    /**
+     * @throws MissingProviderDependencyException
+     * @throws UnknownProviderException
+     */
     public function onEnable(): void
     {
         self::$instance = $this;
@@ -44,16 +50,8 @@ class PiggyAuctions extends PluginBase
             "mysql" => "mysql.sql"
         ]);
 
-        switch ($this->getConfig()->getNested("economy.provider")) {
-            default:
-            case "EconomyS":
-                if ($this->getServer()->getPluginManager()->getPlugin("EconomyAPI") === null) {
-                    $this->getLogger()->error("EconomyAPI is required for your selected economy provider.");
-                    $this->getServer()->getPluginManager()->disablePlugin($this);
-                    return;
-                }
-                $this->economyProvider = new EconomySProvider();
-        }
+        libPiggyEconomy::init();
+        $this->economyProvider = libPiggyEconomy::getProvider($this->getConfig()->get("economy"));
 
         $this->auctionManager = new AuctionManager($this);
         $this->auctionManager->init();
