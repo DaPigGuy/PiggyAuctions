@@ -63,12 +63,12 @@ class MenuUtils
 
     /**
      * @param Player $player
+     * @param int $page
      */
-    public static function displayAuctionBrowser(Player $player): void
+    public static function displayAuctionBrowser(Player $player, int $page = 1): void
     {
         $menu = InvMenu::create(DoubleChestInventory::class);
-        $menu->setName("Auction House");
-        $page = $args["page"] ?? 1;
+        $menu->setName("Auction Browser");
         $pageAuctions = self::displayPageAuctions($menu->getInventory(), $page);
 
         $updateTask = new ClosureTask(function (int $currentTick) use ($menu, $page) : void {
@@ -88,10 +88,10 @@ class MenuUtils
         });
         PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask($updateTask, 1);
 
-        $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($page, $pageAuctions): bool {
+        $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($menu, $page, $pageAuctions): bool {
             if (isset($pageAuctions[$action->getSlot()])) {
                 $auction = $pageAuctions[$action->getSlot()];
-                //TODO: Show auction page
+                self::displayItemPage($player, $auction, $page);
             }
             if ($itemClicked->getId() === Item::ARROW && $itemClicked->getNamedTagEntry("Page") !== null) {
                 $pageAuctions = self::displayPageAuctions($action->getInventory(), $itemClicked->getNamedTagEntry("Page")->getValue());
@@ -218,7 +218,44 @@ class MenuUtils
                 $menu->getInventory()->setItem(10 + $index, self::getDisplayItem($auction));
             }
         }), 1);
-        $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool {
+        $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($menu): bool {
+            $player->removeWindow($action->getInventory());
+            self::displayItemPage($player, PiggyAuctions::getInstance()->getAuctionManager()->getAuction($itemClicked->getNamedTagEntry("AuctionID")->getValue()), $menu);
+            return false;
+        });
+        PiggyAuctions::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function () use ($menu, $player): void {
+            $menu->send($player);
+        }), 1);
+    }
+
+    /**
+     * @param Player $player
+     * @param Auction $auction
+     * @param int|InvMenu $previousMenu
+     */
+    public static function displayItemPage(Player $player, Auction $auction, $previousMenu): void
+    {
+        $menu = InvMenu::create(DoubleChestInventory::class);
+        $menu->setName("Auction View");
+        PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask(function () use ($menu, $auction): void {
+            $menu->getInventory()->setItem(13, self::getDisplayItem($auction));
+        }), 1);
+        $menu->getInventory()->setItem(29, Item::get(Item::POISONOUS_POTATO));
+        $menu->getInventory()->setItem(33, Item::get(Item::EMPTYMAP));
+        $menu->getInventory()->setItem(49, Item::get(Item::ARROW));
+        $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($previousMenu): bool {
+            switch ($action->getSlot()) {
+                case 49:
+                    $player->removeWindow($action->getInventory());
+                    PiggyAuctions::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function () use ($previousMenu, $player): void {
+                        if ($previousMenu instanceof InvMenu) {
+                            $previousMenu->send($player);
+                            return;
+                        }
+                        self::displayAuctionBrowser($player, $previousMenu);
+                    }), 1);
+                    break;
+            }
             return false;
         });
         PiggyAuctions::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function () use ($menu, $player): void {
