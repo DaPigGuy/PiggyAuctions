@@ -89,7 +89,7 @@ class AuctionManager
     {
         if ($player instanceof Player) $player = $player->getName();
         return array_filter($this->auctions, function (Auction $auction) use ($player): bool {
-            return $auction->getAuctioneer() === $player;
+            return strtolower($auction->getAuctioneer()) === strtolower($player);
         });
     }
 
@@ -101,7 +101,7 @@ class AuctionManager
     {
         if ($player instanceof Player) $player = $player->getName();
         return array_filter($this->auctions, function (Auction $auction) use ($player): bool {
-            return $auction->getAuctioneer() === $player && !$auction->hasExpired();
+            return strtolower($auction->getAuctioneer()) === strtolower($player) && !$auction->hasExpired();
         });
     }
 

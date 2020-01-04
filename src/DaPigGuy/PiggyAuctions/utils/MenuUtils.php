@@ -207,9 +207,17 @@ class MenuUtils
     {
         $menu = InvMenu::create(ChestInventory::class);
         $menu->setName($auctioneer . "'s Auctions");
-        foreach (array_slice(PiggyAuctions::getInstance()->getAuctionManager()->getActiveAuctionsHeldBy($auctioneer), 0, 7) as $index => $auction) {
-            $menu->getInventory()->setItem(10 + $index, self::getDisplayItem($auction));
-        }
+        PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask(function () use ($menu, $auctioneer): void {
+            $auctions = PiggyAuctions::getInstance()->getAuctionManager()->getActiveAuctionsHeldBy($auctioneer);
+            uasort($auctions, function (Auction $a, Auction $b): bool {
+                return $a->getEndDate() > $b->getEndDate();
+            });
+            /** @var Auction $auction */
+            foreach (array_slice($auctions, 0, 7) as $index => $auction) {
+                if ($index === 0) $menu->setName($auction->getAuctioneer() . "'s Auctions");
+                $menu->getInventory()->setItem(10 + $index, self::getDisplayItem($auction));
+            }
+        }), 1);
         $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool {
             return false;
         });
