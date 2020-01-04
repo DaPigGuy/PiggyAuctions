@@ -34,7 +34,6 @@ class MenuUtils
     {
         $menu = InvMenu::create(ChestInventory::class);
         $menu->setName("Auction House");
-        //TODO: More detailed menu item lore/name
         $menu->getInventory()->setContents([
             11 => Item::get(Item::GOLD_BLOCK)->setCustomName(TextFormat::RESET . TextFormat::WHITE . "Browse Auctions"),
             13 => Item::get(Item::GOLDEN_CARROT)->setCustomName(TextFormat::RESET . TextFormat::WHITE . "View Bids"),
@@ -148,15 +147,15 @@ class MenuUtils
         $menu->setName("Create Auction");
         for ($i = 0; $i < $menu->getInventory()->getSize(); $i++) $menu->getInventory()->setItem($i, Item::get(Item::BLEACH)->setCustomName(" "));
         $menu->getInventory()->setItem(13, Item::get(Item::AIR));
-        $menu->getInventory()->setItem(29, Item::get(Item::STAINED_CLAY, 14));
-        $menu->getInventory()->setItem(31, Item::get(Item::GOLD_INGOT));
-        $menu->getInventory()->setItem(33, Item::get(Item::CLOCK));
-        $menu->getInventory()->setItem(49, Item::get(Item::ARROW));
+        $menu->getInventory()->setItem(29, Item::get(Item::STAINED_CLAY, 14)->setCustomName("Create Auction"));
+        $menu->getInventory()->setItem(31, Item::get(Item::GOLD_INGOT)->setCustomName("Starting Bid: 50"));
+        $menu->getInventory()->setItem(33, Item::get(Item::CLOCK)->setCustomName("Duration: 2 Hours"));
+        $menu->getInventory()->setItem(49, Item::get(Item::ARROW)->setCustomName("Go Back"));
         $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($menu, $previousMenu): bool {
             switch ($action->getSlot()) {
                 case 13:
                     $action->getInventory()->setItem(13, $itemClickedWith);
-                    $action->getInventory()->setItem(29, Item::get(Item::STAINED_CLAY, $itemClickedWith->getId() === Item::AIR ? 14 : 13));
+                    $action->getInventory()->setItem(29, $action->getInventory()->getItem(29)->setDamage(Item::AIR ? 14 : 13));
                     return true;
                 case 29:
                     if ($itemClicked->getDamage() === 13) {
@@ -177,7 +176,7 @@ class MenuUtils
 
                             $item = $menu->getInventory()->getItem(31);
                             $item->setNamedTagEntry(new IntTag("StartingBid", (int)$data[0]));
-                            $menu->getInventory()->setItem(31, $item);
+                            $menu->getInventory()->setItem(31, $item->setCustomName("Starting Bid: " . (int)$data[0]));
                         }
                     });
                     $form->setTitle("Create Auction");
@@ -226,7 +225,28 @@ class MenuUtils
     {
         $menu = InvMenu::create(ChestInventory::class);
         $menu->setName("Auction Manager");
-        $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool {
+        PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask(function () use ($menu, $player): void {
+            $auctions = PiggyAuctions::getInstance()->getAuctionManager()->getAuctionsHeldBy($player);
+            uasort($auctions, function (Auction $a, Auction $b): bool {
+                return $a->getEndDate() > $b->getEndDate();
+            });
+            /** @var Auction $auction */
+            foreach (array_slice($auctions, 0, 7) as $index => $auction) {
+                $menu->getInventory()->setItem(10 + $index, self::getDisplayItem($auction));
+            }
+        }), 1);
+        $menu->getInventory()->setItem(24, Item::get(Item::GOLDEN_HORSE_ARMOR)->setCustomName("Create Auction"));
+        $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($menu): bool {
+            switch ($action->getSlot()) {
+                case 24:
+                    $player->removeWindow($action->getInventory());
+                    self::displayAuctionCreator($player, $menu);
+                    break;
+                default:
+                    $player->removeWindow($action->getInventory());
+                    self::displayItemPage($player, PiggyAuctions::getInstance()->getAuctionManager()->getAuction($itemClicked->getNamedTagEntry("AuctionID")->getValue()), $menu);
+                    break;
+            }
             return false;
         });
         PiggyAuctions::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function () use ($menu, $player): void {
@@ -277,7 +297,7 @@ class MenuUtils
         }), 1);
         $menu->getInventory()->setItem(29, Item::get(Item::POISONOUS_POTATO));
         $menu->getInventory()->setItem(33, Item::get(Item::EMPTYMAP));
-        $menu->getInventory()->setItem(49, Item::get(Item::ARROW));
+        $menu->getInventory()->setItem(49, Item::get(Item::ARROW)->setCustomName("Go Back"));
         $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($previousMenu): bool {
             switch ($action->getSlot()) {
                 case 49:
