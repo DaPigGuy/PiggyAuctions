@@ -167,9 +167,12 @@ class MenuUtils
                     }
                     break;
                 case 31:
+                    $item = $action->getInventory()->getItem(13);
+                    $action->getInventory()->clear(13);
                     $player->removeWindow($action->getInventory());
-                    $form = new CustomForm(function (Player $player, ?array $data = null) use ($menu): void {
+                    $form = new CustomForm(function (Player $player, ?array $data = null) use ($menu, $item): void {
                         if ($data !== null && is_numeric($data[0])) {
+                            $menu->getInventory()->setItem(13, $item);
                             $menu->send($player);
 
                             $item = $menu->getInventory()->getItem(31);
@@ -182,9 +185,12 @@ class MenuUtils
                     $player->sendForm($form);
                     break;
                 case 33:
+                    $item = $action->getInventory()->getItem(13);
+                    $action->getInventory()->clear(13);
                     $player->removeWindow($action->getInventory());
-                    $form = new CustomForm(function (Player $player, ?array $data = null) use ($menu): void {
+                    $form = new CustomForm(function (Player $player, ?array $data = null) use ($menu, $item): void {
                         if ($data !== null && is_numeric($data[0])) {
+                            $menu->getInventory()->setItem(13, $item);
                             $menu->send($player);
 
                             $item = $menu->getInventory()->getItem(33);
