@@ -77,7 +77,7 @@ class MenuUtils
                     $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction($content->getNamedTagEntry("AuctionID")->getValue());
                     if ($auction === null || $auction->hasExpired()) {
                         self::displayPageAuctions($menu->getInventory(), $page);
-                        continue;
+                        break;
                     }
                     $lore = $content->getLore();
                     $lore[count($lore) - 1] = self::TF_RESET . "Ends in " . self::formatDuration($auction->getEndDate() - time());
