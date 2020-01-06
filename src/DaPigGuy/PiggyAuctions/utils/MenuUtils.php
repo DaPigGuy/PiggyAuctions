@@ -135,6 +135,29 @@ class MenuUtils
     /**
      * @param Player $player
      */
+    public static function displayBidsPage(Player $player): void
+    {
+        $menu = InvMenu::create(ChestInventory::class);
+        $menu->setName("Your Bids");
+        $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool {
+            switch ($action->getSlot()) {
+                default:
+                    $player->removeWindow($action->getInventory());
+                    self::displayItemPage($player, PiggyAuctions::getInstance()->getAuctionManager()->getAuction($itemClicked->getNamedTagEntry("AuctionID")->getValue()), function (Player $player) {
+                        self::displayBidsPage($player);
+                    });
+                    break;
+            }
+            return false;
+        });
+        PiggyAuctions::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function () use ($menu, $player): void {
+            $menu->send($player);
+        }), 1);
+    }
+
+    /**
+     * @param Player $player
+     */
     public static function displayAuctionCreator(Player $player): void
     {
         $menu = InvMenu::create(DoubleChestInventory::class);
