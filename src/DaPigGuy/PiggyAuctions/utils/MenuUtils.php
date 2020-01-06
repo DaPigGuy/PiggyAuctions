@@ -92,7 +92,7 @@ class MenuUtils
             if ($itemClicked->getNamedTagEntry("AuctionID") !== null) {
                 $player->removeWindow($action->getInventory());
                 $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction($itemClicked->getNamedTagEntry("AuctionID")->getValue());
-                $returnPage = $action->getInventory()->getItem(53)->getNamedTagEntry("Page")->getValue() - 1;
+                $returnPage = $action->getInventory()->getItem($action->getInventory()->getItem(53)->getNamedTagEntry("Page") === null ? 45 : 53)->getNamedTagEntry("Page")->getValue() - 1;
                 self::displayItemPage($player, $auction, function (Player $player) use ($returnPage) {
                     self::displayAuctionBrowser($player, $returnPage);
                 });
