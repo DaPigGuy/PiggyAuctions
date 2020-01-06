@@ -140,9 +140,11 @@ class MenuUtils
         $menu = InvMenu::create(ChestInventory::class);
         $menu->setName("Your Bids");
         PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask(($updateTask = new InventoryClosureTask($player, $menu->getInventory(), function () use ($menu, $player): void {
-            $auctions = array_map(function (AuctionBid $bid): Auction {
+            $auctions = array_filter(array_map(function (AuctionBid $bid): Auction {
                 return $bid->getAuction();
-            }, PiggyAuctions::getInstance()->getAuctionManager()->getBidsBy($player));
+            }, PiggyAuctions::getInstance()->getAuctionManager()->getBidsBy($player)), function (Auction $auction) use ($player): bool {
+                return $auction->getUnclaimedBidsHeldBy($player->getName()) > 0;
+            });
             self::updateDisplayedItems($menu->getInventory(), $auctions, 0, 10, 7);
         })), 20);
         $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool {
@@ -248,7 +250,9 @@ class MenuUtils
         $menu = InvMenu::create(ChestInventory::class);
         $menu->setName("Auction Manager");
         PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask(($updateTask = new InventoryClosureTask($player, $menu->getInventory(), function () use ($menu, $player): void {
-            $auctions = PiggyAuctions::getInstance()->getAuctionManager()->getAuctionsHeldBy($player);
+            $auctions = array_filter(PiggyAuctions::getInstance()->getAuctionManager()->getAuctionsHeldBy($player), function (Auction $auction): bool {
+                return $auction->isClaimed();
+            });
             self::updateDisplayedItems($menu->getInventory(), $auctions, 0, 10, 7);
         })), 20);
         $menu->getInventory()->setItem(24, Item::get(Item::GOLDEN_HORSE_ARMOR)->setCustomName("Create Auction"));

@@ -163,6 +163,7 @@ class Auction
     public function bidderClaim(Player $player): void
     {
         $bids = $this->getUnclaimedBidsHeldBy($player->getName());
+        if (count($bids) < 1) return;
         foreach ($bids as $bid) $this->claimedBids[] = $bid;
         if (!$this->hasExpired()) PiggyAuctions::getInstance()->getAuctionManager()->updateAuction($this);
         if (in_array($this->getTopBid(), $bids)) {
@@ -178,6 +179,7 @@ class Auction
      */
     public function claim(Player $player): void
     {
+        if ($this->claimed) return;
         if ($this->getTopBid() === null) {
             $player->getInventory()->addItem($this->getItem());
         } else {
