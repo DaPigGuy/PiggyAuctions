@@ -44,12 +44,12 @@ class AuctionManager
                     $row["startdate"],
                     $row["enddate"],
                     (bool)$row["claimed"],
-                    array_map(function (array $bidData) {
-                        return new AuctionBid($bidData["bidder"], $bidData["bidamount"], $bidData["timestamp"]);
+                    array_map(function (array $bidData) use($row) {
+                        return new AuctionBid($row["id"], $bidData["bidder"], $bidData["bidamount"], $bidData["timestamp"]);
                     }, json_decode($row["claimed_bids"], true)),
                     $row["starting_bid"],
-                    array_map(function (array $bidData) {
-                        return new AuctionBid($bidData["bidder"], $bidData["bidamount"], $bidData["timestamp"]);
+                    array_map(function (array $bidData) use($row) {
+                        return new AuctionBid($row["id"], $bidData["bidder"], $bidData["bidamount"], $bidData["timestamp"]);
                     }, json_decode($row["bids"], true))
                 );
             }
@@ -113,6 +113,28 @@ class AuctionManager
     {
         return array_filter($this->auctions, function (Auction $auction): bool {
             return !$auction->hasExpired();
+        });
+    }
+
+    /**
+     * @return AuctionBid[]
+     */
+    public function getBids(): array
+    {
+        $bids = [];
+        foreach ($this->auctions as $auction) $bids = array_merge($bids, $auction->getBids());
+        return $bids;
+    }
+
+    /**
+     * @param $player
+     * @return AuctionBid[]
+     */
+    public function getBidsBy($player): array
+    {
+        if ($player instanceof Player) $player = $player->getName();
+        return array_filter($this->getBids(), function (AuctionBid $bid) use ($player): bool {
+            return strtolower($bid->getBidder()) === strtolower($player);
         });
     }
 
