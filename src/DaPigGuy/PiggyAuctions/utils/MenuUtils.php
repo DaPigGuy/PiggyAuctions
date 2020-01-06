@@ -327,7 +327,7 @@ class MenuUtils
                                 if ($data !== null && is_numeric($data[0])) {
                                     $bid = (int)$data[0];
                                     if (($auction->getTopBid() === null && $bid >= $auction->getStartingBid()) || $bid >= (int)($auction->getTopBid() * 1.15)) {
-                                        if ($auction->getTopBid()->getBidder() !== $player->getName()) {
+                                        if ($auction->getTopBid() === null || $auction->getTopBid()->getBidder() !== $player->getName()) {
                                             if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($player) >= $bid) {
                                                 PiggyAuctions::getInstance()->getEconomyProvider()->takeMoney($player, $bid - ($auction->getTopBidBy($player->getName()) ?? 0));
                                                 $auction->addBid(new AuctionBid($auction->getId(), $player->getName(), $bid, time()));
