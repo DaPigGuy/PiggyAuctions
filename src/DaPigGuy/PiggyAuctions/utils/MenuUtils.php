@@ -320,8 +320,8 @@ class MenuUtils
         $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($auction, $previousMenu): bool {
             switch ($action->getSlot()) {
                 case 29:
-                    if ($auction->getAuctioneer() !== $player->getName()) {
-                        if (!$auction->hasExpired()) {
+                    if (!$auction->hasExpired()) {
+                        if ($auction->getAuctioneer() !== $player->getName()) {
                             $player->removeWindow($action->getInventory());
                             $form = new CustomForm(function (Player $player, ?array $data) use ($auction) {
                                 if ($data !== null && is_numeric($data[0])) {
@@ -329,7 +329,7 @@ class MenuUtils
                                     if (($auction->getTopBid() === null && $bid >= $auction->getStartingBid()) || $bid >= (int)($auction->getTopBid() * 1.15)) {
                                         if ($auction->getTopBid()->getBidder() !== $player->getName()) {
                                             if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($player) >= $bid) {
-                                                PiggyAuctions::getInstance()->getEconomyProvider()->takeMoney($player, $bid);
+                                                PiggyAuctions::getInstance()->getEconomyProvider()->takeMoney($player, $bid - ($auction->getTopBidBy($player->getName()) ?? 0));
                                                 $auction->addBid(new AuctionBid($auction->getId(), $player->getName(), $bid, time()));
                                             }
                                         }
@@ -339,6 +339,12 @@ class MenuUtils
                             $form->setTitle("Bid on Item");
                             $form->addInput("Bid Amount", "", (string)($auction->getTopBid() === null ? $auction->getStartingBid() : (int)($auction->getTopBid()->getBidAmount() * 1.15)));
                             $player->sendForm($form);
+                        }
+                    } else {
+                        if ($auction->getAuctioneer() === $player->getName()) {
+                            $auction->claim($player);
+                        } else if ($auction->getTopBidBy($player->getName())) {
+                            $auction->bidderClaim($player);
                         }
                     }
                     break;
