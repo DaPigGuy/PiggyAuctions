@@ -251,7 +251,7 @@ class MenuUtils
         $menu->setName("Auction Manager");
         PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask(($updateTask = new InventoryClosureTask($player, $menu->getInventory(), function () use ($menu, $player): void {
             $auctions = array_filter(PiggyAuctions::getInstance()->getAuctionManager()->getAuctionsHeldBy($player), function (Auction $auction): bool {
-                return $auction->isClaimed();
+                return !$auction->isClaimed();
             });
             self::updateDisplayedItems($menu->getInventory(), $auctions, 0, 10, 7);
         })), 20);
