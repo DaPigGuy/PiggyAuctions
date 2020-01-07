@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace DaPigGuy\PiggyAuctions\tasks;
 
 use pocketmine\inventory\Inventory;
+use pocketmine\network\mcpe\protocol\types\ContainerIds;
 use pocketmine\Player;
 use pocketmine\scheduler\ClosureTask;
 
@@ -43,10 +44,10 @@ class InventoryClosureTask extends ClosureTask
     public function onRun(int $currentTick)
     {
         parent::onRun($currentTick);
-        if ($this->inventoryOpen && $this->player->getWindowId($this->inventory) === -1) {
+        if ($this->inventoryOpen && $this->player->getWindowId($this->inventory) === ContainerIds::NONE) {
             $this->getHandler()->cancel();
             return;
         }
-        $this->inventoryOpen = $this->player->getWindowId($this->inventory) !== -1;
+        $this->inventoryOpen = $this->player->getWindowId($this->inventory) !== ContainerIds::NONE;
     }
 }
