@@ -143,7 +143,7 @@ class MenuUtils
             $auctions = array_filter(array_map(function (AuctionBid $bid): Auction {
                 return $bid->getAuction();
             }, PiggyAuctions::getInstance()->getAuctionManager()->getBidsBy($player)), function (Auction $auction) use ($player): bool {
-                return $auction->getUnclaimedBidsHeldBy($player->getName()) > 0;
+                return count($auction->getUnclaimedBidsHeldBy($player->getName())) > 0;
             });
             self::updateDisplayedItems($menu->getInventory(), $auctions, 0, 10, 7);
         })), 20);
