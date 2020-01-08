@@ -327,9 +327,12 @@ class MenuUtils
         $menu->setName("Auction View");
         PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask((self::$personalTasks[$player->getName()] = new ClosureTask(function () use ($menu, $auction): void {
             $menu->getInventory()->setItem(13, self::getDisplayItem($auction));
+            $menu->getInventory()->setItem(33, Item::get(Item::FILLED_MAP)->setCustomName("Bid History")->setLore(count($auction->getBids()) < 1 ? [self::TF_RESET . "No bids have been placed on this item yet."] : array_merge([self::TF_RESET . "Total Bids: " . count($auction->getBids()), ""], ...array_map(function (AuctionBid $auctionBid): array {
+                return ["Bid: " . $auctionBid->getBidAmount(), "By: " . $auctionBid->getBidder()];
+            }, array_reverse($auction->getBids())))));
         })), 20);
         $menu->getInventory()->setItem(29, Item::get(Item::POISONOUS_POTATO));
-        $menu->getInventory()->setItem(33, Item::get(Item::EMPTYMAP));
+        $menu->getInventory()->setItem(33, Item::get(Item::FILLED_MAP));
         $menu->getInventory()->setItem(49, Item::get(Item::ARROW)->setCustomName("Go Back"));
         $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($auction, $callback, $removeWindow): bool {
             switch ($action->getSlot()) {
