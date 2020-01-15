@@ -4,6 +4,7 @@ version: 1.0.0
 api: 3.2.0
 load: POSTWORLD
 author: DaPigGuy
+website: "https://github.com/DaPigGuy/PiggyAuctions/"
 permissions:
   piggyauctions:
     default: op
