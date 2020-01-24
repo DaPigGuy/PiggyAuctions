@@ -10,9 +10,11 @@ use DaPigGuy\libPiggyEconomy\libPiggyEconomy;
 use DaPigGuy\libPiggyEconomy\providers\EconomyProvider;
 use DaPigGuy\PiggyAuctions\auction\AuctionManager;
 use DaPigGuy\PiggyAuctions\commands\AuctionHouseCommand;
+use DaPigGuy\PiggyAuctions\utils\Utils;
 use muqsit\invmenu\InvMenuHandler;
 use pocketmine\item\Item;
 use pocketmine\plugin\PluginBase;
+use pocketmine\utils\Config;
 use poggit\libasynql\DataConnector;
 use poggit\libasynql\libasynql;
 
@@ -24,6 +26,9 @@ class PiggyAuctions extends PluginBase
 {
     /** @var self */
     public static $instance;
+
+    /** @var Config */
+    private $messages;
 
     /** @var DataConnector */
     private $database;
@@ -44,6 +49,8 @@ class PiggyAuctions extends PluginBase
             InvMenuHandler::register($this);
         }
 
+        $this->saveResource("messages.yml");
+        $this->messages = new Config($this->getDataFolder() . "messages.yml");
         $this->saveDefaultConfig();
         $this->database = libasynql::create($this, $this->getConfig()->get("database"), [
             "sqlite" => "sqlite.sql",
@@ -65,6 +72,16 @@ class PiggyAuctions extends PluginBase
     public static function getInstance(): PiggyAuctions
     {
         return self::$instance;
+    }
+
+    /**
+     * @param string $key
+     * @param array $tags
+     * @return string
+     */
+    public function getMessage(string $key, array $tags = []): string
+    {
+        return Utils::translateColorTags(str_replace(array_keys($tags), $tags, $this->messages->getNested($key, $key)));
     }
 
     /**

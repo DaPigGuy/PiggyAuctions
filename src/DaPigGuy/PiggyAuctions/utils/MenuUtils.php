@@ -24,8 +24,6 @@ use pocketmine\utils\TextFormat;
  */
 class MenuUtils
 {
-    /** @var InvMenu[][] */
-    private static $personalMenu;
     /** @var Task[] */
     private static $personalTasks;
 
@@ -37,11 +35,11 @@ class MenuUtils
     public static function displayMainMenu(Player $player): void
     {
         $menu = InvMenu::create(InvMenu::TYPE_CHEST);
-        $menu->setName("Auction House");
+        $menu->setName(PiggyAuctions::getInstance()->getMessage("menus.main-menu.title"));
         $menu->getInventory()->setContents([
-            11 => Item::get(Item::GOLD_BLOCK)->setCustomName(TextFormat::RESET . TextFormat::WHITE . "Browse Auctions"),
-            13 => Item::get(Item::GOLDEN_CARROT)->setCustomName(TextFormat::RESET . TextFormat::WHITE . "View Bids"),
-            15 => Item::get(Item::GOLDEN_HORSE_ARMOR)->setCustomName(TextFormat::RESET . TextFormat::WHITE . "Manage Auctions")
+            11 => Item::get(Item::GOLD_BLOCK)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.main-menu.browse-auctions")),
+            13 => Item::get(Item::GOLDEN_CARROT)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.main-menu.view-bids")),
+            15 => Item::get(Item::GOLDEN_HORSE_ARMOR)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.main-menu.manage-auctions"))
         ]);
         $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($menu): bool {
             switch ($itemClicked->getId()) {
@@ -73,7 +71,7 @@ class MenuUtils
     public static function displayAuctionBrowser(Player $player, int $page = 1): void
     {
         $menu = InvMenu::create(InvMenu::TYPE_DOUBLE_CHEST);
-        $menu->setName("Auction Browser");
+        $menu->setName(PiggyAuctions::getInstance()->getMessage("menus.main-menu.auction-browser"));
         self::displayPageAuctions($menu->getInventory(), $page);
 
         PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask((self::$personalTasks[$player->getName()] = new ClosureTask(function () use ($menu, $page) : void {
@@ -85,7 +83,7 @@ class MenuUtils
                         break;
                     }
                     $lore = $content->getLore();
-                    $lore[count($lore) - 1] = self::TF_RESET . "Ends in " . self::formatDuration($auction->getEndDate() - time());
+                    $lore[count($lore) - 1] = self::TF_RESET . "Ends in " . Utils::formatDuration($auction->getEndDate() - time()); //custom msg
                     $content->setLore($lore);
                     $menu->getInventory()->setItem($slot, $content);
                 }
@@ -119,12 +117,12 @@ class MenuUtils
         $activeAuctions = PiggyAuctions::getInstance()->getAuctionManager()->getActiveAuctions();
         $displayedAuctions = self::updateDisplayedItems($inventory, $activeAuctions, ($page - 1) * 45, 0, 45);
         if ($page > 1) {
-            $previousPage = Item::get(Item::ARROW, 0, 1)->setCustomName("Previous Page\n(" . ($page - 1) . "/" . ceil(count($activeAuctions) / 45) . ")");
+            $previousPage = Item::get(Item::ARROW, 0, 1)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-browser.previous-page", ["{PAGE}" => $page - 1, "{MAXPAGE}" => ceil(count($activeAuctions) / 45)]));
             $previousPage->setNamedTagEntry(new IntTag("Page", $page - 1));
             $inventory->setItem(45, $previousPage);
         }
         if ($page < ceil(count($activeAuctions) / 45)) {
-            $nextPage = Item::get(Item::ARROW, 0, 1)->setCustomName("Next Page\n(" . ($page + 1) . "/" . ceil(count($activeAuctions) / 45) . ")");
+            $nextPage = Item::get(Item::ARROW, 0, 1)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-browser.next-page", ["{PAGE}" => $page + 1, "{MAXPAGE}" => ceil(count($activeAuctions) / 45)]));
             $nextPage->setNamedTagEntry(new IntTag("Page", $page + 1));
             $inventory->setItem(53, $nextPage);
         }
@@ -137,7 +135,7 @@ class MenuUtils
     public static function displayBidsPage(Player $player): void
     {
         $menu = InvMenu::create(InvMenu::TYPE_CHEST);
-        $menu->setName("Your Bids");
+        $menu->setName(PiggyAuctions::getInstance()->getMessage("menus.view-bids.title"));
         PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask((self::$personalTasks[$player->getName()] = new ClosureTask(function () use ($menu, $player): void {
             $auctions = array_filter(array_map(function (AuctionBid $bid): Auction {
                 return $bid->getAuction();
@@ -166,13 +164,13 @@ class MenuUtils
     public static function displayAuctionCreator(Player $player): void
     {
         $menu = InvMenu::create(InvMenu::TYPE_DOUBLE_CHEST);
-        $menu->setName("Create Auction");
+        $menu->setName(PiggyAuctions::getInstance()->getMessage("menus.auction-creator.title"));
         for ($i = 0; $i < $menu->getInventory()->getSize(); $i++) $menu->getInventory()->setItem($i, Item::get(Item::BLEACH)->setCustomName(" "));
         $menu->getInventory()->setItem(13, Item::get(Item::AIR));
         $menu->getInventory()->setItem(29, Item::get(Item::STAINED_CLAY, 14)->setCustomName("Create Auction"));
         $menu->getInventory()->setItem(31, Item::get(Item::GOLD_INGOT)->setCustomName("Starting Bid: 50"));
         $menu->getInventory()->setItem(33, Item::get(Item::CLOCK)->setCustomName("Duration: 2 Hours"));
-        $menu->getInventory()->setItem(49, Item::get(Item::ARROW)->setCustomName("Go Back"));
+        $menu->getInventory()->setItem(49, Item::get(Item::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
         $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($menu): bool {
             switch ($action->getSlot()) {
                 case 13:
@@ -399,34 +397,10 @@ class MenuUtils
         }
         $lore = array_merge($lore, [
             "",
-            self::TF_RESET . "Ends in " . self::formatDuration($auction->getEndDate() - time())
+            self::TF_RESET . "Ends in " . Utils::formatDuration($auction->getEndDate() - time())
         ]);
 
         $item->setNamedTagEntry(new IntTag("AuctionID", $auction->getId()));
         return $item->setLore($lore);
-    }
-
-    /**
-     * @param int $duration
-     * @return string
-     */
-    public static function formatDuration(int $duration): string
-    {
-        $days = floor($duration / 86400);
-        $hours = floor($duration / 3600 % 24);
-        $minutes = floor($duration / 60 % 60);
-        $seconds = floor($duration % 60);
-
-        if ($days >= 1) {
-            $dateString = $days . "d";
-        } elseif ($hours > 6) {
-            $dateString = $hours . "h";
-        } elseif ($minutes >= 1) {
-            $dateString = ($hours > 0 ? $hours . "h" : "") . $minutes . "m" . ($seconds == 0 ? "" : $seconds . "s");
-        } else {
-            $dateString = $seconds . "s";
-        }
-
-        return $dateString;
     }
 }
