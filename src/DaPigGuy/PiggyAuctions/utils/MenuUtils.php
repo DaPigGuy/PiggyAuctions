@@ -184,9 +184,7 @@ class MenuUtils
                         PiggyAuctions::getInstance()->getAuctionManager()->addAuction($player->getName(), $action->getInventory()->getItem(13), time(), time() + ($action->getInventory()->getItem(33)->getNamedTagEntry("Duration") ? $action->getInventory()->getItem(33)->getNamedTagEntry("Duration")->getValue() : 60 * 60 * 2), $action->getInventory()->getItem(31)->getNamedTagEntry("StartingBid") ? $action->getInventory()->getItem(31)->getNamedTagEntry("StartingBid")->getValue() : 50);
                         $action->getInventory()->clear(13);
                         $player->removeWindow($action->getInventory());
-                        PiggyAuctions::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function () use ($player): void {
-                            self::displayAuctionManager($player);
-                        }), 5);
+                        self::displayAuctionManager($player);
                     }
                     break;
                 case 31:
@@ -227,13 +225,11 @@ class MenuUtils
                     break;
                 case 49:
                     $player->removeWindow($action->getInventory());
-                    PiggyAuctions::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function () use ($player): void {
-                        if (count(PiggyAuctions::getInstance()->getAuctionManager()->getAuctionsHeldBy($player)) < 1) {
-                            self::displayMainMenu($player);
-                            return;
-                        }
-                        self::displayAuctionManager($player);
-                    }), 5);
+                    if (count(PiggyAuctions::getInstance()->getAuctionManager()->getAuctionsHeldBy($player)) < 1) {
+                        self::displayMainMenu($player);
+                        break;
+                    }
+                    self::displayAuctionManager($player);
                     break;
             }
             return false;
@@ -348,9 +344,7 @@ class MenuUtils
                     break;
                 case 49:
                     if ($removeWindow) $player->removeWindow($action->getInventory());
-                    PiggyAuctions::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function () use ($callback, $player): void {
-                        ($callback)($player);
-                    }), 5);
+                    ($callback)($player);
                     break;
             }
             return false;
