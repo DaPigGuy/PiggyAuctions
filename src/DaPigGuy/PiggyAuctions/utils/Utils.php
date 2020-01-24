@@ -18,6 +18,18 @@ class Utils
      */
     public static function formatDuration(int $duration): string
     {
+        if ($duration > 60 * 60 * 24) return floor($duration / 60 / 60 / 24) . " Days";
+        if ($duration > 60 * 60) return floor($duration / 60 / 60) . " Hours";
+        if ($duration > 60) return floor($duration / 60) . " Minutes";
+        return $duration . " Seconds";
+    }
+
+    /**
+     * @param int $duration
+     * @return string
+     */
+    public static function formatDetailedDuration(int $duration): string
+    {
         $days = floor($duration / 86400);
         $hours = floor($duration / 3600 % 24);
         $minutes = floor($duration / 60 % 60);

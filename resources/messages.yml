@@ -16,6 +16,14 @@ menus:
     title: "Your Bids"
   auction-creator:
     title: "Create Auction"
+    create-auction: "{STATUS}Create Auction\n\n{YELLOW}Click to submit!"
+    starting-bid: "{WHITE} Starting bid: {GOLD}{MONEY}\n\n{YELLOW}Click to edit!"
+    duration: "Duration: {YELLOW}{DURATION}\n\n{YELLOW}Click to edit!"
+  auction-manager:
+    title: "Auction Manager"
+    create-auctions: "{GREEN}Create Auction\n\n{YELLOW}Click to become rich!"
+  auctioneer-page:
+    title: "{PLAYER}'s Auctions"
 auction:
   claim:
     bidder-item: "{YELLOW}You claimed {WHITE}{ITEM} {YELLOW}from {PLAYER}'s auction!"
