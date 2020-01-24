@@ -238,6 +238,16 @@ class Auction
      */
     public function addBid(AuctionBid $bid): void
     {
+        $notified = [];
+        foreach ($this->bids as $b) {
+            if (!in_array($b->getBidder(), $notified) && $b->getBidder() !== $bid->getBidder() && $b->getBidAmount() < $bid->getBidAmount()) {
+                $notified[] = $b->getBidder();
+                if (($player = PiggyAuctions::getInstance()->getServer()->getPlayerExact($b->getBidder())) !== null) {
+                    $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.outbid", ["{PLAYER}" => $bid->getBidder(), "{DIFFERENCE}" => $bid->getBidAmount() - $b->getBidAmount(), "{ITEM}" => $this->getItem()->getName()]));
+                }
+            }
+        }
+
         $this->bids[] = $bid;
         PiggyAuctions::getInstance()->getAuctionManager()->updateAuction($this);
     }

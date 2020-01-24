@@ -5,9 +5,9 @@ menus:
   back: "{GREEN}Go Back"
   main-menu:
     title: "Auction House"
-    browse-auctions: "{GOLD}Auctions Browser\n{YELLOW}Click to browse!"
-    view-bids: "{GREEN}View Bids\n{YELLOW}Click to view!"
-    manage-auctions: "{GREEN}Manage Auctions\n{YELLOW}Click to manage!"
+    browse-auctions: "{GOLD}Auctions Browser\n\n{YELLOW}Click to browse!"
+    view-bids: "{GREEN}View Bids\n\n{YELLOW}Click to view!"
+    manage-auctions: "{GREEN}Manage Auctions\n\n{YELLOW}Click to manage!"
   auction-browser:
     title: "Auction Browsers"
     previous-page: "{GREEN}Previous Page\n{GRAY}({PAGE}/{MAXPAGES})\n\n{YELLOW}Click to turn page!"
@@ -21,7 +21,10 @@ menus:
     duration: "Duration: {YELLOW}{DURATION}\n\n{YELLOW}Click to edit!"
   auction-manager:
     title: "Auction Manager"
-    create-auctions: "{GREEN}Create Auction\n\n{YELLOW}Click to become rich!"
+    create-auction: "{GREEN}Create Auction\n\n{YELLOW}Click to become rich!"
+  auction-view:
+    title: "Auction View"
+
   auctioneer-page:
     title: "{PLAYER}'s Auctions"
 auction:
@@ -29,4 +32,5 @@ auction:
     bidder-item: "{YELLOW}You claimed {WHITE}{ITEM} {YELLOW}from {PLAYER}'s auction!"
     bidder-money: ""
     auctioneer-item: ""
-    auctioneer-money: ""
+    auctioneer-money: "{GOLD}Collect Auction\n\nItem sold to {PLAYER}\nfor a splendid {GOLD}{MONEY}!\n\n{YELLOW}Click to collect coins!"
+  outbid: "{YELLOW}{PLAYER} outbid you by {GOLD}{DIFFERENCE} {YELLOW}for {WHITE}{ITEM}"

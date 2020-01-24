@@ -71,7 +71,7 @@ class MenuUtils
     public static function displayAuctionBrowser(Player $player, int $page = 1): void
     {
         $menu = InvMenu::create(InvMenu::TYPE_DOUBLE_CHEST);
-        $menu->setName(PiggyAuctions::getInstance()->getMessage("menus.main-menu.auction-browser"));
+        $menu->setName(PiggyAuctions::getInstance()->getMessage("menus.auction-browser.title"));
         self::displayPageAuctions($menu->getInventory(), $page);
 
         PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask((self::$personalTasks[$player->getName()] = new ClosureTask(function () use ($menu, $page) : void {
@@ -117,12 +117,12 @@ class MenuUtils
         $activeAuctions = PiggyAuctions::getInstance()->getAuctionManager()->getActiveAuctions();
         $displayedAuctions = self::updateDisplayedItems($inventory, $activeAuctions, ($page - 1) * 45, 0, 45);
         if ($page > 1) {
-            $previousPage = Item::get(Item::ARROW, 0, 1)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-browser.previous-page", ["{PAGE}" => $page - 1, "{MAXPAGE}" => ceil(count($activeAuctions) / 45)]));
+            $previousPage = Item::get(Item::ARROW, 0, 1)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-browser.previous-page", ["{PAGE}" => $page - 1, "{MAXPAGES}" => ceil(count($activeAuctions) / 45)]));
             $previousPage->setNamedTagEntry(new IntTag("Page", $page - 1));
             $inventory->setItem(45, $previousPage);
         }
         if ($page < ceil(count($activeAuctions) / 45)) {
-            $nextPage = Item::get(Item::ARROW, 0, 1)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-browser.next-page", ["{PAGE}" => $page + 1, "{MAXPAGE}" => ceil(count($activeAuctions) / 45)]));
+            $nextPage = Item::get(Item::ARROW, 0, 1)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-browser.next-page", ["{PAGE}" => $page + 1, "{MAXPAGES}" => ceil(count($activeAuctions) / 45)]));
             $nextPage->setNamedTagEntry(new IntTag("Page", $page + 1));
             $inventory->setItem(53, $nextPage);
         }
@@ -299,7 +299,7 @@ class MenuUtils
     public static function displayItemPage(Player $player, Auction $auction, callable $callback, bool $removeWindow = false): void
     {
         $menu = InvMenu::create(InvMenu::TYPE_DOUBLE_CHEST);
-        $menu->setName("Auction View");
+        $menu->setName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.title"));
         PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask((self::$personalTasks[$player->getName()] = new ClosureTask(function () use ($menu, $auction): void {
             $menu->getInventory()->setItem(13, self::getDisplayItem($auction));
             $menu->getInventory()->setItem(33, Item::get(Item::FILLED_MAP)->setCustomName("Bid History")->setLore(count($auction->getBids()) < 1 ? [self::TF_RESET . "No bids have been placed on this item yet."] : array_merge([self::TF_RESET . "Total Bids: " . count($auction->getBids()), ""], ...array_map(function (AuctionBid $auctionBid): array {
@@ -308,7 +308,7 @@ class MenuUtils
         })), 20);
         $menu->getInventory()->setItem(29, Item::get(Item::POISONOUS_POTATO));
         $menu->getInventory()->setItem(33, Item::get(Item::FILLED_MAP));
-        $menu->getInventory()->setItem(49, Item::get(Item::ARROW)->setCustomName("Go Back"));
+        $menu->getInventory()->setItem(49, Item::get(Item::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
         $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($auction, $callback, $removeWindow): bool {
             switch ($action->getSlot()) {
                 case 29:
