@@ -8,8 +8,6 @@ use DaPigGuy\PiggyAuctions\auction\Auction;
 use DaPigGuy\PiggyAuctions\auction\AuctionBid;
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
 use jojoe77777\FormAPI\CustomForm;
-use muqsit\invmenu\inventories\ChestInventory;
-use muqsit\invmenu\inventories\DoubleChestInventory;
 use muqsit\invmenu\InvMenu;
 use pocketmine\inventory\Inventory;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
@@ -35,27 +33,10 @@ class MenuUtils
 
     /**
      * @param Player $player
-     * @param string $inventoryType
-     * @return InvMenu
-     */
-    public static function getMenu(Player $player, string $inventoryType = ChestInventory::class, bool $clear = true): InvMenu
-    {
-        if (!isset(self::$personalMenu[$player->getName()])) self::$personalMenu[$player->getName()] = [];
-        if (!isset(self::$personalMenu[$player->getName()][$inventoryType])) self::$personalMenu[$player->getName()][$inventoryType] = InvMenu::create($inventoryType);
-        if (isset(self::$personalTasks[$player->getName()])) {
-            self::$personalTasks[$player->getName()]->getHandler()->cancel();
-            unset(self::$personalTasks[$player->getName()]);
-        }
-        if ($clear) self::$personalMenu[$player->getName()][$inventoryType]->getInventory()->clearAll();
-        return self::$personalMenu[$player->getName()][$inventoryType];
-    }
-
-    /**
-     * @param Player $player
      */
     public static function displayMainMenu(Player $player): void
     {
-        $menu = self::getMenu($player);
+        $menu = InvMenu::create(InvMenu::TYPE_CHEST);
         $menu->setName("Auction House");
         $menu->getInventory()->setContents([
             11 => Item::get(Item::GOLD_BLOCK)->setCustomName(TextFormat::RESET . TextFormat::WHITE . "Browse Auctions"),
@@ -91,7 +72,7 @@ class MenuUtils
      */
     public static function displayAuctionBrowser(Player $player, int $page = 1): void
     {
-        $menu = self::getMenu($player, DoubleChestInventory::class);
+        $menu = InvMenu::create(InvMenu::TYPE_DOUBLE_CHEST);
         $menu->setName("Auction Browser");
         self::displayPageAuctions($menu->getInventory(), $page);
 
@@ -155,7 +136,7 @@ class MenuUtils
      */
     public static function displayBidsPage(Player $player): void
     {
-        $menu = self::getMenu($player);
+        $menu = InvMenu::create(InvMenu::TYPE_CHEST);
         $menu->setName("Your Bids");
         PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask((self::$personalTasks[$player->getName()] = new ClosureTask(function () use ($menu, $player): void {
             $auctions = array_filter(array_map(function (AuctionBid $bid): Auction {
@@ -184,7 +165,7 @@ class MenuUtils
      */
     public static function displayAuctionCreator(Player $player): void
     {
-        $menu = self::getMenu($player, DoubleChestInventory::class);
+        $menu = InvMenu::create(InvMenu::TYPE_DOUBLE_CHEST);
         $menu->setName("Create Auction");
         for ($i = 0; $i < $menu->getInventory()->getSize(); $i++) $menu->getInventory()->setItem($i, Item::get(Item::BLEACH)->setCustomName(" "));
         $menu->getInventory()->setItem(13, Item::get(Item::AIR));
@@ -265,7 +246,7 @@ class MenuUtils
      */
     public static function displayAuctionManager(Player $player): void
     {
-        $menu = self::getMenu($player);
+        $menu = InvMenu::create(InvMenu::TYPE_CHEST);
         $menu->setName("Auction Manager");
         PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask((self::$personalTasks[$player->getName()] = new ClosureTask(function () use ($menu, $player): void {
             $auctions = array_filter(PiggyAuctions::getInstance()->getAuctionManager()->getAuctionsHeldBy($player), function (Auction $auction): bool {
@@ -298,7 +279,7 @@ class MenuUtils
      */
     public static function displayAuctioneerPage(Player $player, string $auctioneer): void
     {
-        $menu = self::getMenu($player);
+        $menu = InvMenu::create(InvMenu::TYPE_CHEST);
         $menu->setName($auctioneer . "'s Auctions");
         PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask((self::$personalTasks[$player->getName()] = new ClosureTask(function () use ($menu, $auctioneer): void {
             $auctions = PiggyAuctions::getInstance()->getAuctionManager()->getActiveAuctionsHeldBy($auctioneer);
@@ -323,7 +304,7 @@ class MenuUtils
      */
     public static function displayItemPage(Player $player, Auction $auction, callable $callback, bool $removeWindow = false): void
     {
-        $menu = self::getMenu($player, DoubleChestInventory::class);
+        $menu = InvMenu::create(InvMenu::TYPE_DOUBLE_CHEST);
         $menu->setName("Auction View");
         PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask((self::$personalTasks[$player->getName()] = new ClosureTask(function () use ($menu, $auction): void {
             $menu->getInventory()->setItem(13, self::getDisplayItem($auction));
