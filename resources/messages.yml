@@ -1,30 +1,34 @@
 commands:
   no-active-auctions: "{RED}{PLAYER} does not exist or has no active auctions"
 menus:
-  close: "{RED}Close"
-  back: "{GREEN}Go Back"
+  close: "{RESET}{RED}Close"
+  back: "{RESET}{GREEN}Go Back"
   main-menu:
     title: "Auction House"
-    browse-auctions: "{GOLD}Auctions Browser\n\n{YELLOW}Click to browse!"
-    view-bids: "{GREEN}View Bids\n\n{YELLOW}Click to view!"
-    manage-auctions: "{GREEN}Manage Auctions\n\n{YELLOW}Click to manage!"
+    browse-auctions: "{RESET}{GOLD}Auctions Browser\n\n{YELLOW}Click to browse!"
+    view-bids: "{RESET}{GREEN}View Bids\n\n{YELLOW}Click to view!"
+    manage-auctions: "{RESET}{GREEN}Manage Auctions\n\n{YELLOW}Click to manage!"
   auction-browser:
     title: "Auction Browsers"
-    previous-page: "{GREEN}Previous Page\n{GRAY}({PAGE}/{MAXPAGES})\n\n{YELLOW}Click to turn page!"
-    next-page: "{GREEN}Next Page\n{GRAY}({PAGE}/{MAXPAGES})\n\n{YELLOW}Click to turn page!"
+    previous-page: "{RESET}{GREEN}Previous Page\n{GRAY}({PAGE}/{MAXPAGES})\n\n{YELLOW}Click to turn page!"
+    next-page: "{RESET}{GREEN}Next Page\n{GRAY}({PAGE}/{MAXPAGES})\n\n{YELLOW}Click to turn page!"
   view-bids:
     title: "Your Bids"
   auction-creator:
     title: "Create Auction"
-    create-auction: "{STATUS}Create Auction\n\n{YELLOW}Click to submit!"
-    starting-bid: "{WHITE} Starting bid: {GOLD}{MONEY}\n\n{YELLOW}Click to edit!"
-    duration: "Duration: {YELLOW}{DURATION}\n\n{YELLOW}Click to edit!"
+    create-auction: "{RESET}{STATUS}Create Auction\n\n{YELLOW}Click to submit!"
+    starting-bid: "{RESET}{WHITE}Starting bid: {GOLD}{MONEY}\n\n{YELLOW}Click to edit!"
+    duration: "{RESET}{WHITE}Duration: {YELLOW}{DURATION}\n\n{YELLOW}Click to edit!"
   auction-manager:
     title: "Auction Manager"
-    create-auction: "{GREEN}Create Auction\n\n{YELLOW}Click to become rich!"
+    create-auction: "{RESET}{GREEN}Create Auction\n\n{YELLOW}Click to become rich!"
   auction-view:
     title: "Auction View"
-
+    item-description: "\n{RESET}{GRAY}Seller: {PLAYER}\n{RESET}{GRAY}Bids: {GREEN}{BIDS}\n\n{RESET}{GRAY}Top Bid: {GOLD}{TOPBID}\n{RESET}{GRAY}Bidder: {GOLD}{TOPBIDDER}\n\n{RESET}{GRAY}Ends in {DURATION}"
+    item-description-no-bid: "\n{RESET}{GRAY}Seller: {PLAYER}\n{RESET}{GRAY}Bids: {GREEN}{BIDS}\n\n{RESET}{GRAY}Starting Bid: {GOLD}{STARTINGBID}\n\n{RESET}{GRAY}Ends in {DURATION}"
+    bid-history: "Bid History\n{GRAY}Total bids: {GREEN}{BIDS} bids\n{HISTORY}"
+    bid-history-entry: "{GRAY}Bid: {GOLD}{MONEY}\n{GRAY}By: {PLAYER}\n{AQUA}{DURATION}"
+    no-bids: "{GRAY}No bids have been placed on this item yet."
   auctioneer-page:
     title: "{PLAYER}'s Auctions"
 auction:

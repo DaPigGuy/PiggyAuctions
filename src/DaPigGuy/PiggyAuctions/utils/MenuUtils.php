@@ -13,6 +13,7 @@ use pocketmine\inventory\Inventory;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\item\Item;
 use pocketmine\nbt\tag\IntTag;
+use pocketmine\nbt\tag\StringTag;
 use pocketmine\Player;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\scheduler\Task;
@@ -82,9 +83,9 @@ class MenuUtils
                         self::displayPageAuctions($menu->getInventory(), $page);
                         break;
                     }
-                    $lore = $content->getLore();
-                    $lore[count($lore) - 1] = self::TF_RESET . "Ends in " . Utils::formatDetailedDuration($auction->getEndDate() - time()); //custom msg
-                    $content->setLore($lore);
+                    $lore = $content->getNamedTagEntry("TemplateLore")->getValue();
+                    $lore = str_replace("{DURATION}", Utils::formatDetailedDuration($auction->getEndDate() - time()), $lore);
+                    $content->setLore(explode("\n", $lore));
                     $menu->getInventory()->setItem($slot, $content);
                 }
             }
@@ -302,9 +303,9 @@ class MenuUtils
         $menu->setName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.title"));
         PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask((self::$personalTasks[$player->getName()] = new ClosureTask(function () use ($menu, $auction): void {
             $menu->getInventory()->setItem(13, self::getDisplayItem($auction));
-            $menu->getInventory()->setItem(33, Item::get(Item::FILLED_MAP)->setCustomName("Bid History")->setLore(count($auction->getBids()) < 1 ? [self::TF_RESET . "No bids have been placed on this item yet."] : array_merge([self::TF_RESET . "Total Bids: " . count($auction->getBids()), ""], ...array_map(function (AuctionBid $auctionBid): array {
-                return ["Bid: " . $auctionBid->getBidAmount(), "By: " . $auctionBid->getBidder()];
-            }, array_reverse($auction->getBids())))));
+            $menu->getInventory()->setItem(33, Item::get(Item::FILLED_MAP)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bid-history", ["{BIDS}" => count($auction->getBids()), "{HISTORY}" => count($auction->getBids()) === 0 ? PiggyAuctions::getInstance()->getMessage("menus.auction-view.no-bids") : implode("\n", array_map(function (AuctionBid $auctionBid): string {
+                return PiggyAuctions::getInstance()->getMessage("menus.auction-view.bid-history-entry", ["{MONEY}" => $auctionBid->getBidAmount(), "{PLAYER}" => $auctionBid->getBidder(), "{DURATION}" => Utils::formatDuration(time() - $auctionBid->getTimestamp())]);
+            }, array_reverse($auction->getBids())))])));
         })), 20);
         $menu->getInventory()->setItem(29, Item::get(Item::POISONOUS_POTATO));
         $menu->getInventory()->setItem(33, Item::get(Item::FILLED_MAP));
@@ -381,26 +382,12 @@ class MenuUtils
     {
         $item = clone $auction->getItem();
 
-        $lore = array_merge($item->getLore(), [
-            "",
-            self::TF_RESET . "Seller: " . $auction->getAuctioneer(),
-            self::TF_RESET . "Bids: " . TextFormat::GREEN . count($auction->getBids()),
-            ""
-        ]);
-        if ($auction->getTopBid() !== null) {
-            $lore = array_merge($lore, [
-                self::TF_RESET . "Top Bid: " . TextFormat::GOLD . $auction->getTopBid()->getBidAmount(),
-                self::TF_RESET . "Bidder: " . TextFormat::GOLD . $auction->getTopBid()->getBidder(),
-            ]);
-        } else {
-            $lore[] = self::TF_RESET . "Starting Bid: " . TextFormat::GOLD . $auction->getStartingBid();
-        }
-        $lore = array_merge($lore, [
-            "",
-            self::TF_RESET . "Ends in " . Utils::formatDetailedDuration($auction->getEndDate() - time())
-        ]);
+        $lore = PiggyAuctions::getInstance()->getMessage("menus.auction-view.item-description-no-bid", ["{PLAYER}" => $auction->getAuctioneer(), "{BIDS}" => 0, "{STARTINGBID}" => $auction->getStartingBid()]);
+        if ($auction->getTopBid() !== null) $lore = PiggyAuctions::getInstance()->getMessage("menus.auction-view.item-description", ["{PLAYER}" => $auction->getAuctioneer(), "{BIDS}" => count($auction->getBids()), "{TOPBID}" => $auction->getTopBid()->getBidAmount(), "{TOPBIDDER}" => $auction->getTopBid()->getBidder()]);
+        $item->setNamedTagEntry(new StringTag("TemplateLore", $lore));
+        $lore = str_replace("{DURATION}", Utils::formatDetailedDuration($auction->getEndDate() - time()), $lore);
 
         $item->setNamedTagEntry(new IntTag("AuctionID", $auction->getId()));
-        return $item->setLore($lore);
+        return $item->setLore(explode("\n", $lore));
     }
 }
