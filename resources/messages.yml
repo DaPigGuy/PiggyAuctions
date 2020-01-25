@@ -58,4 +58,8 @@ auction:
     auctioneer-item-success: "{YELLOW}You claimed {WHITE}{ITEM}{RESET} {YELLOW}back from your expired auction!"
     auctioneer-money: "{RESET}{GOLD}Collect Auction\n\n{GRAY}Item sold to {PLAYER}\nfor a splendid {GOLD}${MONEY}!\n\n{YELLOW}Click to collect coins!"
     auctioneer-money-success: "{YELLOW}Collected an auction for {GOLD}${MONEY}"
+  bid:
+    already-top-bid: "{GREEN}You already have the highest bid on this auction!"
+    cant-afford: "{RED}You don't have enough money to afford this bid!"
+    cant-self-bid: "{GREEN}You cannot bid on your own auctions!"
   outbid: "{YELLOW}{PLAYER} outbid you by {GOLD}{DIFFERENCE} {YELLOW}for {WHITE}{ITEM}"
