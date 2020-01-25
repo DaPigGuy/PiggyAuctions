@@ -303,13 +303,13 @@ class MenuUtils
         $menu->setName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.title"));
         PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask((self::$personalTasks[$player->getName()] = new ClosureTask(function () use ($menu, $auction): void {
             $menu->getInventory()->setItem(13, self::getDisplayItem($auction));
-            $menu->getInventory()->setItem(33, Item::get(Item::FILLED_MAP)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bid-history", ["{BIDS}" => count($auction->getBids()), "{HISTORY}" => count($auction->getBids()) === 0 ? PiggyAuctions::getInstance()->getMessage("menus.auction-view.no-bids") : implode("\n", array_map(function (AuctionBid $auctionBid): string {
+            $menu->getInventory()->setItem(33, $map->setCustomName(count($auction->getBids()) === 0 ? PiggyAuctions::getInstance()->getMessage("menus.auction-view.no-bids") : PiggyAuctions::getInstance()->getMessage("menus.auction-view.bid-history", ["{BIDS}" => count($auction->getBids()), "{HISTORY}" => implode("\n", array_map(function (AuctionBid $auctionBid): string {
                 return PiggyAuctions::getInstance()->getMessage("menus.auction-view.bid-history-entry", ["{MONEY}" => $auctionBid->getBidAmount(), "{PLAYER}" => $auctionBid->getBidder(), "{DURATION}" => Utils::formatDuration(time() - $auctionBid->getTimestamp())]);
             }, array_reverse($auction->getBids())))])));
         })), 20);
         $bidAmount = $auction->getTopBid() === null ? $auction->getStartingBid() : $auction->getTopBid()->getBidAmount();
         $bidItem = Item::get(Item::POISONOUS_POTATO)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.submit", ["{NEWBID}" => $bidAmount]));
-        if ($auction->getAuctioneer() === $player) {
+        if ($auction->getAuctioneer() === $player->getName()) {
             $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.own-auction", ["{NEWBID}" => $bidAmount]));
         } else if (($topBid = $auction->getTopBidBy($player->getName())) === null) {
             if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($player) < $bidAmount) {
@@ -398,8 +398,10 @@ class MenuUtils
     {
         $item = clone $auction->getItem();
 
-        $lore = PiggyAuctions::getInstance()->getMessage("menus.auction-view.item-description-no-bid", ["{PLAYER}" => $auction->getAuctioneer(), "{BIDS}" => 0, "{STARTINGBID}" => $auction->getStartingBid()]);
-        if ($auction->getTopBid() !== null) $lore = PiggyAuctions::getInstance()->getMessage("menus.auction-view.item-description", ["{PLAYER}" => $auction->getAuctioneer(), "{BIDS}" => count($auction->getBids()), "{TOPBID}" => $auction->getTopBid()->getBidAmount(), "{TOPBIDDER}" => $auction->getTopBid()->getBidder()]);
+        $status = PiggyAuctions::getInstance()->getMessage("menus.auction-view.status-ongoing");
+        if ($auction->hasExpired()) $status = PiggyAuctions::getInstance()->getMessage("menus.auction-view.status-ended");
+        $lore = PiggyAuctions::getInstance()->getMessage("menus.auction-view.item-description-no-bid", ["{PLAYER}" => $auction->getAuctioneer(), "{BIDS}" => 0, "{STARTINGBID}" => $auction->getStartingBid(), "{STATUS}" => $status]);
+        if ($auction->getTopBid() !== null) $lore = PiggyAuctions::getInstance()->getMessage("menus.auction-view.item-description", ["{PLAYER}" => $auction->getAuctioneer(), "{BIDS}" => count($auction->getBids()), "{TOPBID}" => $auction->getTopBid()->getBidAmount(), "{TOPBIDDER}" => $auction->getTopBid()->getBidder(), "{STATUS}" => $status]);
         $item->setNamedTagEntry(new StringTag("TemplateLore", $lore));
         $lore = str_replace("{DURATION}", Utils::formatDetailedDuration($auction->getEndDate() - time()), $lore);
 

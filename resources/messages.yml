@@ -24,11 +24,13 @@ menus:
     create-auction: "{RESET}{GREEN}Create Auction\n\n{YELLOW}Click to become rich!"
   auction-view:
     title: "Auction View"
-    item-description: "\n{RESET}{GRAY}Seller: {PLAYER}\n{RESET}{GRAY}Bids: {GREEN}{BIDS}\n\n{RESET}{GRAY}Top Bid: {GOLD}{TOPBID}\n{RESET}{GRAY}Bidder: {GOLD}{TOPBIDDER}\n\n{RESET}{GRAY}Ends in {DURATION}"
-    item-description-no-bid: "\n{RESET}{GRAY}Seller: {PLAYER}\n{RESET}{GRAY}Bids: {GREEN}{BIDS}\n\n{RESET}{GRAY}Starting Bid: {GOLD}{STARTINGBID}\n\n{RESET}{GRAY}Ends in {DURATION}"
-    bid-history: "Bid History\n{GRAY}Total bids: {GREEN}{BIDS} bids\n{HISTORY}"
-    bid-history-entry: "{GRAY}Bid: {GOLD}{MONEY}\n{GRAY}By: {PLAYER}\n{AQUA}{DURATION}"
-    no-bids: "{GRAY}No bids have been placed on this item yet."
+    item-description: "\n{RESET}{GRAY}Seller: {PLAYER}\n{RESET}{GRAY}Bids: {GREEN}{BIDS}\n\n{RESET}{GRAY}Top Bid: {GOLD}{TOPBID}\n{RESET}{GRAY}Bidder: {GOLD}{TOPBIDDER}\n\n{RESET}{STATUS}"
+    item-description-no-bid: "\n{RESET}{GRAY}Seller: {PLAYER}\n{RESET}{GRAY}Bids: {GREEN}{BIDS}\n\n{RESET}{GRAY}Starting Bid: {GOLD}{STARTINGBID}\n\n{RESET}{STATUS}"
+    status-ended: "{GRAY}Status: {GREEN}Ended!"
+    status-ongoing: "{GRAY}Ends in {DURATION}"
+    bid-history: "{RESET}{WHITE}Bid History\n{GRAY}Total bids: {GREEN}{BIDS} bids\n{HISTORY}"
+    bid-history-entry: "{DARK_GRAY}----------\n{GRAY}Bid: {GOLD}{MONEY}\n{GRAY}By: {PLAYER}\n{AQUA}{DURATION} ago"
+    no-bids: "{RESET}{WHITE}Bid History\n{GRAY}No bids have been placed on this item yet.\n\nBe the first to bid on it!"
     bidding:
       submit-first: "{RESET}{GOLD}Submit Bid\n\n{GRAY}New bid: {GOLD}{NEWBID}\n\n{YELLOW}Click to bid!"
       submit-first-cant-afford: "{RESET}{GOLD}Submit Bid\n\n{GRAY}New Bid: {GOLD}{NEWBID}\n\n{RED}Cannot afford bid!"
