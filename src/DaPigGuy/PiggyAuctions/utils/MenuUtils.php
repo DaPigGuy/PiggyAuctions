@@ -341,7 +341,7 @@ class MenuUtils
                             $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.bid.cant-self-bid"));
                             return false;
                         }
-                        if ($auction->getTopBid()->getBidder() === $player->getName()) {
+                        if ($auction->getTopBid() !== null && $auction->getTopBid()->getBidder() === $player->getName()) {
                             $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.bid.already-top-bid"));
                             return false;
                         }

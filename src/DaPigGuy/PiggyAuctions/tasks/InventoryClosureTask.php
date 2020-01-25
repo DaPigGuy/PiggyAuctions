@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DaPigGuy\PiggyAuctions\tasks;
 
+use Closure;
 use pocketmine\inventory\Inventory;
 use pocketmine\network\mcpe\protocol\types\ContainerIds;
 use pocketmine\Player;
@@ -19,7 +20,7 @@ class InventoryClosureTask extends ClosureTask
     private $player;
     /** @var Inventory */
     private $inventory;
-    /** @var \Closure */
+    /** @var Closure */
     protected $closure;
 
     /** @var bool */
@@ -29,9 +30,9 @@ class InventoryClosureTask extends ClosureTask
      * InventoryClosureTask constructor.
      * @param Player $player
      * @param Inventory $inventory
-     * @param \Closure $closure
+     * @param Closure $closure
      */
-    public function __construct(Player $player, Inventory $inventory, \Closure $closure)
+    public function __construct(Player $player, Inventory $inventory, Closure $closure)
     {
         parent::__construct($closure);
         $this->player = $player;
