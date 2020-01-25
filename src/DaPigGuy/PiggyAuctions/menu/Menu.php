@@ -425,19 +425,21 @@ class Menu
      * @param int $arrayOffset
      * @param int $offsetSlot
      * @param int $displayCount
+     * @param callable|null $itemIndexFunction
      * @param callable|null $sortFunction
      * @return Auction[]
      */
-    public static function updateDisplayedItems(Inventory $inventory, array $auctions, int $arrayOffset, int $offsetSlot, int $displayCount, ?callable $sortFunction = null): array
+    public static function updateDisplayedItems(Inventory $inventory, array $auctions, int $arrayOffset, int $offsetSlot, int $displayCount, ?callable $itemIndexFunction = null, ?callable $sortFunction = null): array
     {
-        if ($sortFunction === null) {
-            $sortFunction = function (Auction $a, Auction $b): bool {
+        $itemIndexFunction = $itemIndexFunction ?? function ($index) use ($offsetSlot): int {
+                return $index + $offsetSlot;
+            };
+        $sortFunction = $sortFunction ?? function (Auction $a, Auction $b): bool {
                 return $a->getEndDate() > $b->getEndDate();
             };
-        }
         uasort($auctions, $sortFunction);
         foreach (array_slice($auctions, $arrayOffset, $displayCount) as $index => $auction) {
-            $inventory->setItem($offsetSlot + $index, self::getDisplayItem($auction));
+            $inventory->setItem(($itemIndexFunction)($index), self::getDisplayItem($auction));
         }
         return array_slice($auctions, $arrayOffset, $displayCount);
     }
