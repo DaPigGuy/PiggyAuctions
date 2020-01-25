@@ -147,9 +147,13 @@ class Menu
                 return count($auction->getUnclaimedBidsHeldBy($player->getName())) > 0;
             });
             self::updateDisplayedItems($menu->getInventory(), $auctions, 0, 10, 7);
+            $menu->getInventory()->setItem(22, Item::get(Item::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
         }), 20);
         $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool {
             switch ($action->getSlot()) {
+                case 22:
+                    self::displayMainMenu($player);
+                    break;
                 default:
                     self::displayItemPage($player, PiggyAuctions::getInstance()->getAuctionManager()->getAuction($itemClicked->getNamedTagEntry("AuctionID")->getValue()), function (Player $player) {
                         self::displayBidsPage($player);
@@ -249,9 +253,13 @@ class Menu
             });
             self::updateDisplayedItems($menu->getInventory(), $auctions, 0, 10, 7);
         }), 20);
+        $menu->getInventory()->setItem(22, Item::get(Item::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
         $menu->getInventory()->setItem(24, Item::get(Item::GOLDEN_HORSE_ARMOR)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-manager.create-auction")));
         $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($menu): bool {
             switch ($action->getSlot()) {
+                case 22:
+                    self::displayMainMenu($player);
+                    break;
                 case 24:
                     self::displayAuctionCreator($player);
                     break;
