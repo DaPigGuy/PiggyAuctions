@@ -1,7 +1,7 @@
 commands:
   no-active-auctions: "{RED}{PLAYER} does not exist or has no active auctions"
 menus:
-  close: "{RESET}{RED}Close"
+  #close: "{RESET}{RED}Close"
   back: "{RESET}{GREEN}Go Back"
   main-menu:
     title: "Auction House"

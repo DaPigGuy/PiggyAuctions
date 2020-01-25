@@ -25,6 +25,8 @@ use pocketmine\utils\TextFormat;
  */
 class Menu
 {
+    const PAGE_LENGTH = 45;
+
     /**
      * @param Player $player
      */
@@ -87,13 +89,18 @@ class Menu
         $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool {
             if ($itemClicked->getNamedTagEntry("AuctionID") !== null) {
                 $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction($itemClicked->getNamedTagEntry("AuctionID")->getValue());
-                $returnPage = ($action->getInventory()->getItem(53)->getNamedTagEntry("Page") ?? $action->getInventory()->getItem(45)->getNamedTagEntry("Page"))->getValue() - 1;
+                $returnPage = $action->getInventory()->getItem(49)->getNamedTagEntry("CurrentPage")->getValue();
                 self::displayItemPage($player, $auction, function (Player $player) use ($returnPage) {
                     self::displayAuctionBrowser($player, $returnPage);
                 });
             }
-            if ($itemClicked->getId() === Item::ARROW && $itemClicked->getNamedTagEntry("Page") !== null) {
-                self::displayPageAuctions($action->getInventory(), $itemClicked->getNamedTagEntry("Page")->getValue());
+            if ($itemClicked->getId() === Item::ARROW) {
+                if ($itemClicked->getNamedTagEntry("Page") !== null) {
+                    self::displayPageAuctions($action->getInventory(), $itemClicked->getNamedTagEntry("Page")->getValue());
+                }
+                if ($itemClicked->getNamedTagEntry("CurrentPage") !== null) {
+                    self::displayMainMenu($player);
+                }
             }
             return false;
         });
@@ -109,14 +116,17 @@ class Menu
     {
         $inventory->clearAll(false);
         $activeAuctions = PiggyAuctions::getInstance()->getAuctionManager()->getActiveAuctions();
-        $displayedAuctions = self::updateDisplayedItems($inventory, $activeAuctions, ($page - 1) * 45, 0, 45);
+        $displayedAuctions = self::updateDisplayedItems($inventory, $activeAuctions, ($page - 1) * self::PAGE_LENGTH, 0, self::PAGE_LENGTH);
+        $backArrow = Item::get(Item::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back"));
+        $backArrow->setNamedTagEntry(new IntTag("CurrentPage", $page));
+        $inventory->setItem(49, $backArrow);
         if ($page > 1) {
-            $previousPage = Item::get(Item::ARROW, 0, 1)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-browser.previous-page", ["{PAGE}" => $page - 1, "{MAXPAGES}" => ceil(count($activeAuctions) / 45)]));
+            $previousPage = Item::get(Item::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-browser.previous-page", ["{PAGE}" => $page - 1, "{MAXPAGES}" => ceil(count($activeAuctions) / self::PAGE_LENGTH)]));
             $previousPage->setNamedTagEntry(new IntTag("Page", $page - 1));
             $inventory->setItem(45, $previousPage);
         }
-        if ($page < ceil(count($activeAuctions) / 45)) {
-            $nextPage = Item::get(Item::ARROW, 0, 1)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-browser.next-page", ["{PAGE}" => $page + 1, "{MAXPAGES}" => ceil(count($activeAuctions) / 45)]));
+        if ($page < ceil(count($activeAuctions) / self::PAGE_LENGTH)) {
+            $nextPage = Item::get(Item::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-browser.next-page", ["{PAGE}" => $page + 1, "{MAXPAGES}" => ceil(count($activeAuctions) / self::PAGE_LENGTH)]));
             $nextPage->setNamedTagEntry(new IntTag("Page", $page + 1));
             $inventory->setItem(53, $nextPage);
         }
