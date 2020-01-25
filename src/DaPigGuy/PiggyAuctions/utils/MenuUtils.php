@@ -9,6 +9,7 @@ use DaPigGuy\PiggyAuctions\auction\AuctionBid;
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
 use DaPigGuy\PiggyAuctions\tasks\InventoryClosureTask;
 use jojoe77777\FormAPI\CustomForm;
+use jojoe77777\FormAPI\ModalForm;
 use muqsit\invmenu\InvMenu;
 use pocketmine\inventory\Inventory;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
@@ -289,8 +290,9 @@ class MenuUtils
      * @param Player $player
      * @param Auction $auction
      * @param callable $callback
+     * @param int|null $bidAmount
      */
-    public static function displayItemPage(Player $player, Auction $auction, callable $callback): void
+    public static function displayItemPage(Player $player, Auction $auction, callable $callback, ?int $bidAmount = null): void
     {
         $menu = InvMenu::create(InvMenu::TYPE_DOUBLE_CHEST);
         $menu->setName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.title"));
@@ -301,7 +303,7 @@ class MenuUtils
                 return PiggyAuctions::getInstance()->getMessage("menus.auction-view.bid-history-entry", ["{MONEY}" => $auctionBid->getBidAmount(), "{PLAYER}" => $auctionBid->getBidder(), "{DURATION}" => Utils::formatDuration(time() - $auctionBid->getTimestamp())]);
             }, array_reverse($auction->getBids())))])));
         }), 20);
-        $bidAmount = $auction->getTopBid() === null ? $auction->getStartingBid() : $auction->getTopBid()->getBidAmount() * 1.15;
+        $bidAmount = $bidAmount ?? ($auction->getTopBid() === null ? $auction->getStartingBid() : $auction->getTopBid()->getBidAmount() * 1.15);
         $bidItem = Item::get(Item::POISONOUS_POTATO)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.submit", ["{NEWBID}" => $bidAmount]));
         if ($auction->hasExpired()) {
             $bidItem = Item::get(Item::GOLD_NUGGET);
@@ -330,29 +332,31 @@ class MenuUtils
             $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.top-bid", ["{NEWBID}" => $bidAmount, "{PREVIOUSBID}" => $topBid->getBidAmount()]));
         }
         $menu->getInventory()->setItem(29, $bidItem);
-        $menu->getInventory()->setItem(33, Item::get(Item::FILLED_MAP));
+        if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($player) >= $bidAmount) $menu->getInventory()->setItem(31, Item::get(Item::GOLD_INGOT)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bid-amount", ["{MONEY}" => $bidAmount])));
         $menu->getInventory()->setItem(49, Item::get(Item::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
-        $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($auction, $callback, $removeWindow): bool {
+        $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($bidAmount, $auction, $callback): bool {
             switch ($action->getSlot()) {
                 case 29:
                     if (!$auction->hasExpired()) {
                         if ($auction->getAuctioneer() !== $player->getName()) {
                             $player->removeWindow($action->getInventory());
-                            $form = new CustomForm(function (Player $player, ?array $data) use ($auction) {
-                                if ($data !== null && is_numeric($data[0])) {
-                                    $bid = (int)$data[0];
-                                    if (($auction->getTopBid() === null && $bid >= $auction->getStartingBid()) || $bid >= (int)($auction->getTopBid() * 1.15)) {
-                                        if ($auction->getTopBid() === null || $auction->getTopBid()->getBidder() !== $player->getName()) {
-                                            if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($player) >= $bid) {
-                                                PiggyAuctions::getInstance()->getEconomyProvider()->takeMoney($player, $bid - ($auction->getTopBidBy($player->getName()) ?? 0));
-                                                $auction->addBid(new AuctionBid($auction->getId(), $player->getName(), $bid, time()));
-                                            }
+                            $form = new ModalForm(function (Player $player, ?bool $data = null) use ($callback, $auction, $bidAmount): void {
+                                if (!$data) {
+                                    self::displayItemPage($player, $auction, $callback, $bidAmount);
+                                    return;
+                                }
+                                if (($auction->getTopBid() === null && $bidAmount >= $auction->getStartingBid()) || $bidAmount >= (int)($auction->getTopBid() * 1.15)) {
+                                    if ($auction->getTopBid() === null || $auction->getTopBid()->getBidder() !== $player->getName()) {
+                                        if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($player) >= $bidAmount) {
+                                            PiggyAuctions::getInstance()->getEconomyProvider()->takeMoney($player, $bidAmount - ($auction->getTopBidBy($player->getName()) ?? 0));
+                                            $auction->addBid(new AuctionBid($auction->getId(), $player->getName(), $bidAmount, time()));
                                         }
                                     }
                                 }
                             });
-                            $form->setTitle("Bid on Item");
-                            $form->addInput("Bid Amount", "", (string)($auction->getTopBid() === null ? $auction->getStartingBid() : (int)($auction->getTopBid()->getBidAmount() * 1.15)));
+                            $form->setTitle("Confirm Bid");
+                            $form->setButton1("Confirm");
+                            $form->setButton2("Cancel");
                             $player->sendForm($form);
                         }
                     } else {
@@ -361,6 +365,21 @@ class MenuUtils
                         } else if ($auction->getTopBidBy($player->getName())) {
                             $auction->bidderClaim($player);
                         }
+                    }
+                    break;
+                case 31:
+                    if ($itemClicked->getId() === Item::GOLD_INGOT) {
+                        $player->removeWindow($action->getInventory());
+                        $form = new CustomForm(function (Player $player, ?array $data = null) use ($bidAmount, $callback, $auction): void {
+                            if ($data !== null && is_numeric($data[0])) {
+                                self::displayItemPage($player, $auction, $callback, (int)$data[0]);
+                                return;
+                            }
+                            self::displayItemPage($player, $auction, $callback, $bidAmount);
+                        });
+                        $form->setTitle("Change Bid Amount");
+                        $form->addInput("Bid Amount");
+                        $player->sendForm($form);
                     }
                     break;
                 case 49:
