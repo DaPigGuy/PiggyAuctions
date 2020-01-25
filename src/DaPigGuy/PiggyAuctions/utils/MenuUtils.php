@@ -307,9 +307,21 @@ class MenuUtils
                 return PiggyAuctions::getInstance()->getMessage("menus.auction-view.bid-history-entry", ["{MONEY}" => $auctionBid->getBidAmount(), "{PLAYER}" => $auctionBid->getBidder(), "{DURATION}" => Utils::formatDuration(time() - $auctionBid->getTimestamp())]);
             }, array_reverse($auction->getBids())))])));
         })), 20);
-        $bidAmount = $auction->getTopBid() === null ? $auction->getStartingBid() : $auction->getTopBid()->getBidAmount();
+        $bidAmount = $auction->getTopBid() === null ? $auction->getStartingBid() : $auction->getTopBid()->getBidAmount() * 1.15;
         $bidItem = Item::get(Item::POISONOUS_POTATO)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.submit", ["{NEWBID}" => $bidAmount]));
-        if ($auction->getAuctioneer() === $player->getName()) {
+        if ($auction->hasExpired()) {
+            $bidItem = Item::get(Item::GOLD_NUGGET);
+            if ($auction->getAuctioneer() === $player->getName()) {
+                $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("auction.claim.auctioneer-item"));
+                if (count($auction->getBids()) > 0) $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("auction.claim.auctioneer-money", ["{MONEY}" => $auction->getTopBid()->getBidAmount(), "{PLAYER}" => $auction->getTopBid()->getBidder()]));
+            } elseif (($topBid = $auction->getTopBidBy($player->getName())) !== null) {
+                $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("auction.claim.bidder-money", ["{BID}" => $topBid->getBidAmount(), "{TOPBID}" => $auction->getTopBid()->getBidAmount(), "{TOPBIDDER}" => $auction->getTopBid()->getBidder()]));
+                if ($topBid === $auction->getTopBid()) $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("auction.claim.bidder-item", ["{MONEY}" => $topBid->getBidAmount()]));
+            } else {
+                $bidItem = Item::get(Item::POTATO);
+                $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("auction.claim.did-not-participate"));
+            }
+        } else if ($auction->getAuctioneer() === $player->getName()) {
             $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.own-auction", ["{NEWBID}" => $bidAmount]));
         } else if (($topBid = $auction->getTopBidBy($player->getName())) === null) {
             if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($player) < $bidAmount) {
