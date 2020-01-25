@@ -309,7 +309,9 @@ class MenuUtils
         })), 20);
         $bidAmount = $auction->getTopBid() === null ? $auction->getStartingBid() : $auction->getTopBid()->getBidAmount();
         $bidItem = Item::get(Item::POISONOUS_POTATO)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.submit", ["{NEWBID}" => $bidAmount]));
-        if (($topBid = $auction->getTopBidBy($player->getName())) === null) {
+        if ($auction->getAuctioneer() === $player) {
+            $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.own-auction", ["{NEWBID}" => $bidAmount]));
+        } else if (($topBid = $auction->getTopBidBy($player->getName())) === null) {
             if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($player) < $bidAmount) {
                 $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.submit-first-cant-afford", ["{NEWBID}" => $bidAmount]));
             }
