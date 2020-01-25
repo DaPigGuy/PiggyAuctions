@@ -47,8 +47,8 @@ menus:
   auctioneer-page:
     title: "{PLAYER}'s Auctions"
   search:
-    title: "Search"
-    search: "Enter Query"
+    search: "{RESET}{GREEN}Search\n{GRAY}Find items by name.\n\n{FILTERED}{YELLOW}Click to edit filter!"
+    filter: "Filtered: {YELLOW}{FILTERED}\n\n"
   sorting:
     sort-type: "{RESET}{GREEN}Sort\n\n{TYPES}\n\n{YELLOW}Click to switch types!"
     selected: "{AQUA}▷ "
@@ -61,6 +61,9 @@ forms:
     title: "Create Auction"
     starting-bid: "Starting Bid"
     duration: "Duration (Seconds)"
+  search:
+    title: "Search"
+    search: "Enter Query"
   bid-amount:
     title: "Change Bid Amount"
     bid-amount: "Bid Amount"

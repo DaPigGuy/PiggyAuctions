@@ -108,8 +108,8 @@ class Menu
                     $form = new CustomForm(function (Player $player, ?array $data) use ($sort): void {
                         self::displayAuctionBrowser($player, 1, $data[0] ?? "", $sort);
                     });
-                    $form->setTitle(PiggyAuctions::getInstance()->getMessage("menus.search.title"));
-                    $form->addInput(PiggyAuctions::getInstance()->getMessage("menus.search.search"));
+                    $form->setTitle(PiggyAuctions::getInstance()->getMessage("forms.search.title"));
+                    $form->addInput(PiggyAuctions::getInstance()->getMessage("forms.search.search"));
                     $player->sendForm($form);
                     break;
                 case 49:
@@ -140,7 +140,7 @@ class Menu
         });
         $displayedAuctions = self::updateDisplayedItems($inventory, $activeAuctions, ($page - 1) * self::PAGE_LENGTH, 0, self::PAGE_LENGTH, null, MenuSort::closureFromType($sortType));
 
-        $searchItem = Item::get(Item::SIGN)->setCustomName($search);
+        $searchItem = Item::get(Item::SIGN)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.search.search", ["{FILTERED}" => empty($search) ? "" : PiggyAuctions::getInstance()->getMessage("menus.search.filter", ["{FILTERED}" => $search])]));
         $searchItem->setNamedTagEntry(new StringTag("Search", $search));
         $inventory->setItem(48, $searchItem);
 
@@ -207,7 +207,7 @@ class Menu
     {
         $menu = InvMenu::create(InvMenu::TYPE_DOUBLE_CHEST);
         $menu->setName(PiggyAuctions::getInstance()->getMessage("menus.auction-creator.title"));
-        for ($i = 0; $i < $menu->getInventory()->getSize(); $i++) $menu->getInventory()->setItem($i, Item::get(Item::BLEACH)->setCustomName(" "));
+        for ($i = 0; $i < $menu->getInventory()->getSize(); $i++) $menu->getInventory()->setItem($i, Item::get(Item::BLEACH)->setCustomName(TextFormat::RESET));
         $menu->getInventory()->setItem(13, Item::get(Item::AIR));
         $menu->getInventory()->setItem(29, Item::get(Item::STAINED_CLAY, 14)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-creator.create-auction", ["{STATUS}" => TextFormat::RED])));
         $menu->getInventory()->setItem(31, Item::get(Item::GOLD_INGOT)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-creator.starting-bid", ["{MONEY}" => 50])));
