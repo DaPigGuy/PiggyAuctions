@@ -194,8 +194,8 @@ class MenuUtils
                         }
                         $menu->send($player);
                     });
-                    $form->setTitle("Create Auction");
-                    $form->addInput("Starting Bid");
+                    $form->setTitle(PiggyAuctions::getInstance()->getMessage("forms.create-auction.title"));
+                    $form->addInput(PiggyAuctions::getInstance()->getMessage("forms.create-auction.starting-bid"));
                     $player->sendForm($form);
                     break;
                 case 33:
@@ -212,8 +212,8 @@ class MenuUtils
                         }
                         $menu->send($player);
                     });
-                    $form->setTitle("Create Auction");
-                    $form->addInput("Duration (Seconds)");
+                    $form->setTitle(PiggyAuctions::getInstance()->getMessage("forms.create-auction.title"));
+                    $form->addInput(PiggyAuctions::getInstance()->getMessage("forms.create-auction.duration"));
                     $player->sendForm($form);
                     break;
                 case 49:
@@ -393,8 +393,8 @@ class MenuUtils
                             }
                             self::displayItemPage($player, $auction, $callback, $bidAmount);
                         });
-                        $form->setTitle("Change Bid Amount");
-                        $form->addInput("Bid Amount");
+                        $form->setTitle(PiggyAuctions::getInstance()->getMessage("forms.bid-amount.title"));
+                        $form->addInput(PiggyAuctions::getInstance()->getMessage("forms.bid-amount.bid-amount"));
                         $player->sendForm($form);
                     }
                     break;

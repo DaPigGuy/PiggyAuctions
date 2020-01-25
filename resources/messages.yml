@@ -46,6 +46,14 @@ menus:
     bidding-on: "{RESET}{YELLOW}{BOLD}BIDDING ON ITEM:\n\n{RESET}{ITEM}"
   auctioneer-page:
     title: "{PLAYER}'s Auctions"
+forms:
+  create-auction:
+    title: "Create Auction"
+    starting-bid: "Starting Bid"
+    duration: "Duration (Seconds)"
+  bid-amount:
+    title: "Change Bid Amount"
+    bid-amount: "Bid Amount"
 auction:
   claim:
     did-not-participate: "{RESET}{GOLD}Collect Auction\n{GRAY}You didn't participate in\nthis auction"
