@@ -88,7 +88,7 @@ class Menu
             }
         }), 20);
 
-        $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($page): bool {
+        $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool {
             $search = $action->getInventory()->getItem(48)->getNamedTagEntry("Search")->getValue();
             $sort = $action->getInventory()->getItem(50)->getNamedTagEntry("SortType")->getValue();
             if ($itemClicked->getNamedTagEntry("AuctionID") !== null) {
@@ -105,8 +105,8 @@ class Menu
                     break;
                 case 48:
                     $player->removeWindow($action->getInventory());
-                    $form = new CustomForm(function (Player $player, ?array $data) use ($page, $sort): void {
-                        self::displayAuctionBrowser($player, $page, $data[0] ?? "", $sort);
+                    $form = new CustomForm(function (Player $player, ?array $data) use ($sort): void {
+                        self::displayAuctionBrowser($player, 1, $data[0] ?? "", $sort);
                     });
                     $form->setTitle(PiggyAuctions::getInstance()->getMessage("menus.search.title"));
                     $form->addInput(PiggyAuctions::getInstance()->getMessage("menus.search.search"));
