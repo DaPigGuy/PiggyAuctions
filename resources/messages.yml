@@ -46,6 +46,9 @@ menus:
     bidding-on: "{RESET}{YELLOW}{BOLD}BIDDING ON ITEM:\n\n{RESET}{ITEM}"
   auctioneer-page:
     title: "{PLAYER}'s Auctions"
+  search:
+    title: "Search"
+    search: "Enter Query"
   sorting:
     sort-type: "{RESET}{GREEN}Sort\n\n{TYPES}\n\n{YELLOW}Click to switch types!"
     selected: "{AQUA}▷ "

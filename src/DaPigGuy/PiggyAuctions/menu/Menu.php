@@ -63,19 +63,21 @@ class Menu
     /**
      * @param Player $player
      * @param int $page
+     * @param string $search
+     * @param int $sortType
      */
-    public static function displayAuctionBrowser(Player $player, int $page = 1): void
+    public static function displayAuctionBrowser(Player $player, int $page = 1, string $search = "", int $sortType = MenuSort::TYPE_HIGHEST_BID): void
     {
         $menu = InvMenu::create(InvMenu::TYPE_DOUBLE_CHEST);
         $menu->setName(PiggyAuctions::getInstance()->getMessage("menus.auction-browser.title"));
-        self::displayPageAuctions($menu->getInventory(), $page);
+        self::displayPageAuctions($menu->getInventory(), $page, $search, $sortType);
 
         PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask(new InventoryClosureTask($player, $menu->getInventory(), function () use ($menu, $page) : void {
             foreach ($menu->getInventory()->getContents() as $slot => $content) {
                 if ($content->getNamedTagEntry("AuctionID") !== null) {
                     $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction($content->getNamedTagEntry("AuctionID")->getValue());
                     if ($auction === null || $auction->hasExpired()) {
-                        self::displayPageAuctions($menu->getInventory(), $page, $menu->getInventory()->getItem(50)->getNamedTagEntry("SortType")->getValue());
+                        self::displayPageAuctions($menu->getInventory(), $page, $menu->getInventory()->getItem(48)->getNamedTagEntry("Search")->getValue(), $menu->getInventory()->getItem(50)->getNamedTagEntry("SortType")->getValue());
                         break;
                     }
                     $lore = $content->getNamedTagEntry("TemplateLore")->getValue();
@@ -86,24 +88,35 @@ class Menu
             }
         }), 20);
 
-        $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool {
+        $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($page): bool {
+            $search = $action->getInventory()->getItem(48)->getNamedTagEntry("Search")->getValue();
+            $sort = $action->getInventory()->getItem(50)->getNamedTagEntry("SortType")->getValue();
             if ($itemClicked->getNamedTagEntry("AuctionID") !== null) {
                 $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction($itemClicked->getNamedTagEntry("AuctionID")->getValue());
                 $returnPage = $action->getInventory()->getItem(49)->getNamedTagEntry("CurrentPage")->getValue();
-                self::displayItemPage($player, $auction, function (Player $player) use ($returnPage) {
-                    self::displayAuctionBrowser($player, $returnPage);
+                self::displayItemPage($player, $auction, function (Player $player) use ($search, $returnPage, $sort) {
+                    self::displayAuctionBrowser($player, $returnPage, $search, $sort);
                 });
             }
             switch ($action->getSlot()) {
                 case 45:
                 case 53:
-                    self::displayPageAuctions($action->getInventory(), $itemClicked->getNamedTagEntry("Page")->getValue(), $action->getInventory()->getItem(50)->getNamedTagEntry("SortType")->getValue());
+                    self::displayPageAuctions($action->getInventory(), $itemClicked->getNamedTagEntry("Page")->getValue(), $action->getInventory()->getItem(48)->getNamedTagEntry("Search")->getValue(), $action->getInventory()->getItem(50)->getNamedTagEntry("SortType")->getValue());
+                    break;
+                case 48:
+                    $player->removeWindow($action->getInventory());
+                    $form = new CustomForm(function (Player $player, ?array $data) use ($page, $sort): void {
+                        self::displayAuctionBrowser($player, $page, $data[0] ?? "", $sort);
+                    });
+                    $form->setTitle(PiggyAuctions::getInstance()->getMessage("menus.search.title"));
+                    $form->addInput(PiggyAuctions::getInstance()->getMessage("menus.search.search"));
+                    $player->sendForm($form);
                     break;
                 case 49:
                     self::displayMainMenu($player);
                     break;
                 case 50:
-                    self::displayPageAuctions($action->getInventory(), 1, ($itemClicked->getNamedTagEntry("SortType")->getValue() + 1) % 4);
+                    self::displayPageAuctions($action->getInventory(), 1, $search, ($sort + 1) % 4);
                     break;
             }
             return false;
@@ -114,23 +127,34 @@ class Menu
     /**
      * @param Inventory $inventory
      * @param int $page
+     * @param string $search
      * @param int $sortType
      * @return Auction[]
      */
-    public static function displayPageAuctions(Inventory $inventory, int $page, int $sortType = MenuSort::TYPE_HIGHEST_BID): array
+    public static function displayPageAuctions(Inventory $inventory, int $page, string $search = "", int $sortType = MenuSort::TYPE_HIGHEST_BID): array
     {
         $inventory->clearAll(false);
-        $activeAuctions = PiggyAuctions::getInstance()->getAuctionManager()->getActiveAuctions();
+        $activeAuctions = array_filter(PiggyAuctions::getInstance()->getAuctionManager()->getActiveAuctions(), function (Auction $auction) use ($search): bool {
+            if (empty($search)) return true;
+            return strpos($auction->getItem()->getName(), $search) !== false;
+        });
         $displayedAuctions = self::updateDisplayedItems($inventory, $activeAuctions, ($page - 1) * self::PAGE_LENGTH, 0, self::PAGE_LENGTH, null, MenuSort::closureFromType($sortType));
+
+        $searchItem = Item::get(Item::SIGN)->setCustomName($search);
+        $searchItem->setNamedTagEntry(new StringTag("Search", $search));
+        $inventory->setItem(48, $searchItem);
+
         $backArrow = Item::get(Item::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back"));
         $backArrow->setNamedTagEntry(new IntTag("CurrentPage", $page));
         $inventory->setItem(49, $backArrow);
+
         $types = ["highest-bid", "lowest-bid", "ending-soon", "most-bids"];
         $sort = Item::get(Item::HOPPER)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.sorting.sort-type", ["{TYPES}" => implode("\n", array_map(function (string $type, int $index) use ($sortType): string {
             return ($index === $sortType ? PiggyAuctions::getInstance()->getMessage("menus.sorting.selected") : "") . PiggyAuctions::getInstance()->getMessage("menus.sorting." . $type);
         }, $types, array_keys($types)))]));
         $sort->setNamedTagEntry(new IntTag("SortType", $sortType));
         $inventory->setItem(50, $sort);
+
         if ($page > 1) {
             $previousPage = Item::get(Item::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-browser.previous-page", ["{PAGE}" => $page - 1, "{MAXPAGES}" => ceil(count($activeAuctions) / self::PAGE_LENGTH)]));
             $previousPage->setNamedTagEntry(new IntTag("Page", $page - 1));
