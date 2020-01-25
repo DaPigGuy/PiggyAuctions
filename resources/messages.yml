@@ -29,6 +29,12 @@ menus:
     bid-history: "Bid History\n{GRAY}Total bids: {GREEN}{BIDS} bids\n{HISTORY}"
     bid-history-entry: "{GRAY}Bid: {GOLD}{MONEY}\n{GRAY}By: {PLAYER}\n{AQUA}{DURATION}"
     no-bids: "{GRAY}No bids have been placed on this item yet."
+    bidding:
+      submit-first: "{RESET}{GOLD}Submit Bid\n\n{GRAY}New bid: {GOLD}{NEWBID}\n\n{YELLOW}Click to bid!"
+      submit-first-cant-afford: "{RESET}{GOLD}Submit Bid\n\n{GRAY}New Bid: {GOLD}{NEWBID}\n\n{RED}Cannot afford bid!"
+      submit: "{RESET}{GOLD}Submit Bid\n\n{GRAY}New Bid: {GOLD}{NEWBID}\n{GRAY}Your previous bid: {YELLOW}{PREVIOUSBID}\n\n{GRAY}You pay: {GOLD}{DIFFERENCE}\n\n{YELLOW}Click to bid!"
+      submit-cant-afford: "{RESET}{GOLD}Submit Bid\n\n{GRAY}New Bid: {GOLD}{NEWBID}\n{GRAY}Your previous bid: {YELLOW}{PREVIOUSBID}\n\n{GRAY}You pay: {GOLD}{DIFFERENCE}\n\n{RED}Cannot afford bid!"
+      top-bid: "{RESET}{GOLD}Submit Bid\n\n{GRAY}New Bid: {GOLD}{NEWBID}\n{GRAY}Your previous bid: {YELLOW}{PREVIOUSBID}\n\n{GREEN}Already top bid"
   auctioneer-page:
     title: "{PLAYER}'s Auctions"
 auction:

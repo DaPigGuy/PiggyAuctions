@@ -307,7 +307,21 @@ class MenuUtils
                 return PiggyAuctions::getInstance()->getMessage("menus.auction-view.bid-history-entry", ["{MONEY}" => $auctionBid->getBidAmount(), "{PLAYER}" => $auctionBid->getBidder(), "{DURATION}" => Utils::formatDuration(time() - $auctionBid->getTimestamp())]);
             }, array_reverse($auction->getBids())))])));
         })), 20);
-        $menu->getInventory()->setItem(29, Item::get(Item::POISONOUS_POTATO));
+        $bidAmount = $auction->getTopBid() === null ? $auction->getStartingBid() : $auction->getTopBid()->getBidAmount();
+        $bidItem = Item::get(Item::POISONOUS_POTATO)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.submit", ["{NEWBID}" => $bidAmount]));
+        if (($topBid = $auction->getTopBidBy($player->getName())) === null) {
+            if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($player) < $bidAmount) {
+                $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.submit-first-cant-afford", ["{NEWBID}" => $bidAmount]));
+            }
+            $bidItem = Item::get(Item::GOLD_NUGGET);
+            $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.submit-first", ["{NEWBID}" => $bidAmount]));
+        } else if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($player) < ($bidAmount - $topBid->getBidAmount())) {
+            $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.submit-cant-afford", ["{NEWBID}" => $bidAmount, "{PREVIOUSBID}" => $topBid->getBidAmount(), "{DIFFERENCE}" => $bidAmount - $topBid->getBidAmount()]));
+        } else if ($topBid === $auction->getTopBid()) {
+            $bidItem = Item::get(Item::GOLD_BLOCK);
+            $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.top-bid", ["{NEWBID}" => $bidAmount, "{PREVIOUSBID}" => $topBid->getBidAmount()]));
+        }
+        $menu->getInventory()->setItem(29, $bidItem);
         $menu->getInventory()->setItem(33, Item::get(Item::FILLED_MAP));
         $menu->getInventory()->setItem(49, Item::get(Item::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
         $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($auction, $callback, $removeWindow): bool {
