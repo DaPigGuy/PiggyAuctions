@@ -9,7 +9,6 @@ use DaPigGuy\PiggyAuctions\auction\AuctionBid;
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
 use DaPigGuy\PiggyAuctions\tasks\InventoryClosureTask;
 use jojoe77777\FormAPI\CustomForm;
-use jojoe77777\FormAPI\ModalForm;
 use muqsit\invmenu\InvMenu;
 use pocketmine\inventory\Inventory;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
@@ -340,24 +339,31 @@ class MenuUtils
                     if (!$auction->hasExpired()) {
                         if ($auction->getAuctioneer() !== $player->getName()) {
                             $player->removeWindow($action->getInventory());
-                            $form = new ModalForm(function (Player $player, ?bool $data = null) use ($callback, $auction, $bidAmount): void {
-                                if (!$data) {
-                                    self::displayItemPage($player, $auction, $callback, $bidAmount);
-                                    return;
-                                }
-                                if (($auction->getTopBid() === null && $bidAmount >= $auction->getStartingBid()) || $bidAmount >= (int)($auction->getTopBid() * 1.15)) {
-                                    if ($auction->getTopBid() === null || $auction->getTopBid()->getBidder() !== $player->getName()) {
-                                        if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($player) >= $bidAmount) {
-                                            PiggyAuctions::getInstance()->getEconomyProvider()->takeMoney($player, $bidAmount - ($auction->getTopBidBy($player->getName()) ?? 0));
-                                            $auction->addBid(new AuctionBid($auction->getId(), $player->getName(), $bidAmount, time()));
+                            $menu = InvMenu::create(InvMenu::TYPE_CHEST);
+                            $menu->setName(PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.title"));
+                            $menu->getInventory()->setItem(11, Item::get(Item::STAINED_CLAY, 13)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.confirm", ["{ITEM}" => $auction->getItem()->getName(), "{MONEY}" => $bidAmount])));
+                            $menu->getInventory()->setItem(13, (clone $auction->getItem())->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.bidding-on", ["{ITEM}" => ($auction->getItem())->getName()])));
+                            $menu->getInventory()->setItem(15, Item::get(Item::STAINED_CLAY, 14)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.cancel")));
+                            $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($bidAmount, $auction, $callback): bool {
+                                switch ($action->getSlot()) {
+                                    case 11:
+                                        if (($auction->getTopBid() === null && $bidAmount >= $auction->getStartingBid()) || $bidAmount >= (int)($auction->getTopBid()->getBidAmount() * 1.15)) {
+                                            if ($auction->getTopBid() === null || $auction->getTopBid()->getBidder() !== $player->getName()) {
+                                                if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($player) >= $bidAmount) {
+                                                    PiggyAuctions::getInstance()->getEconomyProvider()->takeMoney($player, $bidAmount - ($auction->getTopBidBy($player->getName()) ?? 0));
+                                                    $auction->addBid(new AuctionBid($auction->getId(), $player->getName(), $bidAmount, time()));
+                                                }
+                                            }
                                         }
-                                    }
+                                        self::displayItemPage($player, $auction, $callback, $bidAmount);
+                                        break;
+                                    case 15:
+                                        self::displayItemPage($player, $auction, $callback, $bidAmount);
+                                        break;
                                 }
+                                return false;
                             });
-                            $form->setTitle("Confirm Bid");
-                            $form->setButton1("Confirm");
-                            $form->setButton2("Cancel");
-                            $player->sendForm($form);
+                            $menu->send($player);
                         }
                     } else {
                         if ($auction->getAuctioneer() === $player->getName()) {
