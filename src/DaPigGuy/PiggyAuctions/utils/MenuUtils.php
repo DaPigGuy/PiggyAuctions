@@ -380,6 +380,8 @@ class MenuUtils
                             $auction->claim($player);
                         } else if ($auction->getTopBidBy($player->getName())) {
                             $auction->bidderClaim($player);
+                        } else {
+                            $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.claim.didnt-participate-error"));
                         }
                     }
                     break;

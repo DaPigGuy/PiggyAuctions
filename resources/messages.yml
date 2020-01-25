@@ -57,7 +57,7 @@ forms:
 auction:
   claim:
     did-not-participate: "{RESET}{GOLD}Collect Auction\n{GRAY}You didn't participate in\nthis auction"
-    #did-not-participate-error: "{RED}You didn't participate in this auction!"
+    didnt-participate-error: "{RED}You didn't participate in this auction!"
     bidder-item: "{RESET}{GOLD}Collect Auction\n{GRAY}You placed a bid for {GOLD}${MONEY}\n{GRAY}You may collect the item.\n\n{YELLOW}Click to pickup item!"
     bidder-item-success: "{YELLOW}You claimed {WHITE}{ITEM}{RESET} {YELLOW}from {PLAYER}'s auction!"
     bidder-money: "{RESET}{GOLD}Collect Auction\n\n{GRAY}You did't place the top bid of this auction.\nYou may collect your bid money back.\n\nTop bid: {GOLD}${TOPBID} {GRAY}by {TOPBIDDER}\nYour bid: {GOLD}${BID}\n\n{YELLOW}Click to collect bid money!"
