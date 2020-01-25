@@ -46,6 +46,13 @@ menus:
     bidding-on: "{RESET}{YELLOW}{BOLD}BIDDING ON ITEM:\n\n{RESET}{ITEM}"
   auctioneer-page:
     title: "{PLAYER}'s Auctions"
+  sorting:
+    sort-type: "{RESET}{GREEN}Sort\n\n{TYPES}\n\n{YELLOW}Click to switch types!"
+    selected: "{AQUA}▷ "
+    highest-bid: "{GRAY}Highest Bid"
+    lowest-bid: "{GRAY}Lowest Bid"
+    ending-soon: "{GRAY}Ending Soon"
+    most-bids: "{GRAY}Most Bids"
 forms:
   create-auction:
     title: "Create Auction"

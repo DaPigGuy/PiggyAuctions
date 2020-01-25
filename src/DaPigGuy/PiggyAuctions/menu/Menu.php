@@ -75,7 +75,7 @@ class Menu
                 if ($content->getNamedTagEntry("AuctionID") !== null) {
                     $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction($content->getNamedTagEntry("AuctionID")->getValue());
                     if ($auction === null || $auction->hasExpired()) {
-                        self::displayPageAuctions($menu->getInventory(), $page, $menu->getInventory()->getItem(50)->getNamedTagEntry("SortType")->getValue() );
+                        self::displayPageAuctions($menu->getInventory(), $page, $menu->getInventory()->getItem(50)->getNamedTagEntry("SortType")->getValue());
                         break;
                     }
                     $lore = $content->getNamedTagEntry("TemplateLore")->getValue();
@@ -125,7 +125,10 @@ class Menu
         $backArrow = Item::get(Item::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back"));
         $backArrow->setNamedTagEntry(new IntTag("CurrentPage", $page));
         $inventory->setItem(49, $backArrow);
-        $sort = Item::get(Item::HOPPER)->setCustomName((string) $sortType);
+        $types = ["highest-bid", "lowest-bid", "ending-soon", "most-bids"];
+        $sort = Item::get(Item::HOPPER)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.sorting.sort-type", ["{TYPES}" => implode("\n", array_map(function (string $type, int $index) use ($sortType): string {
+            return ($index === $sortType ? PiggyAuctions::getInstance()->getMessage("menus.sorting.selected") : "") . PiggyAuctions::getInstance()->getMessage("menus.sorting." . $type);
+        }, $types, array_keys($types)))]));
         $sort->setNamedTagEntry(new IntTag("SortType", $sortType));
         $inventory->setItem(50, $sort);
         if ($page > 1) {
