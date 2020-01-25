@@ -44,11 +44,11 @@ class AuctionManager
                     $row["startdate"],
                     $row["enddate"],
                     (bool)$row["claimed"],
-                    array_map(function (array $bidData) use($row) {
+                    array_map(function (array $bidData) use ($row) {
                         return new AuctionBid($row["id"], $bidData["bidder"], $bidData["bidamount"], $bidData["timestamp"]);
                     }, json_decode($row["claimed_bids"], true)),
                     $row["starting_bid"],
-                    array_map(function (array $bidData) use($row) {
+                    array_map(function (array $bidData) use ($row) {
                         return new AuctionBid($row["id"], $bidData["bidder"], $bidData["bidamount"], $bidData["timestamp"]);
                     }, json_decode($row["bids"], true))
                 );

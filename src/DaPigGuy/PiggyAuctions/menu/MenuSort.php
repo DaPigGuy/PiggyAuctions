@@ -23,7 +23,7 @@ class MenuSort
      */
     public static function closureFromType(int $type): \Closure
     {
-        switch ($type){
+        switch ($type) {
             case self::TYPE_LOWEST_BID:
                 return function (Auction $a, Auction $b): bool {
                     return ($a->getTopBid() === null ? $a->getStartingBid() : $a->getTopBid()->getBidAmount()) > ($b->getTopBid() === null ? $b->getStartingBid() : $b->getTopBid()->getBidAmount());
