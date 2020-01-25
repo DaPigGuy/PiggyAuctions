@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace DaPigGuy\PiggyAuctions\utils;
+namespace DaPigGuy\PiggyAuctions\menu;
 
 use DaPigGuy\PiggyAuctions\auction\Auction;
 use DaPigGuy\PiggyAuctions\auction\AuctionBid;
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
 use DaPigGuy\PiggyAuctions\tasks\InventoryClosureTask;
+use DaPigGuy\PiggyAuctions\utils\Utils;
 use jojoe77777\FormAPI\CustomForm;
 use muqsit\invmenu\InvMenu;
 use pocketmine\inventory\Inventory;
@@ -19,10 +20,10 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 /**
- * Class MenuUtils
- * @package DaPigGuy\PiggyAuctions\utils
+ * Class Menu
+ * @package DaPigGuy\PiggyAuctions\menu
  */
-class MenuUtils
+class Menu
 {
     /**
      * @param Player $player
@@ -36,18 +37,16 @@ class MenuUtils
             13 => Item::get(Item::GOLDEN_CARROT)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.main-menu.view-bids")),
             15 => Item::get(Item::GOLDEN_HORSE_ARMOR)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.main-menu.manage-auctions"))
         ]);
-        $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($menu): bool {
-            switch ($itemClicked->getId()) {
-                case Item::GOLD_BLOCK:
-                    $player->removeWindow($action->getInventory());
+        $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool {
+            switch ($action->getSlot()) {
+                case 11:
                     self::displayAuctionBrowser($player);
                     break;
-                case Item::GOLDEN_CARROT:
+                case 13:
                     self::displayBidsPage($player);
                     break;
-                case Item::GOLDEN_HORSE_ARMOR:
+                case 15:
                     if (count(PiggyAuctions::getInstance()->getAuctionManager()->getAuctionsHeldBy($player)) < 1) {
-                        $player->removeWindow($action->getInventory());
                         self::displayAuctionCreator($player);
                         break;
                     }
@@ -88,7 +87,7 @@ class MenuUtils
         $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool {
             if ($itemClicked->getNamedTagEntry("AuctionID") !== null) {
                 $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction($itemClicked->getNamedTagEntry("AuctionID")->getValue());
-                $returnPage = $action->getInventory()->getItem($action->getInventory()->getItem(53)->getNamedTagEntry("Page") === null ? 45 : 53)->getNamedTagEntry("Page")->getValue() - 1;
+                $returnPage = ($action->getInventory()->getItem(53)->getNamedTagEntry("Page") ?? $action->getInventory()->getItem(45)->getNamedTagEntry("Page"))->getValue() - 1;
                 self::displayItemPage($player, $auction, function (Player $player) use ($returnPage) {
                     self::displayAuctionBrowser($player, $returnPage);
                 });
@@ -142,7 +141,6 @@ class MenuUtils
         $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool {
             switch ($action->getSlot()) {
                 default:
-                    $player->removeWindow($action->getInventory());
                     self::displayItemPage($player, PiggyAuctions::getInstance()->getAuctionManager()->getAuction($itemClicked->getNamedTagEntry("AuctionID")->getValue()), function (Player $player) {
                         self::displayBidsPage($player);
                     });
@@ -164,7 +162,7 @@ class MenuUtils
         $menu->getInventory()->setItem(13, Item::get(Item::AIR));
         $menu->getInventory()->setItem(29, Item::get(Item::STAINED_CLAY, 14)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-creator.create-auction", ["{STATUS}" => TextFormat::RED])));
         $menu->getInventory()->setItem(31, Item::get(Item::GOLD_INGOT)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-creator.starting-bid", ["{MONEY}" => 50])));
-        $menu->getInventory()->setItem(33, Item::get(Item::CLOCK)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-creator.duration", ["{DURATION}" => Utils::formatDuration(60 * 60 * 2)])));
+        $menu->getInventory()->setItem(33, Item::get(Item::CLOCK)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-creator.duration", ["{DURATION}" => Utils::formatDuration(7200)])));
         $menu->getInventory()->setItem(49, Item::get(Item::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
         $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($menu): bool {
             switch ($action->getSlot()) {
@@ -174,9 +172,8 @@ class MenuUtils
                     return true;
                 case 29:
                     if ($itemClicked->getDamage() === 13) {
-                        PiggyAuctions::getInstance()->getAuctionManager()->addAuction($player->getName(), $action->getInventory()->getItem(13), time(), time() + ($action->getInventory()->getItem(33)->getNamedTagEntry("Duration") ? $action->getInventory()->getItem(33)->getNamedTagEntry("Duration")->getValue() : 60 * 60 * 2), $action->getInventory()->getItem(31)->getNamedTagEntry("StartingBid") ? $action->getInventory()->getItem(31)->getNamedTagEntry("StartingBid")->getValue() : 50);
+                        PiggyAuctions::getInstance()->getAuctionManager()->addAuction($player->getName(), $action->getInventory()->getItem(13), time(), time() + ($action->getInventory()->getItem(33)->getNamedTagEntry("Duration") ? $action->getInventory()->getItem(33)->getNamedTagEntry("Duration")->getValue() : 7200), $action->getInventory()->getItem(31)->getNamedTagEntry("StartingBid") ? $action->getInventory()->getItem(31)->getNamedTagEntry("StartingBid")->getValue() : 50);
                         $action->getInventory()->clear(13);
-                        $player->removeWindow($action->getInventory());
                         self::displayAuctionManager($player);
                     }
                     break;
@@ -217,7 +214,6 @@ class MenuUtils
                     $player->sendForm($form);
                     break;
                 case 49:
-                    $player->removeWindow($action->getInventory());
                     if (count(PiggyAuctions::getInstance()->getAuctionManager()->getAuctionsHeldBy($player)) < 1) {
                         self::displayMainMenu($player);
                         break;
@@ -247,11 +243,9 @@ class MenuUtils
         $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($menu): bool {
             switch ($action->getSlot()) {
                 case 24:
-                    $player->removeWindow($action->getInventory());
                     self::displayAuctionCreator($player);
                     break;
                 default:
-                    $player->removeWindow($action->getInventory());
                     self::displayItemPage($player, PiggyAuctions::getInstance()->getAuctionManager()->getAuction($itemClicked->getNamedTagEntry("AuctionID")->getValue()), function (Player $player) {
                         self::displayAuctionManager($player);
                     });
@@ -276,7 +270,6 @@ class MenuUtils
             self::updateDisplayedItems($menu->getInventory(), $auctions, 0, 10, 7);
         }), 20);
         $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($auctioneer): bool {
-            $player->removeWindow($action->getInventory());
             self::displayItemPage($player, PiggyAuctions::getInstance()->getAuctionManager()->getAuction($itemClicked->getNamedTagEntry("AuctionID")->getValue()), function (Player $player) use ($auctioneer) {
                 self::displayAuctioneerPage($player, $auctioneer);
             });
@@ -349,7 +342,6 @@ class MenuUtils
                             $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.bid.cant-afford"));
                             return false;
                         }
-                        $player->removeWindow($action->getInventory());
                         $menu = InvMenu::create(InvMenu::TYPE_CHEST);
                         $menu->setName(PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.title"));
                         $menu->getInventory()->setItem(11, Item::get(Item::STAINED_CLAY, 13)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.confirm", ["{ITEM}" => $auction->getItem()->getName(), "{MONEY}" => $bidAmount])));

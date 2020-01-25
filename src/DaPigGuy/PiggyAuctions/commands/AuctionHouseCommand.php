@@ -8,8 +8,8 @@ use CortexPE\Commando\args\BaseArgument;
 use CortexPE\Commando\args\RawStringArgument;
 use CortexPE\Commando\BaseCommand;
 use CortexPE\Commando\exception\ArgumentOrderException;
+use DaPigGuy\PiggyAuctions\menu\Menu;
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
-use DaPigGuy\PiggyAuctions\utils\MenuUtils;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
@@ -52,10 +52,10 @@ class AuctionHouseCommand extends BaseCommand
                 $sender->sendMessage(PiggyAuctions::getInstance()->getMessage("commands.no-active-auctions", ["{PLAYER}" => $args["player"]]));
                 return;
             }
-            MenuUtils::displayAuctioneerPage($sender, $args["player"]);
+            Menu::displayAuctioneerPage($sender, $args["player"]);
             return;
         }
-        MenuUtils::displayMainMenu($sender);
+        Menu::displayMainMenu($sender);
     }
 
     /**

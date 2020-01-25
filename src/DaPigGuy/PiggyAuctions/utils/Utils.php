@@ -18,8 +18,8 @@ class Utils
      */
     public static function formatDuration(int $duration): string
     {
-        if ($duration > 60 * 60 * 24) return floor($duration / 60 / 60 / 24) . " days";
-        if ($duration > 60 * 60) return floor($duration / 60 / 60) . " hours";
+        if ($duration > 86400) return floor($duration / 86400) . " days";
+        if ($duration > 3600) return floor($duration / 3600) . " hours";
         if ($duration > 60) return floor($duration / 60) . " minutes";
         return $duration . " seconds";
     }
