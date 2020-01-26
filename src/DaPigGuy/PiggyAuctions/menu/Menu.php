@@ -136,7 +136,7 @@ class Menu
         $inventory->clearAll(false);
         $activeAuctions = array_filter(PiggyAuctions::getInstance()->getAuctionManager()->getActiveAuctions(), function (Auction $auction) use ($search): bool {
             if (empty($search)) return true;
-            return strpos($auction->getItem()->getName(), $search) !== false;
+            return stripos($auction->getItem()->getName(), $search) !== false;
         });
         $displayedAuctions = self::updateDisplayedItems($inventory, $activeAuctions, ($page - 1) * self::PAGE_LENGTH, 0, self::PAGE_LENGTH, null, MenuSort::closureFromType($sortType));
 
@@ -445,8 +445,10 @@ class Menu
                     } else {
                         if ($auction->getAuctioneer() === $player->getName()) {
                             $auction->claim($player);
+                            $player->removeWindow($action->getInventory());
                         } else if ($auction->getTopBidBy($player->getName())) {
                             $auction->bidderClaim($player);
+                            $player->removeWindow($action->getInventory());
                         } else {
                             $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.claim.didnt-participate-error"));
                         }
