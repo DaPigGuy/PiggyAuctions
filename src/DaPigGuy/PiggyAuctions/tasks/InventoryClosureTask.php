@@ -42,7 +42,7 @@ class InventoryClosureTask extends ClosureTask
     /**
      * @param int $currentTick
      */
-    public function onRun(int $currentTick)
+    public function onRun(int $currentTick): void
     {
         parent::onRun($currentTick);
         if ($this->inventoryOpen && $this->player->getWindowId($this->inventory) === ContainerIds::NONE) {

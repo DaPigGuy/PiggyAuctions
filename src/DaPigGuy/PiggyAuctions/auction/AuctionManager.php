@@ -127,7 +127,7 @@ class AuctionManager
     }
 
     /**
-     * @param $player
+     * @param string|Player $player
      * @return AuctionBid[]
      */
     public function getBidsBy($player): array

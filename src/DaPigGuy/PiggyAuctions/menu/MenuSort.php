@@ -41,7 +41,6 @@ class MenuSort
                 return function (Auction $a, Auction $b): bool {
                     return ($a->hasExpired() ? $a->getEndDate() : ($a->getTopBid() === null ? $a->getStartDate() : $a->getTopBid()->getTimestamp())) < ($b->hasExpired() ? $b->getEndDate() : ($b->getTopBid() === null ? $b->getStartDate() : $b->getTopBid()->getTimestamp()));
                 };
-                break;
         }
         return function (Auction $a, Auction $b): bool {
             return ($a->getTopBid() === null ? $a->getStartingBid() : $a->getTopBid()->getBidAmount()) < ($b->getTopBid() === null ? $b->getStartingBid() : $b->getTopBid()->getBidAmount());

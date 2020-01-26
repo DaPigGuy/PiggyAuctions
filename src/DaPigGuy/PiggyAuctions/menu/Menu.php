@@ -312,6 +312,7 @@ class Menu
                     self::displayMainMenu($player);
                     break;
                 case 23:
+                    /** @var int $key */
                     $key = array_search($itemClicked->getNamedTagEntry("SortType")->getValue(), array_keys($types));
                     $itemClicked->setNamedTagEntry(new IntTag("SortType", array_keys($types)[($key + 1) % 3]));
                     $action->getInventory()->setItem(23, $itemClicked);
@@ -371,7 +372,7 @@ class Menu
             }, array_reverse($auction->getBids())))])));
         }), 20);
         $bidAmount = $bidAmount ?? ($auction->getTopBid() === null ? $auction->getStartingBid() : (int)($auction->getTopBid()->getBidAmount() * 1.15));
-        $bidItem = Item::get(Item::POISONOUS_POTATO)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.submit", ["{NEWBID}" => $bidAmount]));
+        $bidItem = Item::get(Item::POISONOUS_POTATO);
         if ($auction->hasExpired()) {
             $bidItem = Item::get(Item::GOLD_NUGGET);
             if ($auction->getAuctioneer() === $player->getName()) {
@@ -397,6 +398,8 @@ class Menu
         } else if ($topBid === $auction->getTopBid()) {
             $bidItem = Item::get(Item::GOLD_BLOCK);
             $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.top-bid", ["{NEWBID}" => $bidAmount, "{PREVIOUSBID}" => $topBid->getBidAmount()]));
+        } else {
+            $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.submit", ["{NEWBID}" => $bidAmount, "{PREVIOUSBID}" => $topBid->getBidAmount(), "{DIFFERENCE}" => $bidAmount - $topBid->getBidAmount()]));
         }
         $menu->getInventory()->setItem(29, $bidItem);
         if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($player) >= $bidAmount && !$auction->hasExpired() && $auction->getAuctioneer() !== $player->getName()) $menu->getInventory()->setItem(31, Item::get(Item::GOLD_INGOT)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bid-amount", ["{MONEY}" => $bidAmount])));
