@@ -428,7 +428,7 @@ class Menu
                                     if (($auction->getTopBid() === null && $bidAmount >= $auction->getStartingBid()) || $bidAmount >= (int)($auction->getTopBid()->getBidAmount() * 1.15)) {
                                         if ($auction->getTopBid() === null || $auction->getTopBid()->getBidder() !== $player->getName()) {
                                             if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($player) >= $bidAmount) {
-                                                PiggyAuctions::getInstance()->getEconomyProvider()->takeMoney($player, $bidAmount - ($auction->getTopBidBy($player->getName()) ?? 0));
+                                                PiggyAuctions::getInstance()->getEconomyProvider()->takeMoney($player, (int)$bidAmount - ($auction->getTopBidBy($player->getName()) ?? 0));
                                                 $auction->addBid(new AuctionBid($auction->getId(), $player->getName(), $bidAmount, time()));
                                             }
                                         }
