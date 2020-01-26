@@ -254,7 +254,7 @@ class Menu
 
                             $item = $menu->getInventory()->getItem(33);
                             $item->setNamedTagEntry(new IntTag("Duration", (int)$data[0]));
-                            $menu->getInventory()->setItem(33, $item->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-creator.duration", ["{DURATION}" => (int)$data[0]])));
+                            $menu->getInventory()->setItem(33, $item->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-creator.duration", ["{DURATION}" => Utils::formatDuration((int)$data[0])])));
                         }
                         $menu->send($player);
                     });
@@ -271,6 +271,9 @@ class Menu
                     break;
             }
             return false;
+        });
+        $menu->setInventoryCloseListener(function (Player $player, Inventory $inventory): void {
+            $player->getInventory()->addItem($inventory->getItem(13));
         });
         $menu->send($player);
     }

@@ -165,7 +165,8 @@ class Auction
         $bids = $this->getUnclaimedBidsHeldBy($player->getName());
         if (count($bids) < 1) return;
         foreach ($bids as $bid) $this->claimedBids[] = $bid;
-        if (!$this->hasExpired()) PiggyAuctions::getInstance()->getAuctionManager()->updateAuction($this);
+        $this->hasExpired();
+        if (PiggyAuctions::getInstance()->getAuctionManager()->getAuction($this->getId()) === $this) PiggyAuctions::getInstance()->getAuctionManager()->updateAuction($this);
         if (in_array($this->getTopBid(), $bids)) {
             $player->getInventory()->addItem($this->getItem());
             $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.claim.bidder-item-success", ["{PLAYER}" => $this->getAuctioneer(), "{ITEM}" => $this->getItem()->getName(), "{MONEY}" => $this->getTopBidBy($player->getName())->getBidAmount()]));
@@ -189,7 +190,8 @@ class Auction
             $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.claim.auctioneer-money-success", ["{ITEM}" => $this->getItem()->getName(), "{MONEY}" => $this->getTopBid()->getBidAmount()]));
         }
         $this->claimed = true;
-        if (!$this->hasExpired()) PiggyAuctions::getInstance()->getAuctionManager()->updateAuction($this);
+        $this->hasExpired();
+        if (PiggyAuctions::getInstance()->getAuctionManager()->getAuction($this->getId()) === $this) PiggyAuctions::getInstance()->getAuctionManager()->updateAuction($this);
     }
 
     /**
