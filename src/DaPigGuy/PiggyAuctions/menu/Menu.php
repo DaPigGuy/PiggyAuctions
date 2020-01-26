@@ -445,10 +445,10 @@ class Menu
                     } else {
                         if ($auction->getAuctioneer() === $player->getName()) {
                             $auction->claim($player);
-                            $player->removeWindow($action->getInventory());
+                            ($callback)($player);
                         } else if ($auction->getTopBidBy($player->getName())) {
                             $auction->bidderClaim($player);
-                            $player->removeWindow($action->getInventory());
+                            ($callback)($player);
                         } else {
                             $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.claim.didnt-participate-error"));
                         }
