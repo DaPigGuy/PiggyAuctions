@@ -370,7 +370,7 @@ class Menu
                 return PiggyAuctions::getInstance()->getMessage("menus.auction-view.bid-history-entry", ["{MONEY}" => $auctionBid->getBidAmount(), "{PLAYER}" => $auctionBid->getBidder(), "{DURATION}" => Utils::formatDuration(time() - $auctionBid->getTimestamp())]);
             }, array_reverse($auction->getBids())))])));
         }), 20);
-        $bidAmount = $bidAmount ?? ($auction->getTopBid() === null ? $auction->getStartingBid() : $auction->getTopBid()->getBidAmount() * 1.15);
+        $bidAmount = $bidAmount ?? ($auction->getTopBid() === null ? $auction->getStartingBid() : (int)($auction->getTopBid()->getBidAmount() * 1.15));
         $bidItem = Item::get(Item::POISONOUS_POTATO)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.submit", ["{NEWBID}" => $bidAmount]));
         if ($auction->hasExpired()) {
             $bidItem = Item::get(Item::GOLD_NUGGET);
@@ -428,7 +428,7 @@ class Menu
                                     if (($auction->getTopBid() === null && $bidAmount >= $auction->getStartingBid()) || $bidAmount >= (int)($auction->getTopBid()->getBidAmount() * 1.15)) {
                                         if ($auction->getTopBid() === null || $auction->getTopBid()->getBidder() !== $player->getName()) {
                                             if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($player) >= $bidAmount) {
-                                                PiggyAuctions::getInstance()->getEconomyProvider()->takeMoney($player, (int)$bidAmount - ($auction->getTopBidBy($player->getName()) ?? 0));
+                                                PiggyAuctions::getInstance()->getEconomyProvider()->takeMoney($player, $bidAmount - ($auction->getTopBidBy($player->getName()) === null ? 0 : $auction->getTopBidBy($player->getName())->getBidAmount()));
                                                 $auction->addBid(new AuctionBid($auction->getId(), $player->getName(), $bidAmount, time()));
                                             }
                                         }
