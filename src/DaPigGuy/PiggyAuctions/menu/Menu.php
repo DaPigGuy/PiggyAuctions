@@ -277,30 +277,49 @@ class Menu
 
     /**
      * @param Player $player
+     * @param int $sortType
      */
-    public static function displayAuctionManager(Player $player): void
+    public static function displayAuctionManager(Player $player, int $sortType = MenuSort::TYPE_RECENTLY_UPDATED): void
     {
         $menu = InvMenu::create(InvMenu::TYPE_CHEST);
         $menu->setName(PiggyAuctions::getInstance()->getMessage("menus.auction-manager.title"));
-        PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask(new InventoryClosureTask($player, $menu->getInventory(), function () use ($menu, $player): void {
+        $types = [
+            MenuSort::TYPE_RECENTLY_UPDATED => "recently_updated",
+            MenuSort::TYPE_HIGHEST_BID => "highest-bid",
+            MenuSort::TYPE_MOST_BIDS => "most-bids"
+        ];
+        PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask(new InventoryClosureTask($player, $menu->getInventory(), function () use ($menu, $player, $sortType, $types): void {
             $auctions = array_filter(PiggyAuctions::getInstance()->getAuctionManager()->getAuctionsHeldBy($player), function (Auction $auction): bool {
                 return !$auction->isClaimed();
             });
-            self::updateDisplayedItems($menu->getInventory(), $auctions, 0, 10, 7);
+            $sortType = ($menu->getInventory()->getItem(23)->getNamedTagEntry("SortType") ?? new IntTag("SortType", $sortType))->getValue();
+            $sort = $menu->getInventory()->getItem(23)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.sorting.sort-type", ["{TYPES}" => implode("\n", array_map(function (string $type, int $index) use ($sortType): string {
+                return ($index === $sortType ? PiggyAuctions::getInstance()->getMessage("menus.sorting.selected") : "") . PiggyAuctions::getInstance()->getMessage("menus.sorting." . $type);
+            }, $types, array_keys($types)))]));
+            $sort->setNamedTagEntry(new IntTag("SortType", $sortType));
+            $menu->getInventory()->setItem(23, $sort);
+            self::updateDisplayedItems($menu->getInventory(), $auctions, 0, 10, 7, null, MenuSort::closureFromType($sortType));
         }), 20);
         $menu->getInventory()->setItem(22, Item::get(Item::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
+        $menu->getInventory()->setItem(23, Item::get(Item::HOPPER));
         $menu->getInventory()->setItem(24, Item::get(Item::GOLDEN_HORSE_ARMOR)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-manager.create-auction")));
-        $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($menu): bool {
+        $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($types): bool {
             switch ($action->getSlot()) {
                 case 22:
                     self::displayMainMenu($player);
+                    break;
+                case 23:
+                    $key = array_search($itemClicked->getNamedTagEntry("SortType")->getValue(), array_keys($types));
+                    $itemClicked->setNamedTagEntry(new IntTag("SortType", array_keys($types)[($key + 1) % 3]));
+                    $action->getInventory()->setItem(23, $itemClicked);
                     break;
                 case 24:
                     self::displayAuctionCreator($player);
                     break;
                 default:
-                    self::displayItemPage($player, PiggyAuctions::getInstance()->getAuctionManager()->getAuction($itemClicked->getNamedTagEntry("AuctionID")->getValue()), function (Player $player) {
-                        self::displayAuctionManager($player);
+                    $sortType = $action->getInventory()->getItem(23)->getNamedTagEntry("SortType")->getValue();
+                    self::displayItemPage($player, PiggyAuctions::getInstance()->getAuctionManager()->getAuction($itemClicked->getNamedTagEntry("AuctionID")->getValue()), function (Player $player) use ($sortType) {
+                        self::displayAuctionManager($player, $sortType);
                     });
                     break;
             }
@@ -377,7 +396,7 @@ class Menu
             $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.top-bid", ["{NEWBID}" => $bidAmount, "{PREVIOUSBID}" => $topBid->getBidAmount()]));
         }
         $menu->getInventory()->setItem(29, $bidItem);
-        if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($player) >= $bidAmount) $menu->getInventory()->setItem(31, Item::get(Item::GOLD_INGOT)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bid-amount", ["{MONEY}" => $bidAmount])));
+        if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($player) >= $bidAmount && !$auction->hasExpired() && $auction->getAuctioneer() !== $player->getName()) $menu->getInventory()->setItem(31, Item::get(Item::GOLD_INGOT)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bid-amount", ["{MONEY}" => $bidAmount])));
         $menu->getInventory()->setItem(49, Item::get(Item::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
         $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($bidAmount, $auction, $callback): bool {
             switch ($action->getSlot()) {

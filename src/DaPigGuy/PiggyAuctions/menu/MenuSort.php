@@ -16,6 +16,7 @@ class MenuSort
     const TYPE_LOWEST_BID = 1;
     const TYPE_ENDING_SOON = 2;
     const TYPE_MOST_BIDS = 3;
+    const TYPE_RECENTLY_UPDATED = 5;
 
     /**
      * @param int $type
@@ -36,6 +37,11 @@ class MenuSort
                 return function (Auction $a, Auction $b): bool {
                     return count($a->getBids()) < count($b->getBids());
                 };
+            case self::TYPE_RECENTLY_UPDATED:
+                return function (Auction $a, Auction $b): bool {
+                    return ($a->hasExpired() ? $a->getEndDate() : ($a->getTopBid() === null ? $a->getStartDate() : $a->getTopBid()->getTimestamp())) > ($b->hasExpired() ? $b->getEndDate() : ($b->getTopBid() === null ? $b->getStartDate() : $b->getTopBid()->getTimestamp()));
+                };
+                break;
         }
         return function (Auction $a, Auction $b): bool {
             return ($a->getTopBid() === null ? $a->getStartingBid() : $a->getTopBid()->getBidAmount()) < ($b->getTopBid() === null ? $b->getStartingBid() : $b->getTopBid()->getBidAmount());

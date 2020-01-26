@@ -56,6 +56,7 @@ menus:
     lowest-bid: "{GRAY}Lowest Bid"
     ending-soon: "{GRAY}Ending Soon"
     most-bids: "{GRAY}Most Bids"
+    recently-updated: "{GRAY}Recently Updated"
 forms:
   create-auction:
     title: "Create Auction"
