@@ -12,6 +12,9 @@ use DaPigGuy\PiggyAuctions\auction\AuctionManager;
 use DaPigGuy\PiggyAuctions\commands\AuctionHouseCommand;
 use DaPigGuy\PiggyAuctions\utils\Utils;
 use muqsit\invmenu\InvMenuHandler;
+use pocketmine\event\inventory\InventoryTransactionEvent;
+use pocketmine\event\Listener;
+use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\item\Item;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\Config;
@@ -22,7 +25,7 @@ use poggit\libasynql\libasynql;
  * Class PiggyAuctions
  * @package DaPigGuy\PiggyAuctions
  */
-class PiggyAuctions extends PluginBase
+class PiggyAuctions extends PluginBase implements Listener
 {
     /** @var self */
     public static $instance;
@@ -64,6 +67,8 @@ class PiggyAuctions extends PluginBase
         $this->auctionManager->init();
 
         $this->getServer()->getCommandMap()->register("piggyauctions", new AuctionHouseCommand($this, "auctionhouse", "Open the auction house", ["ah"]));
+
+        $this->getServer()->getPluginManager()->registerEvents($this, $this);
     }
 
     /**
@@ -106,5 +111,18 @@ class PiggyAuctions extends PluginBase
     public function getAuctionManager(): AuctionManager
     {
         return $this->auctionManager;
+    }
+
+    /**
+     * @param InventoryTransactionEvent $event
+     * @priority MONITOR
+     */
+    public function onInventoryTransaction(InventoryTransactionEvent $event): void
+    {
+        $transaction = $event->getTransaction();
+        $player = $transaction->getSource();
+        foreach ($transaction->getActions() as $action) {
+            if ($action instanceof SlotChangeAction && $event->isCancelled()) $action->getInventory()->sendSlot($action->getSlot(), $player);
+        }
     }
 }
