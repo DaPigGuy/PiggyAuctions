@@ -284,7 +284,7 @@ class Menu
         $menu = InvMenu::create(InvMenu::TYPE_CHEST);
         $menu->setName(PiggyAuctions::getInstance()->getMessage("menus.auction-manager.title"));
         $types = [
-            MenuSort::TYPE_RECENTLY_UPDATED => "recently_updated",
+            MenuSort::TYPE_RECENTLY_UPDATED => "recently-updated",
             MenuSort::TYPE_HIGHEST_BID => "highest-bid",
             MenuSort::TYPE_MOST_BIDS => "most-bids"
         ];
