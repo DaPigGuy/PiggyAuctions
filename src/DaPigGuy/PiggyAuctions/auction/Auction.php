@@ -164,16 +164,18 @@ class Auction
     {
         $bids = $this->getUnclaimedBidsHeldBy($player->getName());
         if (count($bids) < 1) return;
+        /** @var AuctionBid $topBid */
+        $topBid = $this->getTopBidBy($player->getName());
         foreach ($bids as $bid) $this->claimedBids[] = $bid;
         $this->hasExpired();
         if (PiggyAuctions::getInstance()->getAuctionManager()->getAuction($this->getId()) === $this) PiggyAuctions::getInstance()->getAuctionManager()->updateAuction($this);
         if (in_array($this->getTopBid(), $bids)) {
             $player->getInventory()->addItem($this->getItem());
-            $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.claim.bidder-item-success", ["{PLAYER}" => $this->getAuctioneer(), "{ITEM}" => $this->getItem()->getName(), "{MONEY}" => $this->getTopBidBy($player->getName())->getBidAmount()]));
+            $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.claim.bidder-item-success", ["{PLAYER}" => $this->getAuctioneer(), "{ITEM}" => $this->getItem()->getName(), "{MONEY}" => $topBid->getBidAmount()]));
             return;
         }
         PiggyAuctions::getInstance()->getEconomyProvider()->giveMoney($player, $this->getTopBidBy($player->getName())->getBidAmount());
-        $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.claim.bidder-money-success", ["{PLAYER}" => $this->getAuctioneer(), "{ITEM}" => $this->getItem()->getName(), "{MONEY}" => $this->getTopBidBy($player->getName())->getBidAmount()]));
+        $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.claim.bidder-money-success", ["{PLAYER}" => $this->getAuctioneer(), "{ITEM}" => $this->getItem()->getName(), "{MONEY}" => $topBid->getBidAmount()]));
     }
 
     /**
