@@ -29,7 +29,7 @@ jobs:
       - name: wget virions, libPiggyEconomy
         uses: wei/wget@v1
         with:
-          args: -O vendor/libPiggyEconomy.phar https://poggit.pmmp.io/r/69292/libPiggyEconomy_dev-6.phar
+          args: -O vendor/libPiggyEconomy.phar https://poggit.pmmp.io/r/74456/libPiggyEconomy_dev-6.phar
       - name: wget virions, Commando
         uses: wei/wget@v1
         with:
