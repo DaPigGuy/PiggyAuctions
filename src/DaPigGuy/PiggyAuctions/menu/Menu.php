@@ -75,9 +75,9 @@ class Menu
         PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask(new InventoryClosureTask($player, $menu->getInventory(), function () use ($menu, $page) : void {
             foreach ($menu->getInventory()->getContents() as $slot => $content) {
                 if ($content->getNamedTagEntry("AuctionID") !== null) {
-                    $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction($content->getNamedTagEntry("AuctionID")->getValue());
+                    $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($content->getNamedTagEntry("AuctionID") ?? new IntTag())->getValue());
                     if ($auction === null || $auction->hasExpired()) {
-                        self::displayPageAuctions($menu->getInventory(), $page, $menu->getInventory()->getItem(48)->getNamedTagEntry("Search")->getValue(), $menu->getInventory()->getItem(50)->getNamedTagEntry("SortType")->getValue());
+                        self::displayPageAuctions($menu->getInventory(), $page, ($menu->getInventory()->getItem(48)->getNamedTagEntry("Search") ?? new StringTag())->getValue(), $menu->getInventory()->getItem(50)->getNamedTagEntry("SortType")->getValue());
                         break;
                     }
                     $lore = ($content->getNamedTagEntry("TemplateLore") ?? new StringTag())->getValue();

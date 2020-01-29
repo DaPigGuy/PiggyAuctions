@@ -174,7 +174,7 @@ class Auction
             $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.claim.bidder-item-success", ["{PLAYER}" => $this->getAuctioneer(), "{ITEM}" => $this->getItem()->getName(), "{MONEY}" => $topBid->getBidAmount()]));
             return;
         }
-        PiggyAuctions::getInstance()->getEconomyProvider()->giveMoney($player, $this->getTopBidBy($player->getName())->getBidAmount());
+        PiggyAuctions::getInstance()->getEconomyProvider()->giveMoney($player, $topBid->getBidAmount());
         $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.claim.bidder-money-success", ["{PLAYER}" => $this->getAuctioneer(), "{ITEM}" => $this->getItem()->getName(), "{MONEY}" => $topBid->getBidAmount()]));
     }
 
