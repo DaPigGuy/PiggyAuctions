@@ -94,7 +94,7 @@ class Menu
             if ($itemClicked->getNamedTagEntry("AuctionID") !== null) {
                 $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($itemClicked->getNamedTagEntry("AuctionID") ?? new IntTag())->getValue());
                 if ($auction instanceof Auction) {
-                    $returnPage = $action->getInventory()->getItem(49)->getNamedTagEntry("CurrentPage")->getValue();
+                    $returnPage = ($action->getInventory()->getItem(49)->getNamedTagEntry("CurrentPage") ?? new IntTag("", 1))->getValue();
                     self::displayItemPage($player, $auction, function (Player $player) use ($search, $returnPage, $sort) {
                         self::displayAuctionBrowser($player, $returnPage, $search, $sort);
                     });
@@ -178,10 +178,10 @@ class Menu
         $menu = InvMenu::create(InvMenu::TYPE_CHEST);
         $menu->setName(PiggyAuctions::getInstance()->getMessage("menus.view-bids.title"));
         PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask(new InventoryClosureTask($player, $menu->getInventory(), function () use ($menu, $player): void {
-            $auctions = array_filter(array_map(function (AuctionBid $bid): Auction {
+            $auctions = array_filter(array_map(function (AuctionBid $bid): ?Auction {
                 return $bid->getAuction();
-            }, PiggyAuctions::getInstance()->getAuctionManager()->getBidsBy($player)), function (Auction $auction) use ($player): bool {
-                return count($auction->getUnclaimedBidsHeldBy($player->getName())) > 0;
+            }, PiggyAuctions::getInstance()->getAuctionManager()->getBidsBy($player)), function (?Auction $auction) use ($player): bool {
+                return $auction !== null && count($auction->getUnclaimedBidsHeldBy($player->getName())) > 0;
             });
             self::updateDisplayedItems($menu->getInventory(), $auctions, 0, 10, 7);
             $menu->getInventory()->setItem(22, Item::get(Item::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));

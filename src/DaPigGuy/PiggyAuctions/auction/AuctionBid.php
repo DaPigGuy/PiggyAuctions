@@ -37,9 +37,9 @@ class AuctionBid
     }
 
     /**
-     * @return Auction
+     * @return Auction|null
      */
-    public function getAuction(): Auction
+    public function getAuction(): ?Auction
     {
         return PiggyAuctions::getInstance()->getAuctionManager()->getAuction($this->auctionID);
     }
