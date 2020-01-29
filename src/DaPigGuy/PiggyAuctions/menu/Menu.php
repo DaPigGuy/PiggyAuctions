@@ -379,9 +379,11 @@ class Menu
             $bidItem = Item::get(Item::GOLD_NUGGET);
             if ($auction->getAuctioneer() === $player->getName()) {
                 $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("auction.claim.auctioneer-item"));
-                if (count($auction->getBids()) > 0) $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("auction.claim.auctioneer-money", ["{MONEY}" => $auction->getTopBid()->getBidAmount(), "{PLAYER}" => $auction->getTopBid()->getBidder()]));
+                if (($overallTopBid = $auction->getTopBid()) !== null) $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("auction.claim.auctioneer-money", ["{MONEY}" => $overallTopBid->getBidAmount(), "{PLAYER}" => $overallTopBid->getBidder()]));
             } elseif (($topBid = $auction->getTopBidBy($player->getName())) !== null) {
-                $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("auction.claim.bidder-money", ["{BID}" => $topBid->getBidAmount(), "{TOPBID}" => $auction->getTopBid()->getBidAmount(), "{TOPBIDDER}" => $auction->getTopBid()->getBidder()]));
+                /** @var AuctionBid $overallTopBid */
+                $overallTopBid = $auction->getTopBid();
+                $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("auction.claim.bidder-money", ["{BID}" => $topBid->getBidAmount(), "{TOPBID}" => $overallTopBid->getBidAmount(), "{TOPBIDDER}" => $overallTopBid->getBidder()]));
                 if ($topBid === $auction->getTopBid()) $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("auction.claim.bidder-item", ["{MONEY}" => $topBid->getBidAmount()]));
             } else {
                 $bidItem = Item::get(Item::POTATO);
@@ -430,8 +432,8 @@ class Menu
                         $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($bidAmount, $auction, $callback): bool {
                             switch ($action->getSlot()) {
                                 case 11:
-                                    if (($auction->getTopBid() === null && $bidAmount >= $auction->getStartingBid()) || $bidAmount >= (int)($auction->getTopBid()->getBidAmount() * 1.15)) {
-                                        if ($auction->getTopBid() === null || $auction->getTopBid()->getBidder() !== $player->getName()) {
+                                    if ((($topBid = $auction->getTopBid()) === null && $bidAmount >= $auction->getStartingBid()) || $bidAmount >= (int)($topBid->getBidAmount() * 1.15)) {
+                                        if ($topBid === null || $topBid->getBidder() !== $player->getName()) {
                                             if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($player) >= $bidAmount) {
                                                 PiggyAuctions::getInstance()->getEconomyProvider()->takeMoney($player, $bidAmount - ($auction->getTopBidBy($player->getName()) === null ? 0 : $auction->getTopBidBy($player->getName())->getBidAmount()));
                                                 $auction->addBid(new AuctionBid($auction->getId(), $player->getName(), $bidAmount, time()));
