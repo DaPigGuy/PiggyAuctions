@@ -315,7 +315,7 @@ class Menu
                     break;
                 case 23:
                     /** @var int $key */
-                    $key = array_search($itemClicked->getNamedTagEntry("SortType")->getValue(), array_keys($types));
+                    $key = array_search(($itemClicked->getNamedTagEntry("SortType") ?? new IntTag())->getValue(), array_keys($types));
                     $itemClicked->setNamedTagEntry(new IntTag("SortType", array_keys($types)[($key + 1) % 3]));
                     $action->getInventory()->setItem(23, $itemClicked);
                     break;
@@ -323,8 +323,9 @@ class Menu
                     self::displayAuctionCreator($player);
                     break;
                 default:
-                    $sortType = $action->getInventory()->getItem(23)->getNamedTagEntry("SortType")->getValue();
-                    self::displayItemPage($player, PiggyAuctions::getInstance()->getAuctionManager()->getAuction($itemClicked->getNamedTagEntry("AuctionID")->getValue()), function (Player $player) use ($sortType) {
+                    $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($itemClicked->getNamedTagEntry("AuctionID") ?? new IntTag())->getValue());
+                    $sortType = ($action->getInventory()->getItem(23)->getNamedTagEntry("SortType") ?? new IntTag())->getValue();
+                    if ($auction !== null) self::displayItemPage($player, $auction, function (Player $player) use ($sortType) {
                         self::displayAuctionManager($player, $sortType);
                     });
                     break;
@@ -348,7 +349,8 @@ class Menu
             self::updateDisplayedItems($menu->getInventory(), $auctions, 0, 10, 7);
         }), 20);
         $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($auctioneer): bool {
-            self::displayItemPage($player, PiggyAuctions::getInstance()->getAuctionManager()->getAuction($itemClicked->getNamedTagEntry("AuctionID")->getValue()), function (Player $player) use ($auctioneer) {
+            $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($itemClicked->getNamedTagEntry("AuctionID") ?? new IntTag())->getValue());
+            if ($auction !== null) self::displayItemPage($player, $auction, function (Player $player) use ($auctioneer) {
                 self::displayAuctioneerPage($player, $auctioneer);
             });
             return false;
