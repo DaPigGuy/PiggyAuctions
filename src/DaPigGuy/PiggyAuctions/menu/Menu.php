@@ -80,7 +80,7 @@ class Menu
                         self::displayPageAuctions($menu->getInventory(), $page, $menu->getInventory()->getItem(48)->getNamedTagEntry("Search")->getValue(), $menu->getInventory()->getItem(50)->getNamedTagEntry("SortType")->getValue());
                         break;
                     }
-                    $lore = $content->getNamedTagEntry("TemplateLore")->getValue();
+                    $lore = ($content->getNamedTagEntry("TemplateLore") ?? new StringTag())->getValue();
                     $lore = str_replace("{DURATION}", Utils::formatDetailedDuration($auction->getEndDate() - time()), $lore);
                     $content->setLore(explode("\n", $lore));
                     $menu->getInventory()->setItem($slot, $content);
@@ -89,14 +89,16 @@ class Menu
         }), 20);
 
         $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool {
-            $search = $action->getInventory()->getItem(48)->getNamedTagEntry("Search")->getValue();
-            $sort = $action->getInventory()->getItem(50)->getNamedTagEntry("SortType")->getValue();
+            $search = ($action->getInventory()->getItem(48)->getNamedTagEntry("Search") ?? new StringTag())->getValue();
+            $sort = ($action->getInventory()->getItem(50)->getNamedTagEntry("SortType") ?? new IntTag())->getValue();
             if ($itemClicked->getNamedTagEntry("AuctionID") !== null) {
                 $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction($itemClicked->getNamedTagEntry("AuctionID")->getValue());
-                $returnPage = $action->getInventory()->getItem(49)->getNamedTagEntry("CurrentPage")->getValue();
-                self::displayItemPage($player, $auction, function (Player $player) use ($search, $returnPage, $sort) {
-                    self::displayAuctionBrowser($player, $returnPage, $search, $sort);
-                });
+                if ($auction instanceof Auction) {
+                    $returnPage = $action->getInventory()->getItem(49)->getNamedTagEntry("CurrentPage")->getValue();
+                    self::displayItemPage($player, $auction, function (Player $player) use ($search, $returnPage, $sort) {
+                        self::displayAuctionBrowser($player, $returnPage, $search, $sort);
+                    });
+                }
             }
             switch ($action->getSlot()) {
                 case 45:
@@ -221,7 +223,7 @@ class Menu
                     return true;
                 case 29:
                     if ($itemClicked->getDamage() === 13) {
-                        PiggyAuctions::getInstance()->getAuctionManager()->addAuction($player->getName(), $action->getInventory()->getItem(13), time(), time() + ($action->getInventory()->getItem(33)->getNamedTagEntry("Duration") ? $action->getInventory()->getItem(33)->getNamedTagEntry("Duration")->getValue() : 7200), $action->getInventory()->getItem(31)->getNamedTagEntry("StartingBid") ? $action->getInventory()->getItem(31)->getNamedTagEntry("StartingBid")->getValue() : 50);
+                        PiggyAuctions::getInstance()->getAuctionManager()->addAuction($player->getName(), $action->getInventory()->getItem(13), time(), time() + (($tag = $action->getInventory()->getItem(33)->getNamedTagEntry("Duration")) ? $tag->getValue() : 7200), $action->getInventory()->getItem(31)->getNamedTagEntry("StartingBid") ? $action->getInventory()->getItem(31)->getNamedTagEntry("StartingBid")->getValue() : 50);
                         $action->getInventory()->clear(13);
                         self::displayAuctionManager($player);
                     }
