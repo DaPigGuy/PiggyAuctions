@@ -75,12 +75,12 @@ class Menu
         PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask(new InventoryClosureTask($player, $menu->getInventory(), function () use ($menu, $page) : void {
             foreach ($menu->getInventory()->getContents() as $slot => $content) {
                 if ($content->getNamedTagEntry("AuctionID") !== null) {
-                    $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction($content->getNamedTagEntry("AuctionID")->getValue());
+                    $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($content->getNamedTagEntry("AuctionID") ?? new IntTag())->getValue());
                     if ($auction === null || $auction->hasExpired()) {
-                        self::displayPageAuctions($menu->getInventory(), $page, $menu->getInventory()->getItem(48)->getNamedTagEntry("Search")->getValue(), $menu->getInventory()->getItem(50)->getNamedTagEntry("SortType")->getValue());
+                        self::displayPageAuctions($menu->getInventory(), $page, ($menu->getInventory()->getItem(48)->getNamedTagEntry("Search") ?? new StringTag())->getValue(), ($menu->getInventory()->getItem(50)->getNamedTagEntry("SortType") ?? new IntTag())->getValue());
                         break;
                     }
-                    $lore = $content->getNamedTagEntry("TemplateLore")->getValue();
+                    $lore = ($content->getNamedTagEntry("TemplateLore") ?? new StringTag())->getValue();
                     $lore = str_replace("{DURATION}", Utils::formatDetailedDuration($auction->getEndDate() - time()), $lore);
                     $content->setLore(explode("\n", $lore));
                     $menu->getInventory()->setItem($slot, $content);
@@ -89,19 +89,21 @@ class Menu
         }), 20);
 
         $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool {
-            $search = $action->getInventory()->getItem(48)->getNamedTagEntry("Search")->getValue();
-            $sort = $action->getInventory()->getItem(50)->getNamedTagEntry("SortType")->getValue();
+            $search = ($action->getInventory()->getItem(48)->getNamedTagEntry("Search") ?? new StringTag())->getValue();
+            $sort = ($action->getInventory()->getItem(50)->getNamedTagEntry("SortType") ?? new IntTag())->getValue();
             if ($itemClicked->getNamedTagEntry("AuctionID") !== null) {
-                $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction($itemClicked->getNamedTagEntry("AuctionID")->getValue());
-                $returnPage = $action->getInventory()->getItem(49)->getNamedTagEntry("CurrentPage")->getValue();
-                self::displayItemPage($player, $auction, function (Player $player) use ($search, $returnPage, $sort) {
-                    self::displayAuctionBrowser($player, $returnPage, $search, $sort);
-                });
+                $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($itemClicked->getNamedTagEntry("AuctionID") ?? new IntTag())->getValue());
+                if ($auction instanceof Auction) {
+                    $returnPage = ($action->getInventory()->getItem(49)->getNamedTagEntry("CurrentPage") ?? new IntTag("", 1))->getValue();
+                    self::displayItemPage($player, $auction, function (Player $player) use ($search, $returnPage, $sort) {
+                        self::displayAuctionBrowser($player, $returnPage, $search, $sort);
+                    });
+                }
             }
             switch ($action->getSlot()) {
                 case 45:
                 case 53:
-                    self::displayPageAuctions($action->getInventory(), $itemClicked->getNamedTagEntry("Page")->getValue(), $action->getInventory()->getItem(48)->getNamedTagEntry("Search")->getValue(), $action->getInventory()->getItem(50)->getNamedTagEntry("SortType")->getValue());
+                self::displayPageAuctions($action->getInventory(), ($itemClicked->getNamedTagEntry("Page") ?? new IntTag("", 1))->getValue(), ($action->getInventory()->getItem(48)->getNamedTagEntry("Search") ?? new StringTag())->getValue(), ($action->getInventory()->getItem(50)->getNamedTagEntry("SortType") ?? new IntTag())->getValue());
                     break;
                 case 48:
                     $player->removeWindow($action->getInventory());
@@ -176,10 +178,10 @@ class Menu
         $menu = InvMenu::create(InvMenu::TYPE_CHEST);
         $menu->setName(PiggyAuctions::getInstance()->getMessage("menus.view-bids.title"));
         PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask(new InventoryClosureTask($player, $menu->getInventory(), function () use ($menu, $player): void {
-            $auctions = array_filter(array_map(function (AuctionBid $bid): Auction {
+            $auctions = array_filter(array_map(function (AuctionBid $bid): ?Auction {
                 return $bid->getAuction();
-            }, PiggyAuctions::getInstance()->getAuctionManager()->getBidsBy($player)), function (Auction $auction) use ($player): bool {
-                return count($auction->getUnclaimedBidsHeldBy($player->getName())) > 0;
+            }, PiggyAuctions::getInstance()->getAuctionManager()->getBidsBy($player)), function (?Auction $auction) use ($player): bool {
+                return $auction !== null && count($auction->getUnclaimedBidsHeldBy($player->getName())) > 0;
             });
             self::updateDisplayedItems($menu->getInventory(), $auctions, 0, 10, 7);
             $menu->getInventory()->setItem(22, Item::get(Item::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
@@ -190,7 +192,8 @@ class Menu
                     self::displayMainMenu($player);
                     break;
                 default:
-                    self::displayItemPage($player, PiggyAuctions::getInstance()->getAuctionManager()->getAuction($itemClicked->getNamedTagEntry("AuctionID")->getValue()), function (Player $player) {
+                    $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($itemClicked->getNamedTagEntry("AuctionID") ?? new IntTag())->getValue());
+                    if ($auction !== null) self::displayItemPage($player, $auction, function (Player $player) {
                         self::displayBidsPage($player);
                     });
                     break;
@@ -221,7 +224,7 @@ class Menu
                     return true;
                 case 29:
                     if ($itemClicked->getDamage() === 13) {
-                        PiggyAuctions::getInstance()->getAuctionManager()->addAuction($player->getName(), $action->getInventory()->getItem(13), time(), time() + ($action->getInventory()->getItem(33)->getNamedTagEntry("Duration") ? $action->getInventory()->getItem(33)->getNamedTagEntry("Duration")->getValue() : 7200), $action->getInventory()->getItem(31)->getNamedTagEntry("StartingBid") ? $action->getInventory()->getItem(31)->getNamedTagEntry("StartingBid")->getValue() : 50);
+                        PiggyAuctions::getInstance()->getAuctionManager()->addAuction($player->getName(), $action->getInventory()->getItem(13), time(), time() + (($tag = $action->getInventory()->getItem(33)->getNamedTagEntry("Duration")) ? $tag->getValue() : 7200), ($tag = $action->getInventory()->getItem(31)->getNamedTagEntry("StartingBid")) ? $tag->getValue() : 50);
                         $action->getInventory()->clear(13);
                         self::displayAuctionManager($player);
                     }
@@ -313,7 +316,7 @@ class Menu
                     break;
                 case 23:
                     /** @var int $key */
-                    $key = array_search($itemClicked->getNamedTagEntry("SortType")->getValue(), array_keys($types));
+                    $key = array_search(($itemClicked->getNamedTagEntry("SortType") ?? new IntTag())->getValue(), array_keys($types));
                     $itemClicked->setNamedTagEntry(new IntTag("SortType", array_keys($types)[($key + 1) % 3]));
                     $action->getInventory()->setItem(23, $itemClicked);
                     break;
@@ -321,8 +324,9 @@ class Menu
                     self::displayAuctionCreator($player);
                     break;
                 default:
-                    $sortType = $action->getInventory()->getItem(23)->getNamedTagEntry("SortType")->getValue();
-                    self::displayItemPage($player, PiggyAuctions::getInstance()->getAuctionManager()->getAuction($itemClicked->getNamedTagEntry("AuctionID")->getValue()), function (Player $player) use ($sortType) {
+                    $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($itemClicked->getNamedTagEntry("AuctionID") ?? new IntTag())->getValue());
+                    $sortType = ($action->getInventory()->getItem(23)->getNamedTagEntry("SortType") ?? new IntTag())->getValue();
+                    if ($auction !== null) self::displayItemPage($player, $auction, function (Player $player) use ($sortType) {
                         self::displayAuctionManager($player, $sortType);
                     });
                     break;
@@ -346,7 +350,8 @@ class Menu
             self::updateDisplayedItems($menu->getInventory(), $auctions, 0, 10, 7);
         }), 20);
         $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($auctioneer): bool {
-            self::displayItemPage($player, PiggyAuctions::getInstance()->getAuctionManager()->getAuction($itemClicked->getNamedTagEntry("AuctionID")->getValue()), function (Player $player) use ($auctioneer) {
+            $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($itemClicked->getNamedTagEntry("AuctionID") ?? new IntTag())->getValue());
+            if ($auction !== null) self::displayItemPage($player, $auction, function (Player $player) use ($auctioneer) {
                 self::displayAuctioneerPage($player, $auctioneer);
             });
             return false;
@@ -377,9 +382,11 @@ class Menu
             $bidItem = Item::get(Item::GOLD_NUGGET);
             if ($auction->getAuctioneer() === $player->getName()) {
                 $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("auction.claim.auctioneer-item"));
-                if (count($auction->getBids()) > 0) $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("auction.claim.auctioneer-money", ["{MONEY}" => $auction->getTopBid()->getBidAmount(), "{PLAYER}" => $auction->getTopBid()->getBidder()]));
+                if (($overallTopBid = $auction->getTopBid()) !== null) $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("auction.claim.auctioneer-money", ["{MONEY}" => $overallTopBid->getBidAmount(), "{PLAYER}" => $overallTopBid->getBidder()]));
             } elseif (($topBid = $auction->getTopBidBy($player->getName())) !== null) {
-                $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("auction.claim.bidder-money", ["{BID}" => $topBid->getBidAmount(), "{TOPBID}" => $auction->getTopBid()->getBidAmount(), "{TOPBIDDER}" => $auction->getTopBid()->getBidder()]));
+                /** @var AuctionBid $overallTopBid */
+                $overallTopBid = $auction->getTopBid();
+                $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("auction.claim.bidder-money", ["{BID}" => $topBid->getBidAmount(), "{TOPBID}" => $overallTopBid->getBidAmount(), "{TOPBIDDER}" => $overallTopBid->getBidder()]));
                 if ($topBid === $auction->getTopBid()) $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("auction.claim.bidder-item", ["{MONEY}" => $topBid->getBidAmount()]));
             } else {
                 $bidItem = Item::get(Item::POTATO);
@@ -428,8 +435,8 @@ class Menu
                         $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) use ($bidAmount, $auction, $callback): bool {
                             switch ($action->getSlot()) {
                                 case 11:
-                                    if (($auction->getTopBid() === null && $bidAmount >= $auction->getStartingBid()) || $bidAmount >= (int)($auction->getTopBid()->getBidAmount() * 1.15)) {
-                                        if ($auction->getTopBid() === null || $auction->getTopBid()->getBidder() !== $player->getName()) {
+                                    if ((($topBid = $auction->getTopBid()) === null && $bidAmount >= $auction->getStartingBid()) || ($topBid !== null && $bidAmount >= (int)($topBid->getBidAmount() * 1.15))) {
+                                        if ($topBid === null || $topBid->getBidder() !== $player->getName()) {
                                             if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($player) >= $bidAmount) {
                                                 PiggyAuctions::getInstance()->getEconomyProvider()->takeMoney($player, $bidAmount - ($auction->getTopBidBy($player->getName()) === null ? 0 : $auction->getTopBidBy($player->getName())->getBidAmount()));
                                                 $auction->addBid(new AuctionBid($auction->getId(), $player->getName(), $bidAmount, time()));

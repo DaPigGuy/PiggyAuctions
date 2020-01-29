@@ -46,7 +46,7 @@ class InventoryClosureTask extends ClosureTask
     {
         parent::onRun($currentTick);
         if ($this->inventoryOpen && $this->player->getWindowId($this->inventory) === ContainerIds::NONE) {
-            $this->getHandler()->cancel();
+            if (($handler = $this->getHandler()) !== null) $handler->cancel();
             return;
         }
         $this->inventoryOpen = $this->player->getWindowId($this->inventory) !== ContainerIds::NONE;
