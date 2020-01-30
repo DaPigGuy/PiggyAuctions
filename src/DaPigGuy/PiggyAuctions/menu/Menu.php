@@ -445,7 +445,7 @@ class Menu
                                         if ($topBid === null || $topBid->getBidder() !== $player->getName()) {
                                             if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($player) >= $bidAmount) {
                                                 $bid = new AuctionBid($auction->getId(), $player->getName(), $bidAmount, time());
-                                                $ev = new AuctionBidEvent($bid);
+                                                $ev = new AuctionBidEvent($auction, $bid);
                                                 $ev->call();
                                                 if (!$ev->isCancelled()) {
                                                     PiggyAuctions::getInstance()->getEconomyProvider()->takeMoney($player, $bidAmount - ($auction->getTopBidBy($player->getName()) === null ? 0 : $auction->getTopBidBy($player->getName())->getBidAmount()));

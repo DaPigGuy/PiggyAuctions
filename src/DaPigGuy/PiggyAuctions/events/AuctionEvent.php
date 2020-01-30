@@ -13,7 +13,7 @@ use pocketmine\event\Event;
  */
 class AuctionEvent extends Event
 {
-    /*** @var Auction */
+    /** @var Auction */
     protected $auction;
 
     /**

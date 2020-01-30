@@ -15,15 +15,15 @@ use pocketmine\Player;
  */
 class AuctionStartEvent extends Event implements Cancellable
 {
-    /*** @var Player */
+    /** @var Player */
     protected $player;
-    /*** @var Item */
+    /** @var Item */
     protected $item;
-    /*** @var int */
+    /** @var int */
     protected $timestamp;
-    /*** @var int */
+    /** @var int */
     protected $endDate;
-    /*** @var int */
+    /** @var int */
     protected $startingBid;
 
     /**
