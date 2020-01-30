@@ -450,6 +450,8 @@ class Menu
                                                 if (!$ev->isCancelled()) {
                                                     PiggyAuctions::getInstance()->getEconomyProvider()->takeMoney($player, $ev->getBid()->getBidAmount() - ($auction->getTopBidBy($player->getName()) === null ? 0 : $auction->getTopBidBy($player->getName())->getBidAmount()));
                                                     $auction->addBid($bid);
+                                                    $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.bid.success", ["{MONEY}" => $ev->getBid()->getBidAmount(), "{ITEM}" => $auction->getItem()->getName()]));
+                                                    if (($auctioneer = PiggyAuctions::getInstance()->getServer()->getPlayerExact($auction->getAuctioneer())) instanceof Player) $auctioneer->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.bid.bidder", ["{PLAYER}" => $player->getName(), "{MONEY}" => $ev->getBid()->getBidAmount(), "{ITEM}" => $auction->getItem()->getName()]));
                                                 }
                                             }
                                         }

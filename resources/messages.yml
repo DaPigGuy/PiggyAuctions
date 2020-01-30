@@ -84,4 +84,6 @@ auction:
     already-top-bid: "{GREEN}You already have the highest bid on this auction!"
     cant-afford: "{RED}You don't have enough money to afford this bid!"
     cant-self-bid: "{GREEN}You cannot bid on your own auctions!"
+    success: "{YELLOW}Bid of {GOLD}${MONEY} {YELLOW}placed for {WHITE}{ITEM}"
+    bidder: "{PLAYER} {YELLOW}bid {GOLD}${MONEY} {YELLOW}on {WHITE}{ITEM}"
   outbid: "{YELLOW}{PLAYER} outbid you by {GOLD}${DIFFERENCE} {YELLOW}for {WHITE}{ITEM}"
