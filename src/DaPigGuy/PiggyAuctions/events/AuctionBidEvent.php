@@ -27,4 +27,12 @@ class AuctionBidEvent extends AuctionEvent implements Cancellable
         parent::__construct($auction);
         $this->bid = $bid;
     }
+
+    /**
+     * @return AuctionBid
+     */
+    public function getBid(): AuctionBid
+    {
+        return $this->bid;
+    }
 }

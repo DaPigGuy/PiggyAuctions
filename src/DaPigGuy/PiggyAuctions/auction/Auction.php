@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace DaPigGuy\PiggyAuctions\auction;
 
+use DaPigGuy\PiggyAuctions\events\AuctionClaimItemEvent;
+use DaPigGuy\PiggyAuctions\events\AuctionClaimMoneyEvent;
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
 use pocketmine\item\Item;
 use pocketmine\Player;
@@ -170,12 +172,20 @@ class Auction
         $this->hasExpired();
         if (PiggyAuctions::getInstance()->getAuctionManager()->getAuction($this->getId()) === $this) PiggyAuctions::getInstance()->getAuctionManager()->updateAuction($this);
         if (in_array($this->getTopBid(), $bids)) {
-            $player->getInventory()->addItem($this->getItem());
-            $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.claim.bidder-item-success", ["{PLAYER}" => $this->getAuctioneer(), "{ITEM}" => $this->getItem()->getName(), "{MONEY}" => $topBid->getBidAmount()]));
+            $ev = new AuctionClaimItemEvent($this, $player, clone $this->getItem());
+            $ev->call();
+            if (!$ev->isCancelled()) {
+                $player->getInventory()->addItem($ev->getItem());
+                $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.claim.bidder-item-success", ["{PLAYER}" => $this->getAuctioneer(), "{ITEM}" => $this->getItem()->getName(), "{MONEY}" => $topBid->getBidAmount()]));
+            }
             return;
         }
-        PiggyAuctions::getInstance()->getEconomyProvider()->giveMoney($player, $topBid->getBidAmount());
-        $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.claim.bidder-money-success", ["{PLAYER}" => $this->getAuctioneer(), "{ITEM}" => $this->getItem()->getName(), "{MONEY}" => $topBid->getBidAmount()]));
+        $ev = new AuctionClaimMoneyEvent($this, $player, $topBid->getBidAmount());
+        $ev->call();
+        if (!$ev->isCancelled()) {
+            PiggyAuctions::getInstance()->getEconomyProvider()->giveMoney($player, $ev->getAmount());
+            $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.claim.bidder-money-success", ["{PLAYER}" => $this->getAuctioneer(), "{ITEM}" => $this->getItem()->getName(), "{MONEY}" => $topBid->getBidAmount()]));
+        }
     }
 
     /**
@@ -185,11 +195,19 @@ class Auction
     {
         if ($this->claimed) return;
         if ($this->getTopBid() === null) {
-            $player->getInventory()->addItem($this->getItem());
-            $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.claim.auctioneer-item-success", ["{ITEM}" => $this->getItem()->getName()]));
+            $ev = new AuctionClaimItemEvent($this, $player, clone $this->getItem());
+            $ev->call();
+            if (!$ev->isCancelled()) {
+                $player->getInventory()->addItem($ev->getItem());
+                $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.claim.auctioneer-item-success", ["{ITEM}" => $this->getItem()->getName()]));
+            }
         } else {
-            PiggyAuctions::getInstance()->getEconomyProvider()->giveMoney($player, $this->getTopBid()->getBidAmount());
-            $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.claim.auctioneer-money-success", ["{ITEM}" => $this->getItem()->getName(), "{MONEY}" => $this->getTopBid()->getBidAmount()]));
+            $ev = new AuctionClaimMoneyEvent($this, $player, $this->getTopBid()->getBidAmount());
+            $ev->call();
+            if (!$ev->isCancelled()) {
+                PiggyAuctions::getInstance()->getEconomyProvider()->giveMoney($player, $ev->getAmount());
+                $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.claim.auctioneer-money-success", ["{ITEM}" => $this->getItem()->getName(), "{MONEY}" => $this->getTopBid()->getBidAmount()]));
+            }
         }
         $this->claimed = true;
         $this->hasExpired();
