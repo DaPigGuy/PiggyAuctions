@@ -6,6 +6,8 @@ namespace DaPigGuy\PiggyAuctions\menu;
 
 use DaPigGuy\PiggyAuctions\auction\Auction;
 use DaPigGuy\PiggyAuctions\auction\AuctionBid;
+use DaPigGuy\PiggyAuctions\events\AuctionBidEvent;
+use DaPigGuy\PiggyAuctions\events\AuctionStartEvent;
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
 use DaPigGuy\PiggyAuctions\tasks\InventoryClosureTask;
 use DaPigGuy\PiggyAuctions\utils\Utils;
@@ -224,9 +226,13 @@ class Menu
                     return true;
                 case 29:
                     if ($itemClicked->getDamage() === 13) {
-                        PiggyAuctions::getInstance()->getAuctionManager()->addAuction($player->getName(), $action->getInventory()->getItem(13), time(), time() + (($tag = $action->getInventory()->getItem(33)->getNamedTagEntry("Duration")) ? $tag->getValue() : 7200), ($tag = $action->getInventory()->getItem(31)->getNamedTagEntry("StartingBid")) ? $tag->getValue() : 50);
-                        $action->getInventory()->clear(13);
-                        self::displayAuctionManager($player);
+                        $ev = new AuctionStartEvent($player, $action->getInventory()->getItem(13), time(), time() + (($tag = $action->getInventory()->getItem(33)->getNamedTagEntry("Duration")) ? $tag->getValue() : 7200), ($tag = $action->getInventory()->getItem(31)->getNamedTagEntry("StartingBid")) ? $tag->getValue() : 50);
+                        $ev->call();
+                        if (!$ev->isCancelled()) {
+                            PiggyAuctions::getInstance()->getAuctionManager()->addAuction(...$ev->getAuctionData());
+                            $action->getInventory()->clear(13);
+                            self::displayAuctionManager($player);
+                        }
                     }
                     break;
                 case 31:
@@ -438,8 +444,13 @@ class Menu
                                     if ((($topBid = $auction->getTopBid()) === null && $bidAmount >= $auction->getStartingBid()) || ($topBid !== null && $bidAmount >= (int)($topBid->getBidAmount() * 1.15))) {
                                         if ($topBid === null || $topBid->getBidder() !== $player->getName()) {
                                             if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($player) >= $bidAmount) {
-                                                PiggyAuctions::getInstance()->getEconomyProvider()->takeMoney($player, $bidAmount - ($auction->getTopBidBy($player->getName()) === null ? 0 : $auction->getTopBidBy($player->getName())->getBidAmount()));
-                                                $auction->addBid(new AuctionBid($auction->getId(), $player->getName(), $bidAmount, time()));
+                                                $bid = new AuctionBid($auction->getId(), $player->getName(), $bidAmount, time());
+                                                $ev = new AuctionBidEvent($bid);
+                                                $ev->call();
+                                                if (!$ev->isCancelled()) {
+                                                    PiggyAuctions::getInstance()->getEconomyProvider()->takeMoney($player, $bidAmount - ($auction->getTopBidBy($player->getName()) === null ? 0 : $auction->getTopBidBy($player->getName())->getBidAmount()));
+                                                    $auction->addBid($bid);
+                                                }
                                             }
                                         }
                                     }

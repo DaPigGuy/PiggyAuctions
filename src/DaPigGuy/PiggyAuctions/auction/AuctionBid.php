@@ -61,6 +61,14 @@ class AuctionBid
     }
 
     /**
+     * @param int $bidAmount
+     */
+    public function setBidAmount(int $bidAmount): void
+    {
+        $this->bidAmount = $bidAmount;
+    }
+
+    /**
      * @return int
      */
     public function getTimestamp(): int
