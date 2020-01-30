@@ -6,7 +6,6 @@ namespace DaPigGuy\PiggyAuctions\events;
 
 use DaPigGuy\PiggyAuctions\auction\Auction;
 use pocketmine\event\Cancellable;
-use pocketmine\item\Item;
 use pocketmine\Player;
 
 /**
@@ -44,7 +43,7 @@ class AuctionClaimMoneyEvent extends AuctionEvent implements Cancellable
     /**
      * @return int
      */
-    public function getAmount(): Item
+    public function getAmount(): int
     {
         return $this->amount;
     }
