@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace DaPigGuy\PiggyAuctions\auction;
 
+use DaPigGuy\PiggyAuctions\events\AuctionExpireEvent;
+use DaPigGuy\PiggyAuctions\events\AuctionLoadEvent;
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
 use pocketmine\item\Item;
 use pocketmine\Player;
@@ -158,6 +160,7 @@ class AuctionManager
             "bids" => json_encode([])
         ], function (int $id) use ($auctioneer, $item, $startDate, $endDate, $startingBid) {
             $this->auctions[$id] = new Auction($id, $auctioneer, $item, $startDate, $endDate, false, [], $startingBid, []);
+            (new AuctionLoadEvent($this->auctions[$id]))->call();
         });
     }
 
@@ -184,6 +187,7 @@ class AuctionManager
     public function removeAuction(Auction $auction): void
     {
         unset($this->auctions[$auction->getId()]);
+        (new AuctionExpireEvent($auction))->call();
         $this->plugin->getDatabase()->executeChange("piggyauctions.remove", ["id" => $auction->getId()]);
     }
 }
