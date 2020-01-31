@@ -175,6 +175,7 @@ class Auction
             $ev = new AuctionClaimItemEvent($this, $player, clone $this->getItem());
             $ev->call();
             if (!$ev->isCancelled()) {
+                PiggyAuctions::getInstance()->getStatsManager()->getStatistics($player)->incrementStatistic("auctions_won");
                 $player->getInventory()->addItem($ev->getItem());
                 $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.claim.bidder-item-success", ["{PLAYER}" => $this->getAuctioneer(), "{ITEM}" => $this->getItem()->getName(), "{MONEY}" => $topBid->getBidAmount()]));
             }
@@ -194,10 +195,12 @@ class Auction
     public function claim(Player $player): void
     {
         if ($this->claimed) return;
+        $stats = PiggyAuctions::getInstance()->getStatsManager()->getStatistics($player);
         if ($this->getTopBid() === null) {
             $ev = new AuctionClaimItemEvent($this, $player, clone $this->getItem());
             $ev->call();
             if (!$ev->isCancelled()) {
+                $stats->incrementStatistic("auctions_no_bids");
                 $player->getInventory()->addItem($ev->getItem());
                 $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.claim.auctioneer-item-success", ["{ITEM}" => $this->getItem()->getName()]));
             }
@@ -205,6 +208,9 @@ class Auction
             $ev = new AuctionClaimMoneyEvent($this, $player, $this->getTopBid()->getBidAmount());
             $ev->call();
             if (!$ev->isCancelled()) {
+                $stats->incrementStatistic("auctions_with_bids");
+                $stats->incrementStatistic("money_earned", $ev->getAmount());
+                if ($stats->getStatistic("highest_held") < $ev->getAmount()) $stats->setStatistic("highest_held", $ev->getAmount());
                 PiggyAuctions::getInstance()->getEconomyProvider()->giveMoney($player, $ev->getAmount());
                 $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.claim.auctioneer-money-success", ["{ITEM}" => $this->getItem()->getName(), "{MONEY}" => $this->getTopBid()->getBidAmount()]));
             }
