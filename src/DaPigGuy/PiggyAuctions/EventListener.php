@@ -42,7 +42,6 @@ class EventListener implements Listener
      */
     public function onJoin(PlayerJoinEvent $event): void
     {
-        $this->plugin->getStatsManager()->getStatistics($event->getPlayer())->incrementStatistics("test", 500);
         var_dump(json_encode($this->plugin->getStatsManager()->getStatistics($event->getPlayer())));
     }
 

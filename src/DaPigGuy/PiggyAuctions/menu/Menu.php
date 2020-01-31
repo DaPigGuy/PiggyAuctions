@@ -229,6 +229,7 @@ class Menu
                         $ev = new AuctionStartEvent($player, $action->getInventory()->getItem(13), time(), time() + (($tag = $action->getInventory()->getItem(33)->getNamedTagEntry("Duration")) ? $tag->getValue() : 7200), ($tag = $action->getInventory()->getItem(31)->getNamedTagEntry("StartingBid")) ? $tag->getValue() : 50);
                         $ev->call();
                         if (!$ev->isCancelled()) {
+                            PiggyAuctions::getInstance()->getStatsManager()->getStatistics($player)->incrementStatistic("auctions_created");
                             PiggyAuctions::getInstance()->getAuctionManager()->addAuction(...$ev->getAuctionData());
                             $action->getInventory()->clear(13);
                             self::displayAuctionManager($player);
@@ -443,13 +444,23 @@ class Menu
                                 case 11:
                                     if ((($topBid = $auction->getTopBid()) === null && $bidAmount >= $auction->getStartingBid()) || ($topBid !== null && $bidAmount >= (int)($topBid->getBidAmount() * 1.15))) {
                                         if ($topBid === null || $topBid->getBidder() !== $player->getName()) {
-                                            if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($player) >= $bidAmount) {
+                                            $cost = $bidAmount - ($auction->getTopBidBy($player->getName()) === null ? 0 : $auction->getTopBidBy($player->getName())->getBidAmount());
+                                            if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($player) >= $cost) {
                                                 $bid = new AuctionBid($auction->getId(), $player->getName(), $bidAmount, time());
                                                 $ev = new AuctionBidEvent($auction, $bid);
                                                 $ev->call();
                                                 if (!$ev->isCancelled()) {
-                                                    PiggyAuctions::getInstance()->getEconomyProvider()->takeMoney($player, $ev->getBid()->getBidAmount() - ($auction->getTopBidBy($player->getName()) === null ? 0 : $auction->getTopBidBy($player->getName())->getBidAmount()));
+                                                    $cost = $ev->getBid()->getBidAmount() - ($auction->getTopBidBy($player->getName()) === null ? 0 : $auction->getTopBidBy($player->getName())->getBidAmount());
+                                                    PiggyAuctions::getInstance()->getEconomyProvider()->takeMoney($player, $cost);
                                                     $auction->addBid($bid);
+
+                                                    $stats = PiggyAuctions::getInstance()->getStatsManager()->getStatistics($player);
+                                                    $stats->incrementStatistic("gold_spent", $cost);
+                                                    $stats->incrementStatistic("bids");
+                                                    if ($stats->getStatistic("highest_bid") < $bid->getBidAmount()) {
+                                                        $stats->setStatistic("highest_bid", $bid->getBidAmount());
+                                                    }
+
                                                     $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.bid.success", ["{MONEY}" => $ev->getBid()->getBidAmount(), "{ITEM}" => $auction->getItem()->getName()]));
                                                     if (($auctioneer = PiggyAuctions::getInstance()->getServer()->getPlayerExact($auction->getAuctioneer())) instanceof Player) $auctioneer->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.bid.bidder", ["{PLAYER}" => $player->getName(), "{MONEY}" => $ev->getBid()->getBidAmount(), "{ITEM}" => $auction->getItem()->getName()]));
                                                 }

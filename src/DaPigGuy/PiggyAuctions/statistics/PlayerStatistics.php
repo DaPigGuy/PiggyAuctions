@@ -33,7 +33,7 @@ class PlayerStatistics implements \JsonSerializable
      * @param string $name
      * @return int
      */
-    public function getStatistics(string $name): int
+    public function getStatistic(string $name): int
     {
         return $this->statistics[$name] ?? 0;
     }
@@ -42,7 +42,7 @@ class PlayerStatistics implements \JsonSerializable
      * @param string $name
      * @param int $value
      */
-    public function setStatistics(string $name, int $value): void
+    public function setStatistic(string $name, int $value): void
     {
         $this->statistics[$name] = $value;
         PiggyAuctions::getInstance()->getStatsManager()->saveStatistics($this->player);
@@ -52,7 +52,7 @@ class PlayerStatistics implements \JsonSerializable
      * @param string $name
      * @param int $amount
      */
-    public function incrementStatistics(string $name, int $amount): void
+    public function incrementStatistic(string $name, int $amount = 1): void
     {
         if (!isset($this->statistics[$name])) $this->statistics[$name] = 0;
         $this->statistics[$name] += $amount;
