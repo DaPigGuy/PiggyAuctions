@@ -10,12 +10,10 @@ use DaPigGuy\libPiggyEconomy\libPiggyEconomy;
 use DaPigGuy\libPiggyEconomy\providers\EconomyProvider;
 use DaPigGuy\PiggyAuctions\auction\AuctionManager;
 use DaPigGuy\PiggyAuctions\commands\AuctionHouseCommand;
+use DaPigGuy\PiggyAuctions\statistics\StatisticsManager;
 use DaPigGuy\PiggyAuctions\utils\Utils;
 use muqsit\invmenu\InvMenuHandler;
-use pocketmine\event\inventory\InventoryTransactionEvent;
 use pocketmine\event\Listener;
-use pocketmine\inventory\transaction\action\SlotChangeAction;
-use pocketmine\item\Item;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\Config;
 use poggit\libasynql\DataConnector;
@@ -39,6 +37,8 @@ class PiggyAuctions extends PluginBase implements Listener
     private $economyProvider;
     /** @var AuctionManager */
     private $auctionManager;
+    /** @var StatisticsManager */
+    private $statsManager;
 
     /**
      * @throws MissingProviderDependencyException
@@ -66,9 +66,11 @@ class PiggyAuctions extends PluginBase implements Listener
         $this->auctionManager = new AuctionManager($this);
         $this->auctionManager->init();
 
+        $this->statsManager = new StatisticsManager($this);
+
         $this->getServer()->getCommandMap()->register("piggyauctions", new AuctionHouseCommand($this, "auctionhouse", "Open the auction house", ["ah"]));
 
-        $this->getServer()->getPluginManager()->registerEvents($this, $this);
+        $this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
     }
 
     /**
@@ -114,15 +116,10 @@ class PiggyAuctions extends PluginBase implements Listener
     }
 
     /**
-     * @param InventoryTransactionEvent $event
-     * @priority MONITOR
+     * @return StatisticsManager
      */
-    public function onInventoryTransaction(InventoryTransactionEvent $event): void
+    public function getStatsManager(): StatisticsManager
     {
-        $transaction = $event->getTransaction();
-        $player = $transaction->getSource();
-        foreach ($transaction->getActions() as $action) {
-            if ($action instanceof SlotChangeAction && $event->isCancelled()) $action->getInventory()->sendSlot($action->getSlot(), $player);
-        }
+        return $this->statsManager;
     }
 }

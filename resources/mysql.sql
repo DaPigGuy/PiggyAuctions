@@ -53,4 +53,38 @@ FROM auctions
 WHERE id = :id;
 -- # }
 
+-- # { statistics
+
+-- # { init
+CREATE TABLE IF NOT EXISTS statistics
+(
+    player VARCHAR(15),
+    stats  JSON
+);
+-- # }
+
+-- # { load
+-- #    :player string
+SELECT *
+FROM statistics
+WHERE player = :player;
+-- # }
+
+-- # { add
+-- #    :player string
+-- #    :stats string
+INSERT INTO statistics (player, stats)
+VALUES (:player, :stats);
+-- # }
+
+-- # { update
+-- #    :player string
+-- #    :stats string
+UPDATE statistics
+SET stats = :stats
+WHERE player = :player
+-- # }
+
+-- # }
+
 -- #}
