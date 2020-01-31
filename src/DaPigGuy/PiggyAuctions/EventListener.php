@@ -6,7 +6,6 @@ namespace DaPigGuy\PiggyAuctions;
 
 use pocketmine\event\inventory\InventoryTransactionEvent;
 use pocketmine\event\Listener;
-use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerPreLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
@@ -35,14 +34,6 @@ class EventListener implements Listener
     public function onPreLogin(PlayerPreLoginEvent $event): void
     {
         $this->plugin->getStatsManager()->loadStatistics($event->getPlayer());
-    }
-
-    /**
-     * @param PlayerJoinEvent $event
-     */
-    public function onJoin(PlayerJoinEvent $event): void
-    {
-        var_dump(json_encode($this->plugin->getStatsManager()->getStatistics($event->getPlayer())));
     }
 
     /**
