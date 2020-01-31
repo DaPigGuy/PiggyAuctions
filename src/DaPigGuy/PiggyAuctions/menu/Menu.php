@@ -39,7 +39,8 @@ class Menu
         $menu->getInventory()->setContents([
             11 => Item::get(Item::GOLD_BLOCK)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.main-menu.browse-auctions")),
             13 => Item::get(Item::GOLDEN_CARROT)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.main-menu.view-bids")),
-            15 => Item::get(Item::GOLDEN_HORSE_ARMOR)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.main-menu.manage-auctions"))
+            15 => Item::get(Item::GOLDEN_HORSE_ARMOR)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.main-menu.manage-auctions")),
+            26 => Item::get(Item::MAP)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.main-menu.auction-stats"))
         ]);
         $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool {
             switch ($action->getSlot()) {
@@ -56,9 +57,40 @@ class Menu
                     }
                     self::displayAuctionManager($player);
                     break;
+                case 26:
+                    self::displayAuctionStats($player);
+                    break;
             }
             return false;
         });
+        $menu->send($player);
+    }
+
+    /**
+     * @param Player $player
+     */
+    public static function displayAuctionStats(Player $player): void
+    {
+        $menu = InvMenu::create(InvMenu::TYPE_CHEST);
+        $menu->setName(PiggyAuctions::getInstance()->getMessage("menus.stats.title"));
+
+        $sellerStats = PiggyAuctions::getInstance()->getMessage("menus.stats.seller-stats");
+        preg_match_all("/{STAT_(.*?)}/", $sellerStats, $matches);
+        foreach ($matches[0] as $index => $match) {
+            $sellerStats = str_replace($match, PiggyAuctions::getInstance()->getStatsManager()->getStatistics($player)->getStatistic($matches[1][$index]), $sellerStats);
+        }
+
+        $buyerStats = PiggyAuctions::getInstance()->getMessage("menus.stats.buyer-stats");
+        preg_match_all("/{STAT_(.*?)}/", $buyerStats, $matches);
+        foreach ($matches[0] as $index => $match) {
+            $buyerStats = str_replace($match, PiggyAuctions::getInstance()->getStatsManager()->getStatistics($player)->getStatistic($matches[1][$index]), $buyerStats);
+        }
+
+        $menu->getInventory()->setContents([
+            11 => Item::get(Item::EMPTYMAP)->setCustomName($sellerStats),
+            15 => Item::get(Item::MAP)->setCustomName($buyerStats)
+        ]);
+        $menu->readonly();
         $menu->send($player);
     }
 
@@ -455,7 +487,7 @@ class Menu
                                                     $auction->addBid($bid);
 
                                                     $stats = PiggyAuctions::getInstance()->getStatsManager()->getStatistics($player);
-                                                    $stats->incrementStatistic("gold_spent", $cost);
+                                                    $stats->incrementStatistic("money_spent", $cost);
                                                     $stats->incrementStatistic("bids");
                                                     if ($stats->getStatistic("highest_bid") < $bid->getBidAmount()) {
                                                         $stats->setStatistic("highest_bid", $bid->getBidAmount());

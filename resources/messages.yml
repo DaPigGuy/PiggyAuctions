@@ -8,6 +8,11 @@ menus:
     browse-auctions: "{RESET}{GOLD}Auctions Browser\n\n{YELLOW}Click to browse!"
     view-bids: "{RESET}{GREEN}View Bids\n\n{YELLOW}Click to view!"
     manage-auctions: "{RESET}{GREEN}Manage Auctions\n\n{YELLOW}Click to manage!"
+    auction-stats: "{RESET}{GREEN}Auction Stats\n\n{YELLOW}Click to view!"
+  stats:
+    title: "Auction Stats"
+    seller-stats: "{RESET}{GREEN}Seller Stats\n\n{GRAY}Auctions created: {GOLD}{STAT_auctions_created}\n{GRAY}Auctions completed with bids: {GOLD}{STAT_auctions_with_bids}\n{GRAY}Auctions completed without bids: {GOLD}{STAT_auctions_no_bids}\n\n{GRAY}Highest auction held: {GOLD}{STAT_highest_held}\n{GRAY}Total money earned: {GOLD}{STAT_money_earned}"
+    buyer-stats: "{RESET}{GREEN}Buyer Stats\n\n{GRAY}Auctions won: {GOLD}{STAT_auctions_won}\n{GRAY}Total bids: {GOLD}{STAT_bids}\n\n{GRAY}Highest bid: {GOLD}{STAT_highest_bid}\n{GRAY}Money spent: {GOLD}{STAT_money_spent}"
   auction-browser:
     title: "Auction Browsers"
     previous-page: "{RESET}{GREEN}Previous Page\n{GRAY}({PAGE}/{MAXPAGES})\n\n{YELLOW}Click to turn page!"
