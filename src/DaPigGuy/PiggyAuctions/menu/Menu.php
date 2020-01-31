@@ -77,13 +77,13 @@ class Menu
         $sellerStats = PiggyAuctions::getInstance()->getMessage("menus.stats.seller-stats");
         preg_match_all("/{STAT_(.*?)}/", $sellerStats, $matches);
         foreach ($matches[0] as $index => $match) {
-            $sellerStats = str_replace($match, PiggyAuctions::getInstance()->getStatsManager()->getStatistics($player)->getStatistic($matches[1][$index]), $sellerStats);
+            $sellerStats = str_replace($match, (string)PiggyAuctions::getInstance()->getStatsManager()->getStatistics($player)->getStatistic($matches[1][$index]), $sellerStats);
         }
 
         $buyerStats = PiggyAuctions::getInstance()->getMessage("menus.stats.buyer-stats");
         preg_match_all("/{STAT_(.*?)}/", $buyerStats, $matches);
         foreach ($matches[0] as $index => $match) {
-            $buyerStats = str_replace($match, PiggyAuctions::getInstance()->getStatsManager()->getStatistics($player)->getStatistic($matches[1][$index]), $buyerStats);
+            $buyerStats = str_replace($match, (string)PiggyAuctions::getInstance()->getStatsManager()->getStatistics($player)->getStatistic($matches[1][$index]), $buyerStats);
         }
 
         $menu->getInventory()->setContents([
