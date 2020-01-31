@@ -15,7 +15,7 @@ class StatisticsManager
 {
     /** @var PiggyAuctions */
     private $plugin;
-    /** @var */
+    /** @var PlayerStatistics[] */
     private $statistics;
 
     /**
