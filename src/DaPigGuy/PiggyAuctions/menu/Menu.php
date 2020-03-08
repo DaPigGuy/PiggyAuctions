@@ -88,9 +88,13 @@ class Menu
 
         $menu->getInventory()->setContents([
             11 => Item::get(Item::EMPTYMAP)->setCustomName($sellerStats),
-            15 => Item::get(Item::MAP)->setCustomName($buyerStats)
+            15 => Item::get(Item::MAP)->setCustomName($buyerStats),
+            22 => Item::get(Item::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back"))
         ]);
-        $menu->readonly();
+        $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool {
+            if ($action->getSlot() === 22) self::displayMainMenu($player);
+            return false;
+        });
         $menu->send($player);
     }
 
