@@ -54,7 +54,7 @@ class PiggyAuctions extends PluginBase implements Listener
         $this->saveDefaultConfig();
         $this->database = libasynql::create($this, $this->getConfig()->get("database"), [
             "sqlite" => "sqlite.sql",
-            "mysql" => "mysql.sql"
+            "mysql" => "mysql.sql",
         ]);
 
         libPiggyEconomy::init();
