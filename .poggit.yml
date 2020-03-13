@@ -1,0 +1,12 @@
+--- # Poggit-CI Manifest. Open the CI at https://poggit.pmmp.io/ci/DaPigGuy/PiggyAuctions
+branches:
+  - master
+projects:
+  PiggyAuctions:
+    path: ""
+    libs:
+      - src: muqsit/InvMenu/
+        version: ^3.1
+      - src: CortexPE/Commando/Commando
+        version: ^0.5
+...
