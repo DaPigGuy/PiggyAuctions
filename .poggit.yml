@@ -5,7 +5,7 @@ projects:
   PiggyAuctions:
     path: ""
     libs:
-      - src: muqsit/InvMenu/
+      - src: muqsit/InvMenu/InvMenu
         version: ^3.1
       - src: CortexPE/Commando/Commando
         version: ^0.5
