@@ -28,7 +28,6 @@ class AuctionClaimItemEvent extends AuctionEvent implements Cancellable
         return $this->player;
     }
 
-
     public function getItem(): Item
     {
         return $this->item;
