@@ -6,10 +6,6 @@ namespace DaPigGuy\PiggyAuctions\auction;
 
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
 
-/**
- * Class AuctionBid
- * @package DaPigGuy\PiggyAuctions\auction
- */
 class AuctionBid
 {
     /** @var int */
@@ -21,13 +17,6 @@ class AuctionBid
     /** @var int */
     public $timestamp;
 
-    /**
-     * AuctionBid constructor.
-     * @param int $auctionID
-     * @param string $bidder
-     * @param int $bidAmount
-     * @param int $timestamp
-     */
     public function __construct(int $auctionID, string $bidder, int $bidAmount, int $timestamp)
     {
         $this->auctionID = $auctionID;
@@ -36,41 +25,26 @@ class AuctionBid
         $this->timestamp = $timestamp;
     }
 
-    /**
-     * @return Auction|null
-     */
     public function getAuction(): ?Auction
     {
         return PiggyAuctions::getInstance()->getAuctionManager()->getAuction($this->auctionID);
     }
 
-    /**
-     * @return string
-     */
     public function getBidder(): string
     {
         return $this->bidder;
     }
 
-    /**
-     * @return int
-     */
     public function getBidAmount(): int
     {
         return $this->bidAmount;
     }
 
-    /**
-     * @param int $bidAmount
-     */
     public function setBidAmount(int $bidAmount): void
     {
         $this->bidAmount = $bidAmount;
     }
 
-    /**
-     * @return int
-     */
     public function getTimestamp(): int
     {
         return $this->timestamp;

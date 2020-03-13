@@ -14,15 +14,12 @@ use DaPigGuy\PiggyAuctions\statistics\StatisticsManager;
 use DaPigGuy\PiggyAuctions\utils\Utils;
 use muqsit\invmenu\InvMenuHandler;
 use pocketmine\event\Listener;
+use pocketmine\item\Item;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\Config;
 use poggit\libasynql\DataConnector;
 use poggit\libasynql\libasynql;
 
-/**
- * Class PiggyAuctions
- * @package DaPigGuy\PiggyAuctions
- */
 class PiggyAuctions extends PluginBase implements Listener
 {
     /** @var self */
@@ -73,51 +70,31 @@ class PiggyAuctions extends PluginBase implements Listener
         $this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
     }
 
-    /**
-     * @return PiggyAuctions
-     */
     public static function getInstance(): PiggyAuctions
     {
         return self::$instance;
     }
 
-    /**
-     * @param string $key
-     * @param array $tags
-     * @return string
-     */
     public function getMessage(string $key, array $tags = []): string
     {
         return Utils::translateColorTags(str_replace(array_keys($tags), $tags, $this->messages->getNested($key, $key)));
     }
 
-    /**
-     * @return DataConnector
-     */
     public function getDatabase(): DataConnector
     {
         return $this->database;
     }
 
-    /**
-     * @return EconomyProvider
-     */
     public function getEconomyProvider(): EconomyProvider
     {
         return $this->economyProvider;
     }
 
-    /**
-     * @return AuctionManager
-     */
     public function getAuctionManager(): AuctionManager
     {
         return $this->auctionManager;
     }
 
-    /**
-     * @return StatisticsManager
-     */
     public function getStatsManager(): StatisticsManager
     {
         return $this->statsManager;

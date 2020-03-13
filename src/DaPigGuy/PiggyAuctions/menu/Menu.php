@@ -21,17 +21,10 @@ use pocketmine\nbt\tag\StringTag;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
-/**
- * Class Menu
- * @package DaPigGuy\PiggyAuctions\menu
- */
 class Menu
 {
     const PAGE_LENGTH = 45;
 
-    /**
-     * @param Player $player
-     */
     public static function displayMainMenu(Player $player): void
     {
         $menu = InvMenu::create(InvMenu::TYPE_CHEST);
@@ -66,9 +59,6 @@ class Menu
         $menu->send($player);
     }
 
-    /**
-     * @param Player $player
-     */
     public static function displayAuctionStats(Player $player): void
     {
         $menu = InvMenu::create(InvMenu::TYPE_CHEST);
@@ -98,12 +88,6 @@ class Menu
         $menu->send($player);
     }
 
-    /**
-     * @param Player $player
-     * @param int $page
-     * @param string $search
-     * @param int $sortType
-     */
     public static function displayAuctionBrowser(Player $player, int $page = 1, string $search = "", int $sortType = MenuSort::TYPE_HIGHEST_BID): void
     {
         $menu = InvMenu::create(InvMenu::TYPE_DOUBLE_CHEST);
@@ -165,10 +149,6 @@ class Menu
     }
 
     /**
-     * @param Inventory $inventory
-     * @param int $page
-     * @param string $search
-     * @param int $sortType
      * @return Auction[]
      */
     public static function displayPageAuctions(Inventory $inventory, int $page, string $search = "", int $sortType = MenuSort::TYPE_HIGHEST_BID): array
@@ -208,9 +188,6 @@ class Menu
         return $displayedAuctions;
     }
 
-    /**
-     * @param Player $player
-     */
     public static function displayBidsPage(Player $player): void
     {
         $menu = InvMenu::create(InvMenu::TYPE_CHEST);
@@ -241,9 +218,6 @@ class Menu
         $menu->send($player);
     }
 
-    /**
-     * @param Player $player
-     */
     public static function displayAuctionCreator(Player $player): void
     {
         $menu = InvMenu::create(InvMenu::TYPE_DOUBLE_CHEST);
@@ -324,10 +298,6 @@ class Menu
         $menu->send($player);
     }
 
-    /**
-     * @param Player $player
-     * @param int $sortType
-     */
     public static function displayAuctionManager(Player $player, int $sortType = MenuSort::TYPE_RECENTLY_UPDATED): void
     {
         $menu = InvMenu::create(InvMenu::TYPE_CHEST);
@@ -379,10 +349,6 @@ class Menu
         $menu->send($player);
     }
 
-    /**
-     * @param Player $player
-     * @param string $auctioneer
-     */
     public static function displayAuctioneerPage(Player $player, string $auctioneer): void
     {
         $menu = InvMenu::create(InvMenu::TYPE_CHEST);
@@ -402,12 +368,6 @@ class Menu
         $menu->send($player);
     }
 
-    /**
-     * @param Player $player
-     * @param Auction $auction
-     * @param callable $callback
-     * @param int|null $bidAmount
-     */
     public static function displayItemPage(Player $player, Auction $auction, callable $callback, ?int $bidAmount = null): void
     {
         $menu = InvMenu::create(InvMenu::TYPE_DOUBLE_CHEST);
@@ -549,13 +509,7 @@ class Menu
     }
 
     /**
-     * @param Inventory $inventory
      * @param Auction[] $auctions
-     * @param int $arrayOffset
-     * @param int $offsetSlot
-     * @param int $displayCount
-     * @param callable|null $itemIndexFunction
-     * @param callable|null $sortFunction
      * @return Auction[]
      */
     public static function updateDisplayedItems(Inventory $inventory, array $auctions, int $arrayOffset, int $offsetSlot, int $displayCount, ?callable $itemIndexFunction = null, ?callable $sortFunction = null): array
@@ -573,10 +527,6 @@ class Menu
         return array_slice($auctions, $arrayOffset, $displayCount);
     }
 
-    /**
-     * @param Auction $auction
-     * @return Item
-     */
     public static function getDisplayItem(Auction $auction): Item
     {
         $item = clone $auction->getItem();

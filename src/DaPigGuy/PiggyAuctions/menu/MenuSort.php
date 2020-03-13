@@ -6,10 +6,6 @@ namespace DaPigGuy\PiggyAuctions\menu;
 
 use DaPigGuy\PiggyAuctions\auction\Auction;
 
-/**
- * Class MenuSort
- * @package DaPigGuy\PiggyAuctions\menu
- */
 class MenuSort
 {
     const TYPE_HIGHEST_BID = 0;
@@ -18,10 +14,6 @@ class MenuSort
     const TYPE_MOST_BIDS = 3;
     const TYPE_RECENTLY_UPDATED = 5;
 
-    /**
-     * @param int $type
-     * @return \Closure
-     */
     public static function closureFromType(int $type): \Closure
     {
         switch ($type) {

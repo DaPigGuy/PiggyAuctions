@@ -10,10 +10,6 @@ use DaPigGuy\PiggyAuctions\PiggyAuctions;
 use pocketmine\item\Item;
 use pocketmine\Player;
 
-/**
- * Class Auction
- * @package DaPigGuy\PiggyAuctions\auction
- */
 class Auction
 {
     /** @var int */
@@ -37,15 +33,6 @@ class Auction
     public $bids;
 
     /**
-     * Auction constructor.
-     * @param int $id
-     * @param string $auctioneer
-     * @param Item $item
-     * @param int $startDate
-     * @param int $endDate
-     * @param bool $claimed
-     * @param array $claimedBids
-     * @param int $startingBid
      * @param AuctionBid[] $bids
      */
     public function __construct(int $id, string $auctioneer, Item $item, int $startDate, int $endDate, bool $claimed, array $claimedBids, int $startingBid, array $bids)
@@ -61,49 +48,32 @@ class Auction
         $this->bids = $bids;
     }
 
-    /**
-     * @return int
-     */
     public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * @return string
-     */
+
     public function getAuctioneer(): string
     {
         return $this->auctioneer;
     }
 
-    /**
-     * @return Item
-     */
     public function getItem(): Item
     {
         return $this->item;
     }
 
-    /**
-     * @return int
-     */
     public function getStartDate(): int
     {
         return $this->startDate;
     }
 
-    /**
-     * @return int
-     */
     public function getEndDate(): int
     {
         return $this->endDate;
     }
 
-    /**
-     * @return bool
-     */
     public function hasExpired(): bool
     {
         $expired = time() > $this->endDate;
@@ -114,17 +84,11 @@ class Auction
         return $expired;
     }
 
-    /**
-     * @return bool
-     */
     public function isClaimed(): bool
     {
         return $this->claimed;
     }
 
-    /**
-     * @return int
-     */
     public function getStartingBid(): int
     {
         return $this->startingBid;
@@ -149,7 +113,6 @@ class Auction
     }
 
     /**
-     * @param string $player
      * @return AuctionBid[]
      */
     public function getUnclaimedBidsHeldBy(string $player): array
@@ -159,9 +122,6 @@ class Auction
         });
     }
 
-    /**
-     * @param Player $player
-     */
     public function bidderClaim(Player $player): void
     {
         $bids = $this->getUnclaimedBidsHeldBy($player->getName());
@@ -189,9 +149,6 @@ class Auction
         }
     }
 
-    /**
-     * @param Player $player
-     */
     public function claim(Player $player): void
     {
         if ($this->claimed) return;
@@ -228,9 +185,6 @@ class Auction
         return $this->bids;
     }
 
-    /**
-     * @return AuctionBid|null
-     */
     public function getTopBid(): ?AuctionBid
     {
         $highestBid = null;
@@ -244,10 +198,6 @@ class Auction
         return $highestBid;
     }
 
-    /**
-     * @param string $player
-     * @return AuctionBid|null
-     */
     public function getTopBidBy(string $player): ?AuctionBid
     {
         $highestBid = null;
@@ -261,9 +211,6 @@ class Auction
         return $highestBid;
     }
 
-    /**
-     * @param AuctionBid $bid
-     */
     public function addBid(AuctionBid $bid): void
     {
         $notified = [];

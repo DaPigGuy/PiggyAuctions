@@ -10,42 +10,27 @@ use pocketmine\event\player\PlayerPreLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 
-/**
- * Class EventListener
- * @package DaPigGuy\PiggyAuctions
- */
 class EventListener implements Listener
 {
     /** @var PiggyAuctions */
     private $plugin;
 
-    /**
-     * EventListener constructor.
-     * @param PiggyAuctions $plugin
-     */
     public function __construct(PiggyAuctions $plugin)
     {
         $this->plugin = $plugin;
     }
 
-    /**
-     * @param PlayerPreLoginEvent $event
-     */
     public function onPreLogin(PlayerPreLoginEvent $event): void
     {
         $this->plugin->getStatsManager()->loadStatistics($event->getPlayer());
     }
 
-    /**
-     * @param PlayerQuitEvent $event
-     */
     public function onQuit(PlayerQuitEvent $event): void
     {
         $this->plugin->getStatsManager()->unloadStatistics($event->getPlayer());
     }
 
     /**
-     * @param InventoryTransactionEvent $event
      * @priority MONITOR
      */
     public function onInventoryTransaction(InventoryTransactionEvent $event): void

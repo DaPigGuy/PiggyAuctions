@@ -14,19 +14,12 @@ use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
-/**
- * Class AuctionHouseCommand
- * @package DaPigGuy\PiggyAuctions\commands
- */
 class AuctionHouseCommand extends BaseCommand
 {
     /** @var PiggyAuctions */
     private $plugin;
 
     /**
-     * @param PiggyAuctions $plugin
-     * @param string $name
-     * @param string $description
      * @param string[] $aliases
      */
     public function __construct(PiggyAuctions $plugin, string $name, string $description = "", array $aliases = [])
@@ -36,8 +29,6 @@ class AuctionHouseCommand extends BaseCommand
     }
 
     /**
-     * @param CommandSender $sender
-     * @param string $aliasUsed
      * @param BaseArgument[] $args
      */
     public function onRun(CommandSender $sender, string $aliasUsed, array $args): void

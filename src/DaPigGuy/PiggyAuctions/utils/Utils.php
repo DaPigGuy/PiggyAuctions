@@ -6,16 +6,8 @@ namespace DaPigGuy\PiggyAuctions\utils;
 
 use pocketmine\utils\TextFormat;
 
-/**
- * Class Utils
- * @package DaPigGuy\PiggyAuctions\utils
- */
 class Utils
 {
-    /**
-     * @param int $duration
-     * @return string
-     */
     public static function formatDuration(int $duration): string
     {
         if ($duration > 86400) return floor($duration / 86400) . " days";
@@ -24,10 +16,6 @@ class Utils
         return $duration . " seconds";
     }
 
-    /**
-     * @param int $duration
-     * @return string
-     */
     public static function formatDetailedDuration(int $duration): string
     {
         $days = floor($duration / 86400);
@@ -48,10 +36,6 @@ class Utils
         return $dateString;
     }
 
-    /**
-     * @param string $message
-     * @return string
-     */
     public static function translateColorTags(string $message): string
     {
         $replacements = [

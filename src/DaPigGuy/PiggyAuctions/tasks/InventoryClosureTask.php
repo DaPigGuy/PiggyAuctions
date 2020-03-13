@@ -10,10 +10,6 @@ use pocketmine\network\mcpe\protocol\types\ContainerIds;
 use pocketmine\Player;
 use pocketmine\scheduler\ClosureTask;
 
-/**
- * Class InventoryClosureTask
- * @package DaPigGuy\PiggyAuctions\tasks
- */
 class InventoryClosureTask extends ClosureTask
 {
     /** @var Player */
@@ -26,12 +22,6 @@ class InventoryClosureTask extends ClosureTask
     /** @var bool */
     private $inventoryOpen = false;
 
-    /**
-     * InventoryClosureTask constructor.
-     * @param Player $player
-     * @param Inventory $inventory
-     * @param Closure $closure
-     */
     public function __construct(Player $player, Inventory $inventory, Closure $closure)
     {
         parent::__construct($closure);
@@ -39,9 +29,6 @@ class InventoryClosureTask extends ClosureTask
         $this->inventory = $inventory;
     }
 
-    /**
-     * @param int $currentTick
-     */
     public function onRun(int $currentTick): void
     {
         parent::onRun($currentTick);

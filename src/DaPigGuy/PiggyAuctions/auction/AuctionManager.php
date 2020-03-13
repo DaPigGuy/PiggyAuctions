@@ -10,10 +10,6 @@ use DaPigGuy\PiggyAuctions\PiggyAuctions;
 use pocketmine\item\Item;
 use pocketmine\Player;
 
-/**
- * Class AuctionManager
- * @package DaPigGuy\PiggyAuctions\auction
- */
 class AuctionManager
 {
     /** @var PiggyAuctions */
@@ -24,10 +20,6 @@ class AuctionManager
     /** @var bool */
     private $auctionsLoaded = false;
 
-    /**
-     * AuctionManager constructor.
-     * @param PiggyAuctions $plugin
-     */
     public function __construct(PiggyAuctions $plugin)
     {
         $this->plugin = $plugin;
@@ -66,18 +58,11 @@ class AuctionManager
         return $this->auctions;
     }
 
-    /**
-     * @return bool
-     */
     public function areAuctionsLoaded(): bool
     {
         return $this->auctionsLoaded;
     }
 
-    /**
-     * @param int $id
-     * @return Auction|null
-     */
     public function getAuction(int $id): ?Auction
     {
         return $this->auctions[$id] ?? null;
@@ -107,10 +92,6 @@ class AuctionManager
         });
     }
 
-
-    /**
-     * @return array
-     */
     public function getActiveAuctions(): array
     {
         return array_filter($this->auctions, function (Auction $auction): bool {
@@ -140,13 +121,6 @@ class AuctionManager
         });
     }
 
-    /**
-     * @param string $auctioneer
-     * @param Item $item
-     * @param int $startDate
-     * @param int $endDate
-     * @param int $startingBid
-     */
     public function addAuction(string $auctioneer, Item $item, int $startDate, int $endDate, int $startingBid): void
     {
         $this->plugin->getDatabase()->executeInsert("piggyauctions.add", [
@@ -164,9 +138,6 @@ class AuctionManager
         });
     }
 
-    /**
-     * @param Auction $auction
-     */
     public function updateAuction(Auction $auction): void
     {
         $this->plugin->getDatabase()->executeChange("piggyauctions.update", [
@@ -181,9 +152,6 @@ class AuctionManager
         ]);
     }
 
-    /**
-     * @param Auction $auction
-     */
     public function removeAuction(Auction $auction): void
     {
         unset($this->auctions[$auction->getId()]);

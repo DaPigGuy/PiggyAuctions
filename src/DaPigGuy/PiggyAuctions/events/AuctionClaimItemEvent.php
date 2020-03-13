@@ -9,10 +9,6 @@ use pocketmine\event\Cancellable;
 use pocketmine\item\Item;
 use pocketmine\Player;
 
-/**
- * Class AuctionClaimItemEvent
- * @package DaPigGuy\PiggyAuctions\events
- */
 class AuctionClaimItemEvent extends AuctionEvent implements Cancellable
 {
     /** @var Player */
@@ -20,12 +16,6 @@ class AuctionClaimItemEvent extends AuctionEvent implements Cancellable
     /** @var Item */
     private $item;
 
-    /**
-     * AuctionEvent constructor.
-     * @param Auction $auction
-     * @param Player $player
-     * @param Item $item
-     */
     public function __construct(Auction $auction, Player $player, Item $item)
     {
         parent::__construct($auction);
@@ -33,25 +23,17 @@ class AuctionClaimItemEvent extends AuctionEvent implements Cancellable
         $this->item = $item;
     }
 
-    /**
-     * @return Player
-     */
     public function getPlayer(): Player
     {
         return $this->player;
     }
 
-    /**
-     * @return Item
-     */
+
     public function getItem(): Item
     {
         return $this->item;
     }
 
-    /**
-     * @param Item $item
-     */
     public function setItem(Item $item): void
     {
         $this->item = $item;
