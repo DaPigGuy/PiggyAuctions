@@ -488,7 +488,7 @@ class Menu
                     if ($itemClicked->getId() === Item::GOLD_INGOT) {
                         $player->removeWindow($action->getInventory());
                         $form = new CustomForm(function (Player $player, ?array $data = null) use ($bidAmount, $callback, $auction): void {
-                            if ($data !== null && is_numeric($data[0])) {
+                            if ($data !== null && isset($data[0]) && is_numeric($data[0])) {
                                 self::displayItemPage($player, $auction, $callback, (int)$data[0]);
                                 return;
                             }
