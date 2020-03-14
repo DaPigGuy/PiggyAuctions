@@ -1,5 +1,6 @@
 database:
-  type: mysql
+  # Options: sqlite, mysql
+  type: sqlite
   sqlite:
     file: "auctions.sqlite"
   mysql:
@@ -9,4 +10,5 @@ database:
     schema: "piggyauctions"
   worker-limt: 1
 economy:
-  provider: EconomyS
+  # Options: economyapi, multieconomy, xp
+  provider: economyapi

@@ -11,10 +11,10 @@ use DaPigGuy\libPiggyEconomy\providers\EconomyProvider;
 use DaPigGuy\PiggyAuctions\auction\AuctionManager;
 use DaPigGuy\PiggyAuctions\commands\AuctionHouseCommand;
 use DaPigGuy\PiggyAuctions\statistics\StatisticsManager;
+use DaPigGuy\PiggyAuctions\tasks\CheckUpdatesTask;
 use DaPigGuy\PiggyAuctions\utils\Utils;
 use muqsit\invmenu\InvMenuHandler;
 use pocketmine\event\Listener;
-use pocketmine\item\Item;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\Config;
 use poggit\libasynql\DataConnector;
@@ -68,6 +68,8 @@ class PiggyAuctions extends PluginBase implements Listener
         $this->getServer()->getCommandMap()->register("piggyauctions", new AuctionHouseCommand($this, "auctionhouse", "Open the auction house", ["ah"]));
 
         $this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
+
+        $this->getServer()->getAsyncPool()->submitTask(new CheckUpdatesTask($this->getDescription()->getVersion(), $this->getDescription()->getCompatibleApis()[0]));
     }
 
     public static function getInstance(): PiggyAuctions
