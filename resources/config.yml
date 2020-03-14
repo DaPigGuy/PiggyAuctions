@@ -1,6 +1,6 @@
 database:
   # Options: sqlite, mysql
-  type: mysql
+  type: sqlite
   sqlite:
     file: "auctions.sqlite"
   mysql:
