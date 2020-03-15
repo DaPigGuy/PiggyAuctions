@@ -13,17 +13,32 @@ use DaPigGuy\PiggyAuctions\tasks\InventoryClosureTask;
 use DaPigGuy\PiggyAuctions\utils\Utils;
 use jojoe77777\FormAPI\CustomForm;
 use muqsit\invmenu\InvMenu;
+use muqsit\invmenu\session\PlayerManager;
 use pocketmine\inventory\Inventory;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\item\Item;
 use pocketmine\nbt\tag\IntTag;
 use pocketmine\nbt\tag\StringTag;
 use pocketmine\Player;
+use pocketmine\scheduler\ClosureTask;
 use pocketmine\utils\TextFormat;
 
 class Menu
 {
     const PAGE_LENGTH = 45;
+
+    public static function displayMenu(Player $player, InvMenu $menu): void
+    {
+        $oldMenu = PlayerManager::get($player)->getCurrentMenu();
+        if ($oldMenu !== null) $player->removeWindow($oldMenu->getInventoryForPlayer($player));
+        if ($oldMenu !== null && $player->getPing() < 350) { //Stupid solution to a stupid bug; players with screen animations enabled + good ping results in menu not opening due to close animation
+            PiggyAuctions::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function (int $currentTick) use ($menu, $player): void {
+                $menu->send($player);
+            }), 7);
+        } else {
+            $menu->send($player);
+        }
+    }
 
     public static function displayMainMenu(Player $player): void
     {
@@ -56,7 +71,7 @@ class Menu
             }
             return false;
         });
-        $menu->send($player);
+        self::displayMenu($player, $menu);
     }
 
     public static function displayAuctionStats(Player $player): void
@@ -145,7 +160,7 @@ class Menu
             }
             return false;
         });
-        $menu->send($player);
+        self::displayMenu($player, $menu);
     }
 
     /**
@@ -215,7 +230,7 @@ class Menu
             }
             return false;
         });
-        $menu->send($player);
+        self::displayMenu($player, $menu);
     }
 
     public static function displayAuctionCreator(Player $player): void
@@ -295,7 +310,7 @@ class Menu
         $menu->setInventoryCloseListener(function (Player $player, Inventory $inventory): void {
             $player->getInventory()->addItem($inventory->getItem(13));
         });
-        $menu->send($player);
+        self::displayMenu($player, $menu);
     }
 
     public static function displayAuctionManager(Player $player, int $sortType = MenuSort::TYPE_RECENTLY_UPDATED): void
@@ -346,7 +361,7 @@ class Menu
             }
             return false;
         });
-        $menu->send($player);
+        self::displayMenu($player, $menu);
     }
 
     public static function displayAuctioneerPage(Player $player, string $auctioneer): void
@@ -365,7 +380,7 @@ class Menu
             });
             return false;
         });
-        $menu->send($player);
+        self::displayMenu($player, $menu);
     }
 
     public static function displayItemPage(Player $player, Auction $auction, callable $callback, ?int $bidAmount = null): void
@@ -505,7 +520,7 @@ class Menu
             }
             return false;
         });
-        $menu->send($player);
+        self::displayMenu($player, $menu);
     }
 
     /**
