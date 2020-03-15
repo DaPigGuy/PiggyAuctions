@@ -8,7 +8,7 @@ database:
     username: root
     password: password
     schema: "piggyauctions"
-  worker-limt: 1
+  worker-limit: 1
 economy:
   # Options: economyapi, multieconomy, xp
   provider: economyapi
