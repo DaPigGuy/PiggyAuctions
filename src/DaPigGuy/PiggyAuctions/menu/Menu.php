@@ -29,6 +29,7 @@ class Menu
 
     public static function displayMenu(Player $player, InvMenu $menu): void
     {
+        if (PlayerManager::get($player) === null) return;
         $oldMenu = PlayerManager::get($player)->getCurrentMenu();
         if ($oldMenu !== null) $player->removeWindow($oldMenu->getInventoryForPlayer($player));
         if ($oldMenu !== null && $player->getPing() < 350) { //Stupid solution to a stupid bug; players with screen animations enabled + good ping results in menu not opening due to close animation
