@@ -20,22 +20,22 @@ use pocketmine\item\Item;
 use pocketmine\nbt\tag\IntTag;
 use pocketmine\nbt\tag\StringTag;
 use pocketmine\Player;
-use pocketmine\scheduler\ClosureTask;
 use pocketmine\utils\TextFormat;
 
 class Menu
 {
     const PAGE_LENGTH = 45;
 
+    /** @var InvMenu[] */
+    public static $displayQueue;
+
     public static function displayMenu(Player $player, InvMenu $menu): void
     {
         if (PlayerManager::get($player) === null) return;
         $oldMenu = PlayerManager::get($player)->getCurrentMenu();
-        if ($oldMenu !== null) $player->removeWindow($oldMenu->getInventoryForPlayer($player));
-        if ($oldMenu !== null && $player->getPing() < 350) { //Stupid solution to a stupid bug; players with screen animations enabled + good ping results in menu not opening due to close animation
-            PiggyAuctions::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function (int $currentTick) use ($menu, $player): void {
-                $menu->send($player);
-            }), 7);
+        if ($oldMenu !== null) {
+            $player->removeWindow($oldMenu->getInventoryForPlayer($player));
+            self::$displayQueue[$player->getName()] = $menu;
         } else {
             $menu->send($player);
         }
