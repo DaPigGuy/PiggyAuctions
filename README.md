@@ -4,13 +4,20 @@ PiggyAuctions is an open-sourced auction house plugin for [PocketMine-MP](https:
 
 Why use PiggyAuctions over other competitors?
 1. **BRAND LOYALTY!!!** PiggyAuctions is a quality Piggy-flavored plugin refined throughout generations of the Sus genus. You won't get to experience this authentic rich and savory flavor anywhere else. And, it's *free* bacon, what else could you ask for?
-2. You can place bids on items; other competitors are simply glorified player shop plugins.
+2. PiggyAuctions has bidding, searching, sorting, auto-refreshing, pagination, etc.
 3. Oink? You're not going to install such an amazing plugin? 🐷
+4. Sloths are scary.
 
 ## Supported Economy Plugins
 * [EconomyAPI](https://github.com/onebone/EconomyS/tree/3.x/EconomyAPI) by onebone
 * [MultiEconomy](https://github.com/TwistedAsylumMC/MultiEconomy) by TwistedAsylumMC
 * Or, you can use player experience as a monetary value.
+
+## Commands
+| Command | Description | Permissions | Aliases |
+| --- | --- | --- | --- |
+| `/auctionhouse` | Opens the auction house | `piggyauctions.command.auctionhouse` | `/ah` |
+| `/auctionhouse [player]` | View a specific player's auctions | `piggyauctions.command.auctionhouse` | `/ah` |
 
 ## Permissions
 | Permissions | Description | Default |
