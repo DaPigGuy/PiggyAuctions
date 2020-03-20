@@ -101,7 +101,7 @@ class Menu
             if ($action->getSlot() === 22) self::displayMainMenu($player);
             return false;
         });
-        $menu->send($player);
+        self::displayMenu($player, $menu);
     }
 
     public static function displayAuctionBrowser(Player $player, int $page = 1, string $search = "", int $sortType = MenuSort::TYPE_HIGHEST_BID): void
@@ -487,7 +487,7 @@ class Menu
                             }
                             return false;
                         });
-                        $menu->send($player);
+                        self::displayMenu($player, $menu);
                     } else {
                         if ($auction->getAuctioneer() === $player->getName()) {
                             $auction->claim($player);
