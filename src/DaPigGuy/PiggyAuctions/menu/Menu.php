@@ -118,9 +118,6 @@ class Menu
                         self::displayPageAuctions($menu->getInventory(), $page, ($menu->getInventory()->getItem(48)->getNamedTagEntry("Search") ?? new StringTag())->getValue(), ($menu->getInventory()->getItem(50)->getNamedTagEntry("SortType") ?? new IntTag())->getValue());
                         break;
                     }
-                    $lore = ($content->getNamedTagEntry("TemplateLore") ?? new StringTag())->getValue();
-                    $lore = str_replace("{DURATION}", Utils::formatDetailedDuration($auction->getEndDate() - time()), $lore);
-                    $content->setLore(explode("\n", $lore));
                     $menu->getInventory()->setItem($slot, $content);
                 }
             }
@@ -551,10 +548,9 @@ class Menu
         if ($auction->hasExpired()) $status = PiggyAuctions::getInstance()->getMessage("menus.auction-view.status-ended");
         $lore = PiggyAuctions::getInstance()->getMessage("menus.auction-view.item-description-no-bid", ["{PLAYER}" => $auction->getAuctioneer(), "{BIDS}" => 0, "{STARTINGBID}" => $auction->getStartingBid(), "{STATUS}" => $status]);
         if ($auction->getTopBid() !== null) $lore = PiggyAuctions::getInstance()->getMessage("menus.auction-view.item-description", ["{PLAYER}" => $auction->getAuctioneer(), "{BIDS}" => count($auction->getBids()), "{TOPBID}" => $auction->getTopBid()->getBidAmount(), "{TOPBIDDER}" => $auction->getTopBid()->getBidder(), "{STATUS}" => $status]);
-        $item->setNamedTagEntry(new StringTag("TemplateLore", $lore));
         $lore = str_replace("{DURATION}", Utils::formatDetailedDuration($auction->getEndDate() - time()), $lore);
 
         $item->setNamedTagEntry(new IntTag("AuctionID", $auction->getId()));
-        return $item->setLore(explode("\n", $lore));
+        return $item->setLore(array_merge($item->getLore(), explode("\n", $lore)));
     }
 }
