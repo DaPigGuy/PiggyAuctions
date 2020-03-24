@@ -264,9 +264,8 @@ class Menu
                     $action->getInventory()->clear(13);
                     $player->removeWindow($action->getInventory());
                     $form = new CustomForm(function (Player $player, ?array $data = null) use ($menu, $item): void {
+                        $menu->getInventory()->setItem(13, $item);
                         if ($data !== null && is_numeric($data[0])) {
-                            $menu->getInventory()->setItem(13, $item);
-
                             $item = $menu->getInventory()->getItem(31);
                             $item->setNamedTagEntry(new IntTag("StartingBid", (int)$data[0]));
                             $menu->getInventory()->setItem(31, $item->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-creator.starting-bid", ["{MONEY}" => (int)$data[0]])));
@@ -282,9 +281,8 @@ class Menu
                     $action->getInventory()->clear(13);
                     $player->removeWindow($action->getInventory());
                     $form = new CustomForm(function (Player $player, ?array $data = null) use ($menu, $item): void {
+                        $menu->getInventory()->setItem(13, $item);
                         if ($data !== null && is_numeric($data[0])) {
-                            $menu->getInventory()->setItem(13, $item);
-
                             $item = $menu->getInventory()->getItem(33);
                             $item->setNamedTagEntry(new IntTag("Duration", (int)$data[0]));
                             $menu->getInventory()->setItem(33, $item->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-creator.duration", ["{DURATION}" => Utils::formatDuration((int)$data[0])])));
