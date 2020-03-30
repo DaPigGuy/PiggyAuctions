@@ -2,7 +2,7 @@
 name: Bug Report
 about: Unexpected non-crash behavior with PiggyAuctions
 title: ''
-labels: 'bug'
+labels: 'Type: Bug'
 assignees: 'DaPigGuy'
 ---
 

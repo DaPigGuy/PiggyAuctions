@@ -2,7 +2,7 @@
 name: Crash
 about: Report a crash in PiggyAuctions
 title: ''
-labels: 'bug'
+labels: 'Type: Bug'
 assignees: 'DaPigGuy'
 ---
 
