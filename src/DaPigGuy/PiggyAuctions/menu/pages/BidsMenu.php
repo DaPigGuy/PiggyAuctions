@@ -34,7 +34,7 @@ class BidsMenu extends Menu
         $this->menu->setName(PiggyAuctions::getInstance()->getMessage("menus.view-bids.title"));
         $auctions = array_filter(array_map(function (AuctionBid $bid): ?Auction {
             return $bid->getAuction();
-        }, PiggyAuctions::getInstance()->getAuctionManager()->getBidsBy($this->player)), function (?Auction $auction): bool {
+        }, PiggyAuctions::getInstance()->getAuctionManager()->getBidsBy($this->player)), static function (?Auction $auction): bool {
             return $auction !== null && count($auction->getUnclaimedBidsHeldBy($this->player->getName())) > 0;
         });
         MenuUtils::updateDisplayedItems($this->menu, $auctions, 0, 10, 7);
@@ -49,7 +49,7 @@ class BidsMenu extends Menu
                 break;
             default:
                 $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($itemClicked->getNamedTagEntry("AuctionID") ?? new IntTag())->getValue());
-                if ($auction !== null) new AuctionMenu($player, $auction, function () use ($player) {
+                if ($auction !== null) new AuctionMenu($player, $auction, static function () use ($player) {
                     new BidsMenu($player);
                 });
                 break;

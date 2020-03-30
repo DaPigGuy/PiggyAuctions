@@ -54,7 +54,7 @@ class AuctionBrowserMenu extends Menu
             if (empty($this->search)) return true;
             return stripos($auction->getItem()->getName(), $this->search) !== false;
         });
-        MenuUtils::updateDisplayedItems($this->menu, $activeAuctions, ($this->page - 1) * self::PAGE_LENGTH, 0, self::PAGE_LENGTH, function (int $index): int {
+        MenuUtils::updateDisplayedItems($this->menu, $activeAuctions, ($this->page - 1) * self::PAGE_LENGTH, 0, self::PAGE_LENGTH, static function (int $index): int {
             return (int)($index + 10 + floor($index / self::PAGE_ROW_LENGTH) * 2);
         }, MenuSort::closureFromType($this->sortType));
 
@@ -86,7 +86,7 @@ class AuctionBrowserMenu extends Menu
             $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($itemClicked->getNamedTagEntry("AuctionID") ?? new IntTag())->getValue());
             if ($auction instanceof Auction) {
                 $browserAttributes = [$player, $this->page, $this->search, $this->sortType];
-                new AuctionMenu($player, $auction, function () use ($browserAttributes) {
+                new AuctionMenu($player, $auction, static function () use ($browserAttributes) {
                     new AuctionBrowserMenu(...$browserAttributes);
                 });
             }

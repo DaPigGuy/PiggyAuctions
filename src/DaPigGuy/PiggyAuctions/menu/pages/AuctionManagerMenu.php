@@ -51,7 +51,7 @@ class AuctionManagerMenu extends Menu
         }, self::SORT_TYPES, array_keys(self::SORT_TYPES)))]));
         $this->menu->getInventory()->setItem(23, $sort);
 
-        $auctions = array_filter(PiggyAuctions::getInstance()->getAuctionManager()->getAuctionsHeldBy($this->player), function (Auction $auction): bool {
+        $auctions = array_filter(PiggyAuctions::getInstance()->getAuctionManager()->getAuctionsHeldBy($this->player), static function (Auction $auction): bool {
             return !$auction->isClaimed();
         });
         MenuUtils::updateDisplayedItems($this->menu, $auctions, 0, 10, 7, null, MenuSort::closureFromType($this->sortType));
@@ -75,7 +75,7 @@ class AuctionManagerMenu extends Menu
             default:
                 $managerAttributes = [$player, $this->sortType];
                 $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($itemClicked->getNamedTagEntry("AuctionID") ?? new IntTag())->getValue());
-                if ($auction !== null) new AuctionMenu($player, $auction, function () use ($managerAttributes) {
+                if ($auction !== null) new AuctionMenu($player, $auction, static function () use ($managerAttributes) {
                     new AuctionManagerMenu(...$managerAttributes);
                 });
                 break;

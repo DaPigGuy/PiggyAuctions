@@ -49,7 +49,7 @@ class AuctionMenu extends Menu
         $this->menu->setName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.title"));
 
         $this->menu->getInventory()->setItem(13, MenuUtils::getDisplayItem($this->auction));
-        $this->menu->getInventory()->setItem(33, Item::get(Item::MAP)->setCustomName(count($this->auction->getBids()) === 0 ? PiggyAuctions::getInstance()->getMessage("menus.auction-view.no-bids") : PiggyAuctions::getInstance()->getMessage("menus.auction-view.bid-history", ["{BIDS}" => count($this->auction->getBids()), "{HISTORY}" => implode("\n", array_map(function (AuctionBid $auctionBid): string {
+        $this->menu->getInventory()->setItem(33, Item::get(Item::MAP)->setCustomName(count($this->auction->getBids()) === 0 ? PiggyAuctions::getInstance()->getMessage("menus.auction-view.no-bids") : PiggyAuctions::getInstance()->getMessage("menus.auction-view.bid-history", ["{BIDS}" => count($this->auction->getBids()), "{HISTORY}" => implode("\n", array_map(static function (AuctionBid $auctionBid): string {
             return PiggyAuctions::getInstance()->getMessage("menus.auction-view.bid-history-entry", ["{MONEY}" => $auctionBid->getBidAmount(), "{PLAYER}" => $auctionBid->getBidder(), "{DURATION}" => Utils::formatDuration(time() - $auctionBid->getTimestamp())]);
         }, array_reverse($this->auction->getBids())))])));
 

@@ -19,10 +19,10 @@ class MenuUtils
      */
     public static function updateDisplayedItems(SharedInvMenu $menu, array $auctions, int $arrayOffset, int $offsetSlot, int $displayCount, ?callable $itemIndexFunction = null, ?callable $sortFunction = null): array
     {
-        $itemIndexFunction = $itemIndexFunction ?? function ($index) use ($offsetSlot): int {
+        $itemIndexFunction = $itemIndexFunction ?? static function ($index) use ($offsetSlot): int {
                 return $index + $offsetSlot;
             };
-        $sortFunction = $sortFunction ?? function (Auction $a, Auction $b): bool {
+        $sortFunction = $sortFunction ?? static function (Auction $a, Auction $b): bool {
                 return $a->getEndDate() > $b->getEndDate();
             };
         uasort($auctions, $sortFunction);

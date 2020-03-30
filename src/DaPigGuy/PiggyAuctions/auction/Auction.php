@@ -117,7 +117,7 @@ class Auction
      */
     public function getUnclaimedBidsHeldBy(string $player): array
     {
-        return array_filter($this->getUnclaimedBids(), function (AuctionBid $bid) use ($player): bool {
+        return array_filter($this->getUnclaimedBids(), static function (AuctionBid $bid) use ($player): bool {
             return $bid->getBidder() === $player;
         });
     }
