@@ -72,7 +72,6 @@ class AuctionBrowserMenu extends Menu
 
         if ($this->page > 1) {
             $previousPage = Item::get(Item::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-browser.previous-page", ["{PAGE}" => $this->page - 1, "{MAXPAGES}" => ceil(count($activeAuctions) / self::PAGE_LENGTH)]));
-            $previousPage->setNamedTagEntry(new IntTag("Page", $this->page - 1));
             $this->menu->getInventory()->setItem(45, $previousPage);
         }
         if ($this->page < ceil(count($activeAuctions) / self::PAGE_LENGTH)) {
