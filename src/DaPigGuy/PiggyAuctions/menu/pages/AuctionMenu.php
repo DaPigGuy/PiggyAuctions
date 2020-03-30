@@ -149,9 +149,9 @@ class AuctionMenu extends Menu
                         $oldMenu = PlayerManager::get($this->player)->getCurrentMenu();
                         if ($oldMenu !== null) {
                             $this->player->removeWindow($oldMenu->getInventoryForPlayer($this->player));
-                            Menu::$awaitingInventoryClose[$this->player->getName()] = $this->menu;
+                            Menu::$awaitingInventoryClose[$this->player->getName()] = $menu;
                         } else {
-                            $this->menu->send($this->player);
+                            $menu->send($this->player);
                         }
                     }
                 } else {
@@ -168,11 +168,12 @@ class AuctionMenu extends Menu
                 break;
             case 31:
                 if ($itemClicked->getId() === Item::GOLD_INGOT) {
+                    $this->menu->setInventoryCloseListener(null);
                     $player->removeWindow($action->getInventory());
+                    $this->menu->setInventoryCloseListener([$this, "close"]);
                     $form = new CustomForm(function (Player $player, ?array $data = null): void {
                         if ($data !== null && isset($data[0]) && is_numeric($data[0])) {
                             $this->bidAmount = (int)$data[0];
-                            return;
                         }
                         $this->render();
                         $this->display();
