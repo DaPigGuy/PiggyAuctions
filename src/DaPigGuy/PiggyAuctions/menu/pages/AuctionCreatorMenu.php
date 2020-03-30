@@ -21,7 +21,7 @@ class AuctionCreatorMenu extends Menu
 {
     /** @var string */
     protected $inventoryIdentifier = InvMenu::TYPE_DOUBLE_CHEST;
-    /** @var Item */
+    /** @var Item|null */
     private $item;
     /** @var int */
     private $startingBid = 50;

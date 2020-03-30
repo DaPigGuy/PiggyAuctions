@@ -30,7 +30,7 @@ class AuctionMenu extends Menu
     private $bidAmount;
     /** @var callable */
     private $callback;
-    /** @var TaskHandler */
+    /** @var TaskHandler|null */
     private $taskHandler;
 
     public function __construct(Player $player, Auction $auction, callable $callback)

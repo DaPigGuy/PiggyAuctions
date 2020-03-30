@@ -16,9 +16,9 @@ abstract class Menu
     /** @var InvMenu[] */
     public static $awaitingInventoryClose;
 
-    /** @var Player */
+    /** @var Player|null */
     protected $player;
-    /** @var SharedInvMenu */
+    /** @var SharedInvMenu|null */
     protected $menu;
 
     /** @var string */

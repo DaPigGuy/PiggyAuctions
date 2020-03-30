@@ -22,6 +22,7 @@ class AuctionBrowserMenu extends Menu
 {
     const PAGE_LENGTH = self::PAGE_ROW_LENGTH * 4;
     const PAGE_ROW_LENGTH = 7;
+
     /** @var string */
     protected $inventoryIdentifier = InvMenu::TYPE_DOUBLE_CHEST;
     /** @var int */
@@ -30,7 +31,7 @@ class AuctionBrowserMenu extends Menu
     private $search = "";
     /** @var int */
     private $sortType = MenuSort::TYPE_HIGHEST_BID;
-    /** @var TaskHandler */
+    /** @var TaskHandler|null */
     private $taskHandler;
 
     public function __construct(Player $player)
@@ -121,6 +122,6 @@ class AuctionBrowserMenu extends Menu
     {
         parent::close();
         $this->taskHandler->cancel();
-        $this->page = $this->search = $this->sortType = $this->taskHandler = null;
+        $this->taskHandler = null;
     }
 }

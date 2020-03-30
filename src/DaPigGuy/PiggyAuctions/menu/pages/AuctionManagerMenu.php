@@ -27,7 +27,7 @@ class AuctionManagerMenu extends Menu
     /** @var int */
     private $sortType = MenuSort::TYPE_RECENTLY_UPDATED;
 
-    /** @var TaskHandler */
+    /** @var TaskHandler|null */
     private $taskHandler;
 
     public function __construct(Player $player)
