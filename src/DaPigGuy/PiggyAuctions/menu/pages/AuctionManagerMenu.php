@@ -25,17 +25,18 @@ class AuctionManagerMenu extends Menu
     ];
 
     /** @var int */
-    private $sortType = MenuSort::TYPE_RECENTLY_UPDATED;
+    private $sortType;
 
     /** @var TaskHandler */
     private $taskHandler;
 
-    public function __construct(Player $player)
+    public function __construct(Player $player, int $sortType = MenuSort::TYPE_RECENTLY_UPDATED)
     {
-        parent::__construct($player);
+        $this->sortType = $sortType;
         $this->taskHandler = PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (): void {
             $this->render();
         }), 20);
+        parent::__construct($player);
     }
 
     public function render(): void
@@ -72,9 +73,10 @@ class AuctionManagerMenu extends Menu
                 new AuctionCreatorMenu($player);
                 break;
             default:
+                $managerAttributes = [$player, $this->sortType];
                 $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($itemClicked->getNamedTagEntry("AuctionID") ?? new IntTag())->getValue());
-                if ($auction !== null) new AuctionMenu($player, $auction, function () use ($player) {
-                    new AuctionManagerMenu($player);
+                if ($auction !== null) new AuctionMenu($player, $auction, function () use ($managerAttributes) {
+                    new AuctionManagerMenu(...$managerAttributes);
                 });
                 break;
         }

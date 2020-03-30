@@ -26,20 +26,23 @@ class AuctionBrowserMenu extends Menu
     /** @var string */
     protected $inventoryIdentifier = InvMenu::TYPE_DOUBLE_CHEST;
     /** @var int */
-    private $page = 1;
+    private $page;
     /** @var string */
-    private $search = "";
+    private $search;
     /** @var int */
-    private $sortType = MenuSort::TYPE_HIGHEST_BID;
+    private $sortType;
     /** @var TaskHandler */
     private $taskHandler;
 
-    public function __construct(Player $player)
+    public function __construct(Player $player, int $page = 1, string $search = "", int $sortType = MenuSort::TYPE_HIGHEST_BID)
     {
-        parent::__construct($player);
+        $this->page = $page;
+        $this->search = $search;
+        $this->sortType = $sortType;
         $this->taskHandler = PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (): void {
             $this->render();
         }), 20);
+        parent::__construct($player);
     }
 
     public function render(): void
@@ -83,8 +86,9 @@ class AuctionBrowserMenu extends Menu
         if ($itemClicked->getNamedTagEntry("AuctionID") !== null) {
             $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($itemClicked->getNamedTagEntry("AuctionID") ?? new IntTag())->getValue());
             if ($auction instanceof Auction) {
-                new AuctionMenu($player, $auction, function () use ($player) {
-                    new AuctionBrowserMenu($player);
+                $browserAttributes = [$player, $this->page, $this->search, $this->sortType];
+                new AuctionMenu($player, $auction, function () use ($browserAttributes) {
+                    new AuctionBrowserMenu(...$browserAttributes);
                 });
             }
         }
