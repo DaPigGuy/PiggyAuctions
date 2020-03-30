@@ -17,7 +17,7 @@ use pocketmine\scheduler\TaskHandler;
 
 class BidsMenu extends Menu
 {
-    /** @var TaskHandler|null */
+    /** @var TaskHandler */
     private $taskHandler;
 
     public function __construct(Player $player)
@@ -60,6 +60,5 @@ class BidsMenu extends Menu
     {
         parent::close();
         $this->taskHandler->cancel();
-        $this->taskHandler = null;
     }
 }

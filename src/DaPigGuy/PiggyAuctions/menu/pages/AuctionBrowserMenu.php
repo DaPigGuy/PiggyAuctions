@@ -31,7 +31,7 @@ class AuctionBrowserMenu extends Menu
     private $search = "";
     /** @var int */
     private $sortType = MenuSort::TYPE_HIGHEST_BID;
-    /** @var TaskHandler|null */
+    /** @var TaskHandler */
     private $taskHandler;
 
     public function __construct(Player $player)
@@ -122,6 +122,5 @@ class AuctionBrowserMenu extends Menu
     {
         parent::close();
         $this->taskHandler->cancel();
-        $this->taskHandler = null;
     }
 }

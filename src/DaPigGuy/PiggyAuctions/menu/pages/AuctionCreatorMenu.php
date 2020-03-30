@@ -21,7 +21,7 @@ class AuctionCreatorMenu extends Menu
 {
     /** @var string */
     protected $inventoryIdentifier = InvMenu::TYPE_DOUBLE_CHEST;
-    /** @var Item|null */
+    /** @var Item */
     private $item;
     /** @var int */
     private $startingBid = 50;
@@ -108,7 +108,6 @@ class AuctionCreatorMenu extends Menu
     public function close(): void
     {
         $this->player->getInventory()->addItem($this->menu->getInventory()->getItem(13));
-        $this->item = null;
         parent::close();
     }
 }

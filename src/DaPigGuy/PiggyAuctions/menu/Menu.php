@@ -16,9 +16,9 @@ abstract class Menu
     /** @var InvMenu[] */
     public static $awaitingInventoryClose;
 
-    /** @var Player|null */
+    /** @var Player */
     protected $player;
-    /** @var SharedInvMenu|null */
+    /** @var SharedInvMenu */
     protected $menu;
 
     /** @var string */
@@ -43,7 +43,6 @@ abstract class Menu
 
     public function close(): void
     {
-        $this->player = $this->menu = null;
     }
 
     abstract public function render(): void;

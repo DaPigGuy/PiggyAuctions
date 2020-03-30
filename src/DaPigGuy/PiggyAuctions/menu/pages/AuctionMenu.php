@@ -30,7 +30,7 @@ class AuctionMenu extends Menu
     private $bidAmount;
     /** @var callable */
     private $callback;
-    /** @var TaskHandler|null */
+    /** @var TaskHandler */
     private $taskHandler;
 
     public function __construct(Player $player, Auction $auction, callable $callback)
@@ -193,6 +193,5 @@ class AuctionMenu extends Menu
     {
         parent::close();
         $this->taskHandler->cancel();
-        $this->taskHandler = null;
     }
 }

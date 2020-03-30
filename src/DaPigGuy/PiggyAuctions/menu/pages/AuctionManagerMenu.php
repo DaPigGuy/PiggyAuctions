@@ -27,7 +27,7 @@ class AuctionManagerMenu extends Menu
     /** @var int */
     private $sortType = MenuSort::TYPE_RECENTLY_UPDATED;
 
-    /** @var TaskHandler|null */
+    /** @var TaskHandler */
     private $taskHandler;
 
     public function __construct(Player $player)
@@ -85,6 +85,5 @@ class AuctionManagerMenu extends Menu
     {
         parent::close();
         $this->taskHandler->cancel();
-        $this->taskHandler = null;
     }
 }

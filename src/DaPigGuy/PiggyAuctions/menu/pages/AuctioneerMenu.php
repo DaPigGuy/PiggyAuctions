@@ -19,7 +19,7 @@ class AuctioneerMenu extends Menu
     /** @var string */
     private $auctioneer;
 
-    /** @var TaskHandler|null */
+    /** @var TaskHandler */
     private $taskHandler;
 
     public function __construct(Player $player, string $auctioneer)
@@ -53,6 +53,5 @@ class AuctioneerMenu extends Menu
     {
         parent::close();
         $this->taskHandler->cancel();
-        $this->taskHandler = null;
     }
 }
