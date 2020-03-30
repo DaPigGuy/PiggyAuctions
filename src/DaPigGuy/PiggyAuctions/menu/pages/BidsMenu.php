@@ -11,6 +11,7 @@ use DaPigGuy\PiggyAuctions\menu\utils\MenuUtils;
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\item\Item;
+use pocketmine\nbt\tag\IntTag;
 use pocketmine\Player;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\scheduler\TaskHandler;

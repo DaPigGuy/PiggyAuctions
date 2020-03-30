@@ -73,7 +73,7 @@ class AuctionManagerMenu extends Menu
                 break;
             default:
                 $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($itemClicked->getNamedTagEntry("AuctionID") ?? new IntTag())->getValue());
-                new AuctionMenu($player, $auction, function () use ($player) {
+                if ($auction !== null) new AuctionMenu($player, $auction, function () use ($player) {
                     new AuctionManagerMenu($player);
                 });
                 break;
