@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DaPigGuy\PiggyAuctions\menu;
+namespace DaPigGuy\PiggyAuctions\menu\utils;
 
 use DaPigGuy\PiggyAuctions\auction\Auction;
 
