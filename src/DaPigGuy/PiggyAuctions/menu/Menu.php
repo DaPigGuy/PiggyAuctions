@@ -14,7 +14,7 @@ use pocketmine\Player;
 
 abstract class Menu extends SharedInvMenu
 {
-    /** @var Menu[] */
+    /** @var SharedInvMenu[] */
     public static $awaitingInventoryClose;
 
     /** @var Player */
