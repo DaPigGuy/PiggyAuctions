@@ -11,6 +11,8 @@ use DaPigGuy\PiggyAuctions\menu\utils\MenuUtils;
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\item\Item;
+use pocketmine\item\ItemFactory;
+use pocketmine\item\ItemIds;
 use pocketmine\nbt\tag\IntTag;
 use pocketmine\Player;
 use pocketmine\scheduler\ClosureTask;
@@ -38,7 +40,7 @@ class BidsMenu extends Menu
             return $auction !== null && count($auction->getUnclaimedBidsHeldBy($this->player->getName())) > 0;
         });
         MenuUtils::updateDisplayedItems($this->menu, $auctions, 0, 10, 7);
-        $this->menu->getInventory()->setItem(22, Item::get(Item::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
+        $this->menu->getInventory()->setItem(22, ItemFactory::get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
     }
 
     public function handle(Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool

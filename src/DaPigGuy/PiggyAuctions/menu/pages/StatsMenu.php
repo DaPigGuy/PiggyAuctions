@@ -8,6 +8,8 @@ use DaPigGuy\PiggyAuctions\menu\Menu;
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\item\Item;
+use pocketmine\item\ItemFactory;
+use pocketmine\item\ItemIds;
 use pocketmine\Player;
 
 class StatsMenu extends Menu
@@ -37,9 +39,9 @@ class StatsMenu extends Menu
         }
 
         $this->menu->getInventory()->setContents([
-            11 => Item::get(Item::EMPTYMAP)->setCustomName($sellerStats),
-            15 => Item::get(Item::MAP)->setCustomName($buyerStats),
-            22 => Item::get(Item::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back"))
+            11 => ItemFactory::get(ItemIds::EMPTYMAP)->setCustomName($sellerStats),
+            15 => ItemFactory::get(ItemIds::MAP)->setCustomName($buyerStats),
+            22 => ItemFactory::get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back"))
         ]);
     }
 }

@@ -16,6 +16,8 @@ use muqsit\invmenu\InvMenu;
 use muqsit\invmenu\session\PlayerManager;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\item\Item;
+use pocketmine\item\ItemFactory;
+use pocketmine\item\ItemIds;
 use pocketmine\Player;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\scheduler\TaskHandler;
@@ -49,13 +51,13 @@ class AuctionMenu extends Menu
         $this->menu->setName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.title"));
 
         $this->menu->getInventory()->setItem(13, MenuUtils::getDisplayItem($this->auction));
-        $this->menu->getInventory()->setItem(33, Item::get(Item::MAP)->setCustomName(count($this->auction->getBids()) === 0 ? PiggyAuctions::getInstance()->getMessage("menus.auction-view.no-bids") : PiggyAuctions::getInstance()->getMessage("menus.auction-view.bid-history", ["{BIDS}" => count($this->auction->getBids()), "{HISTORY}" => implode("\n", array_map(static function (AuctionBid $auctionBid): string {
+        $this->menu->getInventory()->setItem(33, ItemFactory::get(ItemIds::MAP)->setCustomName(count($this->auction->getBids()) === 0 ? PiggyAuctions::getInstance()->getMessage("menus.auction-view.no-bids") : PiggyAuctions::getInstance()->getMessage("menus.auction-view.bid-history", ["{BIDS}" => count($this->auction->getBids()), "{HISTORY}" => implode("\n", array_map(static function (AuctionBid $auctionBid): string {
             return PiggyAuctions::getInstance()->getMessage("menus.auction-view.bid-history-entry", ["{MONEY}" => $auctionBid->getBidAmount(), "{PLAYER}" => $auctionBid->getBidder(), "{DURATION}" => Utils::formatDuration(time() - $auctionBid->getTimestamp())]);
         }, array_reverse($this->auction->getBids())))])));
 
-        $bidItem = Item::get(Item::POISONOUS_POTATO);
+        $bidItem = ItemFactory::get(ItemIds::POISONOUS_POTATO);
         if ($this->auction->hasExpired()) {
-            $bidItem = Item::get(Item::GOLD_NUGGET);
+            $bidItem = ItemFactory::get(ItemIds::GOLD_NUGGET);
             if ($this->auction->getAuctioneer() === $this->player->getName()) {
                 $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("auction.claim.auctioneer-item"));
                 if (($overallTopBid = $this->auction->getTopBid()) !== null) $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("auction.claim.auctioneer-money", ["{MONEY}" => $overallTopBid->getBidAmount(), "{PLAYER}" => $overallTopBid->getBidder()]));
@@ -65,7 +67,7 @@ class AuctionMenu extends Menu
                 $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("auction.claim.bidder-money", ["{BID}" => $topBid->getBidAmount(), "{TOPBID}" => $overallTopBid->getBidAmount(), "{TOPBIDDER}" => $overallTopBid->getBidder()]));
                 if ($topBid === $this->auction->getTopBid()) $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("auction.claim.bidder-item", ["{MONEY}" => $topBid->getBidAmount()]));
             } else {
-                $bidItem = Item::get(Item::POTATO);
+                $bidItem = ItemFactory::get(ItemIds::POTATO);
                 $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("auction.claim.did-not-participate"));
             }
         } else if ($this->auction->getAuctioneer() === $this->player->getName()) {
@@ -74,19 +76,19 @@ class AuctionMenu extends Menu
             if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($this->player) < $this->bidAmount) {
                 $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.submit-first-cant-afford", ["{NEWBID}" => $this->bidAmount]));
             }
-            $bidItem = Item::get(Item::GOLD_NUGGET);
+            $bidItem = ItemFactory::get(ItemIds::GOLD_NUGGET);
             $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.submit-first", ["{NEWBID}" => $this->bidAmount]));
         } else if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($this->player) < ($this->bidAmount - $topBid->getBidAmount())) {
             $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.submit-cant-afford", ["{NEWBID}" => $this->bidAmount, "{PREVIOUSBID}" => $topBid->getBidAmount(), "{DIFFERENCE}" => $this->bidAmount - $topBid->getBidAmount()]));
         } else if ($topBid === $this->auction->getTopBid()) {
-            $bidItem = Item::get(Item::GOLD_BLOCK);
+            $bidItem = ItemFactory::get(ItemIds::GOLD_BLOCK);
             $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.top-bid", ["{NEWBID}" => $this->bidAmount, "{PREVIOUSBID}" => $topBid->getBidAmount()]));
         } else {
             $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.submit", ["{NEWBID}" => $this->bidAmount, "{PREVIOUSBID}" => $topBid->getBidAmount(), "{DIFFERENCE}" => $this->bidAmount - $topBid->getBidAmount()]));
         }
         $this->menu->getInventory()->setItem(29, $bidItem);
-        if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($this->player) >= $this->bidAmount && !$this->auction->hasExpired() && $this->auction->getAuctioneer() !== $this->player->getName()) $this->menu->getInventory()->setItem(31, Item::get(Item::GOLD_INGOT)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bid-amount", ["{MONEY}" => $this->bidAmount])));
-        $this->menu->getInventory()->setItem(49, Item::get(Item::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
+        if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($this->player) >= $this->bidAmount && !$this->auction->hasExpired() && $this->auction->getAuctioneer() !== $this->player->getName()) $this->menu->getInventory()->setItem(31, ItemFactory::get(ItemIds::GOLD_INGOT)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bid-amount", ["{MONEY}" => $this->bidAmount])));
+        $this->menu->getInventory()->setItem(49, ItemFactory::get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
     }
 
     public function handle(Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool
@@ -108,9 +110,9 @@ class AuctionMenu extends Menu
                     }
                     $menu = InvMenu::create(InvMenu::TYPE_CHEST);
                     $menu->setName(PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.title"));
-                    $menu->getInventory()->setItem(11, Item::get(Item::STAINED_CLAY, 13)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.confirm", ["{ITEM}" => $this->auction->getItem()->getName(), "{MONEY}" => $this->bidAmount])));
+                    $menu->getInventory()->setItem(11, ItemFactory::get(ItemIds::STAINED_CLAY, 13)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.confirm", ["{ITEM}" => $this->auction->getItem()->getName(), "{MONEY}" => $this->bidAmount])));
                     $menu->getInventory()->setItem(13, (clone $this->auction->getItem())->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.bidding-on", ["{ITEM}" => ($this->auction->getItem())->getName()])));
-                    $menu->getInventory()->setItem(15, Item::get(Item::STAINED_CLAY, 14)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.cancel")));
+                    $menu->getInventory()->setItem(15, ItemFactory::get(ItemIds::STAINED_CLAY, 14)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.cancel")));
                     $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool {
                         switch ($action->getSlot()) {
                             case 11:
