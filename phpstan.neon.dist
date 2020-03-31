@@ -6,11 +6,7 @@ parameters:
     - phar:///pocketmine/PocketMine-MP.phar/vendor/autoload.php
   autoload_directories:
     - /source/src
-    - phar:///source/vendor/Commando.phar/src/
-    - phar:///source/vendor/FormAPI.phar/src/
-    - phar:///source/vendor/InvMenu.phar/src/
-    - phar:///source/vendor/libasynql.phar/src/
-    - phar:///source/vendor/libPiggyEconomy.phar/src/
+    - /deps
   excludes_analyse:
     - source/vendor
   reportUnmatchedIgnoredErrors: false
