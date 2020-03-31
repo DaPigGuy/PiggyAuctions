@@ -1,18 +1,14 @@
 parameters:
   paths:
-    - /source/src
+    - src
   level: 8
   autoload_files:
     - phar:///pocketmine/PocketMine-MP.phar/vendor/autoload.php
   autoload_directories:
-    - /source/src
-    - phar:///source/vendor/Commando.phar/src/
-    - phar:///source/vendor/FormAPI.phar/src/
-    - phar:///source/vendor/InvMenu.phar/src/
-    - phar:///source/vendor/libasynql.phar/src/
-    - phar:///source/vendor/libPiggyEconomy.phar/src/
+    - src
+    - src/DaPigGuy/PiggyAuctions/libs
   excludes_analyse:
-    - source/vendor
+    - src/DaPigGuy/PiggyAuctions/libs
   reportUnmatchedIgnoredErrors: false
   checkMissingIterableValueType: false
   ignoreErrors:
