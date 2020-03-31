@@ -58,7 +58,7 @@ class AuctionCreatorMenu extends Menu
                 $this->player->removeWindow($action->getInventory());
                 $this->setInventoryCloseListener([$this, "close"]);
                 $form = new CustomForm(function (Player $player, ?array $data = null): void {
-                    if ($data !== null && is_numeric($data[0])) {
+                    if (isset($data[0]) && is_numeric($data[0])) {
                         $this->startingBid = (int)$data[0];
                     }
                     $this->render();
@@ -73,7 +73,7 @@ class AuctionCreatorMenu extends Menu
                 $this->player->removeWindow($action->getInventory());
                 $this->setInventoryCloseListener([$this, "close"]);
                 $form = new CustomForm(function (Player $player, ?array $data = null): void {
-                    if ($data !== null && is_numeric($data[0])) {
+                    if (isset($data[0]) && is_numeric($data[0])) {
                         $this->duration = (int)$data[0];
                     }
                     $this->render();
