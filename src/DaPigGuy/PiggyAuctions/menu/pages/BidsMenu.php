@@ -33,26 +33,26 @@ class BidsMenu extends Menu
 
     public function render(): void
     {
-        $this->menu->setName(PiggyAuctions::getInstance()->getMessage("menus.view-bids.title"));
+        $this->setName(PiggyAuctions::getInstance()->getMessage("menus.view-bids.title"));
         $auctions = array_filter(array_map(static function (AuctionBid $bid): ?Auction {
             return $bid->getAuction();
         }, PiggyAuctions::getInstance()->getAuctionManager()->getBidsBy($this->player)), function (?Auction $auction): bool {
             return $auction !== null && count($auction->getUnclaimedBidsHeldBy($this->player->getName())) > 0;
         });
-        MenuUtils::updateDisplayedItems($this->menu, $auctions, 0, 10, 7);
-        $this->menu->getInventory()->setItem(22, ItemFactory::get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
+        MenuUtils::updateDisplayedItems($this, $auctions, 0, 10, 7);
+        $this->getInventory()->setItem(22, ItemFactory::get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
     }
 
-    public function handle(Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool
+    public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool
     {
         switch ($action->getSlot()) {
             case 22:
-                new MainMenu($player);
+                new MainMenu($this->player);
                 break;
             default:
                 $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($itemClicked->getNamedTagEntry("AuctionID") ?? new IntTag())->getValue());
-                if ($auction !== null) new AuctionMenu($player, $auction, static function () use ($player) {
-                    new BidsMenu($player);
+                if ($auction !== null) new AuctionMenu($this->player, $auction, static function () {
+                    new BidsMenu($this->player);
                 });
                 break;
         }

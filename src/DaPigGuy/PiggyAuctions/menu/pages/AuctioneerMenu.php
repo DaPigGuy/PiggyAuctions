@@ -31,22 +31,22 @@ class AuctioneerMenu extends Menu
         parent::__construct($player);
     }
 
-    public function handle(Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool
+    public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool
     {
         $auctioneer = $this->auctioneer;
         $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($itemClicked->getNamedTagEntry("AuctionID") ?? new IntTag())->getValue());
-        if ($auction !== null) new AuctionMenu($player, $auction, static function () use ($player, $auctioneer) {
-            new AuctioneerMenu($player, $auctioneer);
+        if ($auction !== null) new AuctionMenu($this->player, $auction, static function () use ($auctioneer) {
+            new AuctioneerMenu($this->player, $auctioneer);
         });
         return false;
     }
 
     public function render(): void
     {
-        $this->menu->setName(PiggyAuctions::getInstance()->getMessage("menus.auctioneer-page.title", ["{PLAYER}" => $this->auctioneer]));
+        $this->setName(PiggyAuctions::getInstance()->getMessage("menus.auctioneer-page.title", ["{PLAYER}" => $this->auctioneer]));
         $auctions = PiggyAuctions::getInstance()->getAuctionManager()->getActiveAuctionsHeldBy($this->auctioneer);
-        if (isset(array_values($auctions)[0])) $this->menu->setName(PiggyAuctions::getInstance()->getMessage("menus.auctioneer-page.title", ["{PLAYER}" => array_values($auctions)[0]->getAuctioneer()]));
-        MenuUtils::updateDisplayedItems($this->menu, $auctions, 0, 10, 7);
+        if (isset(array_values($auctions)[0])) $this->setName(PiggyAuctions::getInstance()->getMessage("menus.auctioneer-page.title", ["{PLAYER}" => array_values($auctions)[0]->getAuctioneer()]));
+        MenuUtils::updateDisplayedItems($this, $auctions, 0, 10, 7);
     }
 
     public function close(): void

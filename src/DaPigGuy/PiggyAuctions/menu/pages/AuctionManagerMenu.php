@@ -43,27 +43,27 @@ class AuctionManagerMenu extends Menu
 
     public function render(): void
     {
-        $this->menu->setName(PiggyAuctions::getInstance()->getMessage("menus.auction-manager.title"));
+        $this->setName(PiggyAuctions::getInstance()->getMessage("menus.auction-manager.title"));
 
-        $this->menu->getInventory()->setItem(22, ItemFactory::get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
-        $this->menu->getInventory()->setItem(24, ItemFactory::get(ItemIds::GOLDEN_HORSE_ARMOR)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-manager.create-auction")));
+        $this->getInventory()->setItem(22, ItemFactory::get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
+        $this->getInventory()->setItem(24, ItemFactory::get(ItemIds::GOLDEN_HORSE_ARMOR)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-manager.create-auction")));
 
         $sort = ItemFactory::get(ItemIds::HOPPER)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.sorting.sort-type", ["{TYPES}" => implode("\n", array_map(function (string $type, int $index): string {
             return ($index === $this->sortType ? PiggyAuctions::getInstance()->getMessage("menus.sorting.selected") : "") . PiggyAuctions::getInstance()->getMessage("menus.sorting." . $type);
         }, self::SORT_TYPES, array_keys(self::SORT_TYPES)))]));
-        $this->menu->getInventory()->setItem(23, $sort);
+        $this->getInventory()->setItem(23, $sort);
 
         $auctions = array_filter(PiggyAuctions::getInstance()->getAuctionManager()->getAuctionsHeldBy($this->player), static function (Auction $auction): bool {
             return !$auction->isClaimed();
         });
-        MenuUtils::updateDisplayedItems($this->menu, $auctions, 0, 10, 7, null, MenuSort::closureFromType($this->sortType));
+        MenuUtils::updateDisplayedItems($this, $auctions, 0, 10, 7, null, MenuSort::closureFromType($this->sortType));
     }
 
-    public function handle(Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool
+    public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool
     {
         switch ($action->getSlot()) {
             case 22:
-                new MainMenu($player);
+                new MainMenu($this->player);
                 break;
             case 23:
                 /** @var int $key */
@@ -72,12 +72,12 @@ class AuctionManagerMenu extends Menu
                 $this->render();
                 break;
             case 24:
-                new AuctionCreatorMenu($player);
+                new AuctionCreatorMenu($this->player);
                 break;
             default:
-                $managerAttributes = [$player, $this->sortType];
+                $managerAttributes = [$this->player, $this->sortType];
                 $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($itemClicked->getNamedTagEntry("AuctionID") ?? new IntTag())->getValue());
-                if ($auction !== null) new AuctionMenu($player, $auction, static function () use ($managerAttributes) {
+                if ($auction !== null) new AuctionMenu($this->player, $auction, static function () use ($managerAttributes) {
                     new AuctionManagerMenu(...$managerAttributes);
                 });
                 break;

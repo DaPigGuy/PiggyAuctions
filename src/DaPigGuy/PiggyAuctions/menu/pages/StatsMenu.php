@@ -10,21 +10,20 @@ use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
-use pocketmine\Player;
 
 class StatsMenu extends Menu
 {
-    public function handle(Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool
+    public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool
     {
         if ($action->getSlot() === 22) {
-            new MainMenu($player);
+            new MainMenu($this->player);
         }
         return false;
     }
 
     public function render(): void
     {
-        $this->menu->setName(PiggyAuctions::getInstance()->getMessage("menus.stats.title"));
+        $this->setName(PiggyAuctions::getInstance()->getMessage("menus.stats.title"));
 
         $sellerStats = PiggyAuctions::getInstance()->getMessage("menus.stats.seller-stats");
         preg_match_all("/{STAT_(.*?)}/", $sellerStats, $matches);
@@ -38,7 +37,7 @@ class StatsMenu extends Menu
             $buyerStats = str_replace($match, (string)PiggyAuctions::getInstance()->getStatsManager()->getStatistics($this->player)->getStatistic($matches[1][$index]), $buyerStats);
         }
 
-        $this->menu->getInventory()->setContents([
+        $this->getInventory()->setContents([
             11 => ItemFactory::get(ItemIds::EMPTYMAP)->setCustomName($sellerStats),
             15 => ItemFactory::get(ItemIds::MAP)->setCustomName($buyerStats),
             22 => ItemFactory::get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back"))

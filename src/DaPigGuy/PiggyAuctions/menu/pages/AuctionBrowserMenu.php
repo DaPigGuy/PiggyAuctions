@@ -49,46 +49,46 @@ class AuctionBrowserMenu extends Menu
 
     public function render(): void
     {
-        $this->menu->setName(PiggyAuctions::getInstance()->getMessage("menus.auction-browser.title"));
-        $this->menu->getInventory()->clearAll(false);
+        $this->setName(PiggyAuctions::getInstance()->getMessage("menus.auction-browser.title"));
+        $this->getInventory()->clearAll(false);
 
         $activeAuctions = array_filter(PiggyAuctions::getInstance()->getAuctionManager()->getActiveAuctions(), function (Auction $auction): bool {
             if (empty($this->search)) return true;
             return stripos($auction->getItem()->getName(), $this->search) !== false;
         });
-        MenuUtils::updateDisplayedItems($this->menu, $activeAuctions, ($this->page - 1) * self::PAGE_LENGTH, 0, self::PAGE_LENGTH, static function (int $index): int {
+        MenuUtils::updateDisplayedItems($this, $activeAuctions, ($this->page - 1) * self::PAGE_LENGTH, 0, self::PAGE_LENGTH, static function (int $index): int {
             return (int)($index + 10 + floor($index / self::PAGE_ROW_LENGTH) * 2);
         }, MenuSort::closureFromType($this->sortType));
 
         $searchItem = ItemFactory::get(ItemIds::SIGN)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.search.search", ["{FILTERED}" => empty($search) ? "" : PiggyAuctions::getInstance()->getMessage("menus.search.filter", ["{FILTERED}" => $search])]));
-        $this->menu->getInventory()->setItem(48, $searchItem);
+        $this->getInventory()->setItem(48, $searchItem);
 
         $backArrow = ItemFactory::get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back"));
-        $this->menu->getInventory()->setItem(49, $backArrow);
+        $this->getInventory()->setItem(49, $backArrow);
 
         $types = ["highest-bid", "lowest-bid", "ending-soon", "most-bids"];
         $sort = ItemFactory::get(ItemIds::HOPPER)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.sorting.sort-type", ["{TYPES}" => implode("\n", array_map(function (string $type, int $index): string {
             return ($index === $this->sortType ? PiggyAuctions::getInstance()->getMessage("menus.sorting.selected") : "") . PiggyAuctions::getInstance()->getMessage("menus.sorting." . $type);
         }, $types, array_keys($types)))]));
-        $this->menu->getInventory()->setItem(50, $sort);
+        $this->getInventory()->setItem(50, $sort);
 
         if ($this->page > 1) {
             $previousPage = ItemFactory::get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-browser.previous-page", ["{PAGE}" => $this->page - 1, "{MAXPAGES}" => ceil(count($activeAuctions) / self::PAGE_LENGTH)]));
-            $this->menu->getInventory()->setItem(45, $previousPage);
+            $this->getInventory()->setItem(45, $previousPage);
         }
         if ($this->page < ceil(count($activeAuctions) / self::PAGE_LENGTH)) {
             $nextPage = ItemFactory::get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-browser.next-page", ["{PAGE}" => $this->page + 1, "{MAXPAGES}" => ceil(count($activeAuctions) / self::PAGE_LENGTH)]));
-            $this->menu->getInventory()->setItem(53, $nextPage);
+            $this->getInventory()->setItem(53, $nextPage);
         }
     }
 
-    public function handle(Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool
+    public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool
     {
         if ($itemClicked->getNamedTagEntry("AuctionID") !== null) {
             $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($itemClicked->getNamedTagEntry("AuctionID") ?? new IntTag())->getValue());
             if ($auction instanceof Auction) {
-                $browserAttributes = [$player, $this->page, $this->search, $this->sortType];
-                new AuctionMenu($player, $auction, static function () use ($browserAttributes) {
+                $browserAttributes = [$this->player, $this->page, $this->search, $this->sortType];
+                new AuctionMenu($this->player, $auction, static function () use ($browserAttributes) {
                     new AuctionBrowserMenu(...$browserAttributes);
                 });
             }
@@ -100,9 +100,9 @@ class AuctionBrowserMenu extends Menu
                 $this->render();
                 break;
             case 48:
-                $this->menu->setInventoryCloseListener(null);
-                $player->removeWindow($action->getInventory());
-                $this->menu->setInventoryCloseListener([$this, "close"]);
+                $this->setInventoryCloseListener(null);
+                $this->player->removeWindow($action->getInventory());
+                $this->setInventoryCloseListener([$this, "close"]);
                 $form = new CustomForm(function (Player $player, ?array $data): void {
                     $this->search = $data[0] ?? "";
                     $this->render();
@@ -110,10 +110,10 @@ class AuctionBrowserMenu extends Menu
                 });
                 $form->setTitle(PiggyAuctions::getInstance()->getMessage("forms.search.title"));
                 $form->addInput(PiggyAuctions::getInstance()->getMessage("forms.search.search"));
-                $player->sendForm($form);
+                $this->player->sendForm($form);
                 break;
             case 49:
-                new MainMenu($player);
+                new MainMenu($this->player);
                 break;
             case 50:
                 $this->sortType = ($this->sortType + 1) % 4;

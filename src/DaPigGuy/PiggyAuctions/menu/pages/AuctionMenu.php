@@ -48,10 +48,10 @@ class AuctionMenu extends Menu
 
     public function render(): void
     {
-        $this->menu->setName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.title"));
+        $this->setName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.title"));
 
-        $this->menu->getInventory()->setItem(13, MenuUtils::getDisplayItem($this->auction));
-        $this->menu->getInventory()->setItem(33, ItemFactory::get(ItemIds::MAP)->setCustomName(count($this->auction->getBids()) === 0 ? PiggyAuctions::getInstance()->getMessage("menus.auction-view.no-bids") : PiggyAuctions::getInstance()->getMessage("menus.auction-view.bid-history", ["{BIDS}" => count($this->auction->getBids()), "{HISTORY}" => implode("\n", array_map(static function (AuctionBid $auctionBid): string {
+        $this->getInventory()->setItem(13, MenuUtils::getDisplayItem($this->auction));
+        $this->getInventory()->setItem(33, ItemFactory::get(ItemIds::MAP)->setCustomName(count($this->auction->getBids()) === 0 ? PiggyAuctions::getInstance()->getMessage("menus.auction-view.no-bids") : PiggyAuctions::getInstance()->getMessage("menus.auction-view.bid-history", ["{BIDS}" => count($this->auction->getBids()), "{HISTORY}" => implode("\n", array_map(static function (AuctionBid $auctionBid): string {
             return PiggyAuctions::getInstance()->getMessage("menus.auction-view.bid-history-entry", ["{MONEY}" => $auctionBid->getBidAmount(), "{PLAYER}" => $auctionBid->getBidder(), "{DURATION}" => Utils::formatDuration(time() - $auctionBid->getTimestamp())]);
         }, array_reverse($this->auction->getBids())))])));
 
@@ -86,26 +86,26 @@ class AuctionMenu extends Menu
         } else {
             $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.submit", ["{NEWBID}" => $this->bidAmount, "{PREVIOUSBID}" => $topBid->getBidAmount(), "{DIFFERENCE}" => $this->bidAmount - $topBid->getBidAmount()]));
         }
-        $this->menu->getInventory()->setItem(29, $bidItem);
-        if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($this->player) >= $this->bidAmount && !$this->auction->hasExpired() && $this->auction->getAuctioneer() !== $this->player->getName()) $this->menu->getInventory()->setItem(31, ItemFactory::get(ItemIds::GOLD_INGOT)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bid-amount", ["{MONEY}" => $this->bidAmount])));
-        $this->menu->getInventory()->setItem(49, ItemFactory::get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
+        $this->getInventory()->setItem(29, $bidItem);
+        if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($this->player) >= $this->bidAmount && !$this->auction->hasExpired() && $this->auction->getAuctioneer() !== $this->player->getName()) $this->getInventory()->setItem(31, ItemFactory::get(ItemIds::GOLD_INGOT)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bid-amount", ["{MONEY}" => $this->bidAmount])));
+        $this->getInventory()->setItem(49, ItemFactory::get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
     }
 
-    public function handle(Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool
+    public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool
     {
         switch ($action->getSlot()) {
             case 29:
                 if (!$this->auction->hasExpired()) {
-                    if ($this->auction->getAuctioneer() === $player->getName()) {
-                        $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.bid.cant-self-bid"));
+                    if ($this->auction->getAuctioneer() === $this->player->getName()) {
+                        $this->player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.bid.cant-self-bid"));
                         return false;
                     }
-                    if ($this->auction->getTopBid() !== null && $this->auction->getTopBid()->getBidder() === $player->getName()) {
-                        $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.bid.already-top-bid"));
+                    if ($this->auction->getTopBid() !== null && $this->auction->getTopBid()->getBidder() === $this->player->getName()) {
+                        $this->player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.bid.already-top-bid"));
                         return false;
                     }
-                    if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($player) < $this->bidAmount) {
-                        $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.bid.cant-afford"));
+                    if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($this->player) < $this->bidAmount) {
+                        $this->player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.bid.cant-afford"));
                         return false;
                     }
                     $menu = InvMenu::create(InvMenu::TYPE_CHEST);
@@ -157,22 +157,22 @@ class AuctionMenu extends Menu
                         }
                     }
                 } else {
-                    if ($this->auction->getAuctioneer() === $player->getName()) {
-                        $this->auction->claim($player);
+                    if ($this->auction->getAuctioneer() === $this->player->getName()) {
+                        $this->auction->claim($this->player);
                         ($this->callback)();
-                    } else if ($this->auction->getTopBidBy($player->getName())) {
-                        $this->auction->bidderClaim($player);
+                    } else if ($this->auction->getTopBidBy($this->player->getName())) {
+                        $this->auction->bidderClaim($this->player);
                         ($this->callback)();
                     } else {
-                        $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.claim.didnt-participate-error"));
+                        $this->player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.claim.didnt-participate-error"));
                     }
                 }
                 break;
             case 31:
                 if ($itemClicked->getId() === Item::GOLD_INGOT) {
-                    $this->menu->setInventoryCloseListener(null);
-                    $player->removeWindow($action->getInventory());
-                    $this->menu->setInventoryCloseListener([$this, "close"]);
+                    $this->setInventoryCloseListener(null);
+                    $this->player->removeWindow($action->getInventory());
+                    $this->setInventoryCloseListener([$this, "close"]);
                     $form = new CustomForm(function (Player $player, ?array $data = null): void {
                         if ($data !== null && isset($data[0]) && is_numeric($data[0])) {
                             $this->bidAmount = (int)$data[0];
@@ -182,7 +182,7 @@ class AuctionMenu extends Menu
                     });
                     $form->setTitle(PiggyAuctions::getInstance()->getMessage("forms.bid-amount.title"));
                     $form->addInput(PiggyAuctions::getInstance()->getMessage("forms.bid-amount.bid-amount"));
-                    $player->sendForm($form);
+                    $this->player->sendForm($form);
                 }
                 break;
             case 49:
