@@ -51,7 +51,7 @@ class BidsMenu extends Menu
                 break;
             default:
                 $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($itemClicked->getNamedTagEntry("AuctionID") ?? new IntTag())->getValue());
-                if ($auction !== null) new AuctionMenu($this->player, $auction, static function () {
+                if ($auction !== null) new AuctionMenu($this->player, $auction, function () {
                     new BidsMenu($this->player);
                 });
                 break;

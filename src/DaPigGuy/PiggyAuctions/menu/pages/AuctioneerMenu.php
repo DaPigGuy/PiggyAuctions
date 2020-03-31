@@ -35,7 +35,7 @@ class AuctioneerMenu extends Menu
     {
         $auctioneer = $this->auctioneer;
         $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($itemClicked->getNamedTagEntry("AuctionID") ?? new IntTag())->getValue());
-        if ($auction !== null) new AuctionMenu($this->player, $auction, static function () use ($auctioneer) {
+        if ($auction !== null) new AuctionMenu($this->player, $auction, function () use ($auctioneer) {
             new AuctioneerMenu($this->player, $auctioneer);
         });
         return false;
