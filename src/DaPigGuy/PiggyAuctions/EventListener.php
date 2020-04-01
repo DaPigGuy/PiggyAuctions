@@ -28,9 +28,9 @@ class EventListener implements Listener
         $player = $event->getPlayer();
         $packet = $event->getPacket();
         if ($packet instanceof ContainerClosePacket) {
-            if (isset(Menu::$displayQueue[$player->getName()])) {
-                Menu::$displayQueue[$player->getName()]->send($player);
-                unset(Menu::$displayQueue[$player->getName()]);
+            if (isset(Menu::$awaitingInventoryClose[$player->getName()])) {
+                Menu::$awaitingInventoryClose[$player->getName()]->send($player);
+                unset(Menu::$awaitingInventoryClose[$player->getName()]);
             }
         }
     }

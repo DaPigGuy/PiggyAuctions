@@ -38,11 +38,11 @@ class AuctionManager
                     $row["startdate"],
                     $row["enddate"],
                     (bool)$row["claimed"],
-                    array_map(function (array $bidData) use ($row) {
+                    array_map(static function (array $bidData) use ($row) {
                         return new AuctionBid($row["id"], $bidData["bidder"], $bidData["bidamount"], $bidData["timestamp"]);
                     }, json_decode($row["claimed_bids"], true)),
                     $row["starting_bid"],
-                    array_map(function (array $bidData) use ($row) {
+                    array_map(static function (array $bidData) use ($row) {
                         return new AuctionBid($row["id"], $bidData["bidder"], $bidData["bidamount"], $bidData["timestamp"]);
                     }, json_decode($row["bids"], true))
                 );
@@ -75,7 +75,7 @@ class AuctionManager
     public function getAuctionsHeldBy($player): array
     {
         if ($player instanceof Player) $player = $player->getName();
-        return array_filter($this->auctions, function (Auction $auction) use ($player): bool {
+        return array_filter($this->auctions, static function (Auction $auction) use ($player): bool {
             return strtolower($auction->getAuctioneer()) === strtolower($player);
         });
     }
@@ -87,14 +87,14 @@ class AuctionManager
     public function getActiveAuctionsHeldBy($player): array
     {
         if ($player instanceof Player) $player = $player->getName();
-        return array_filter($this->auctions, function (Auction $auction) use ($player): bool {
+        return array_filter($this->auctions, static function (Auction $auction) use ($player): bool {
             return strtolower($auction->getAuctioneer()) === strtolower($player) && !$auction->hasExpired();
         });
     }
 
     public function getActiveAuctions(): array
     {
-        return array_filter($this->auctions, function (Auction $auction): bool {
+        return array_filter($this->auctions, static function (Auction $auction): bool {
             return !$auction->hasExpired();
         });
     }
@@ -116,7 +116,7 @@ class AuctionManager
     public function getBidsBy($player): array
     {
         if ($player instanceof Player) $player = $player->getName();
-        return array_filter($this->getBids(), function (AuctionBid $bid) use ($player): bool {
+        return array_filter($this->getBids(), static function (AuctionBid $bid) use ($player): bool {
             return strtolower($bid->getBidder()) === strtolower($player);
         });
     }
@@ -143,10 +143,10 @@ class AuctionManager
         $this->plugin->getDatabase()->executeChange("piggyauctions.update", [
             "id" => $auction->getId(),
             "claimed" => (int)$auction->isClaimed(),
-            "claimed_bids" => json_encode(array_map(function (AuctionBid $bid) {
+            "claimed_bids" => json_encode(array_map(static function (AuctionBid $bid) {
                 return ["bidder" => $bid->getBidder(), "bidamount" => $bid->getBidAmount(), "timestamp" => $bid->getTimestamp()];
             }, $auction->getclaimedBids())),
-            "bids" => json_encode(array_map(function (AuctionBid $bid) {
+            "bids" => json_encode(array_map(static function (AuctionBid $bid) {
                 return ["bidder" => $bid->getBidder(), "bidamount" => $bid->getBidAmount(), "timestamp" => $bid->getTimestamp()];
             }, $auction->getBids()))
         ]);
