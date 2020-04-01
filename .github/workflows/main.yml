@@ -1,0 +1,40 @@
+name: PHPStan
+
+on: [push, pull_request]
+
+jobs:
+  phpstan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref }}
+      - name: Create Vendor Directory
+        run: |
+          echo Making directory...
+          mkdir vendor
+          echo Directory made.
+      - name: wget virions, libasynql
+        uses: wei/wget@v1
+        with:
+          args: -O vendor/libasynql.phar https://poggit.pmmp.io/r/70846/libasynql_dev-113.phar
+      - name: wget virions, InvMenu
+        uses: wei/wget@v1
+        with:
+          args: -O vendor/InvMenu.phar https://poggit.pmmp.io/r/73860/InvMenu_dev-84.phar
+      - name: wget virions, FormAPI
+        uses: wei/wget@v1
+        with:
+          args: -O vendor/FormAPI.phar https://poggit.pmmp.io/r/54589/FormApi_dev-9.phar
+      - name: wget virions, libPiggyEconomy
+        uses: wei/wget@v1
+        with:
+          args: -O vendor/libPiggyEconomy.phar https://poggit.pmmp.io/r/74456/libPiggyEconomy_dev-6.phar
+      - name: wget virions, Commando
+        uses: wei/wget@v1
+        with:
+          args: -O vendor/Commando.phar https://poggit.pmmp.io/r/67875/Commando_dev-27.phar
+      - name: Run PHPStan
+        uses: nxtlvlsoftware/pmmp-phpstan-action@3
+        with:
+          phpstan-config: phpstan.neon.dist
