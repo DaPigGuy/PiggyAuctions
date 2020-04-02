@@ -17,3 +17,4 @@ projects:
         version: 1.0.1
     lint:
       phpstan: false
+...

@@ -60,7 +60,7 @@ class AuctionBrowserMenu extends Menu
             return (int)($index + 10 + floor($index / self::PAGE_ROW_LENGTH) * 2);
         }, MenuSort::closureFromType($this->sortType));
 
-        $searchItem = ItemFactory::get(ItemIds::SIGN)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.search.search", ["{FILTERED}" => empty($search) ? "" : PiggyAuctions::getInstance()->getMessage("menus.search.filter", ["{FILTERED}" => $search])]));
+        $searchItem = ItemFactory::get(ItemIds::SIGN)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.search.search", ["{FILTERED}" => empty($this->search) ? "" : PiggyAuctions::getInstance()->getMessage("menus.search.filter", ["{FILTERED}" => $this->search])]));
         $this->getInventory()->setItem(48, $searchItem);
 
         $backArrow = ItemFactory::get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back"));
