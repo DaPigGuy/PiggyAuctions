@@ -73,11 +73,11 @@ class AuctionMenu extends Menu
         } else if ($this->auction->getAuctioneer() === $this->player->getName()) {
             $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.own-auction", ["{NEWBID}" => $this->bidAmount]));
         } else if (($topBid = $this->auction->getTopBidBy($this->player->getName())) === null) {
+            $bidItem = ItemFactory::get(ItemIds::GOLD_NUGGET);
+            $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.submit-first", ["{NEWBID}" => $this->bidAmount]));
             if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($this->player) < $this->bidAmount) {
                 $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.submit-first-cant-afford", ["{NEWBID}" => $this->bidAmount]));
             }
-            $bidItem = ItemFactory::get(ItemIds::GOLD_NUGGET);
-            $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.submit-first", ["{NEWBID}" => $this->bidAmount]));
         } else if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($this->player) < ($this->bidAmount - $topBid->getBidAmount())) {
             $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.submit-cant-afford", ["{NEWBID}" => $this->bidAmount, "{PREVIOUSBID}" => $topBid->getBidAmount(), "{DIFFERENCE}" => $this->bidAmount - $topBid->getBidAmount()]));
         } else if ($topBid === $this->auction->getTopBid()) {
