@@ -97,7 +97,7 @@ class AuctionCreatorMenu extends Menu
     public function render(): void
     {
         $this->setName(PiggyAuctions::getInstance()->getMessage("menus.auction-creator.title"));
-        for ($i = 0; $i < $this->getInventory()->getSize(); $i++) $this->getInventory()->setItem($i, ItemFactory::get(ItemIds::BLEACH)->setCustomName(TextFormat::RESET));
+        for ($i = 0; $i < $this->getInventory()->getSize(); $i++) $this->getInventory()->setItem($i, ItemFactory::get(ItemIds::INVISIBLE_BEDROCK)->setCustomName(TextFormat::RESET));
         $this->getInventory()->setItem(13, $this->item);
         $this->getInventory()->setItem(29, ItemFactory::get(ItemIds::STAINED_CLAY, $this->item->getId() === Item::AIR ? 14 : 13)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-creator.create-auction", ["{STATUS}" => $this->item->getId() === Item::AIR ? TextFormat::RED : TextFormat::GREEN])));
         $this->getInventory()->setItem(31, ItemFactory::get(ItemIds::GOLD_INGOT)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-creator.starting-bid", ["{MONEY}" => $this->startingBid])));
