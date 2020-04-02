@@ -7,11 +7,11 @@ CREATE TABLE IF NOT EXISTS auctions
     id           INTEGER PRIMARY KEY AUTO_INCREMENT,
     auctioneer   VARCHAR(15),
     item         JSON,
-    startdate    INTEGER,
-    enddate      INTEGER,
+    startdate    BIGINT,
+    enddate      BIGINT,
     claimed      INTEGER,
     claimed_bids JSON,
-    starting_bid INTEGER,
+    starting_bid BIGINT,
     bids         JSON
 );
 -- # }
