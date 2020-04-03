@@ -1,4 +1,4 @@
-# PiggyAuctions [![Poggit-CI](https://poggit.pmmp.io/ci.badge/DaPigGuy/PiggyAuctions/PiggyAuctions/master)](https://poggit.pmmp.io/ci/DaPigGuy/PiggyAuctions) 
+# PiggyAuctions [![Poggit-CI](https://poggit.pmmp.io/shield.dl/PiggyAuctions)](https://poggit.pmmp.io/p/PiggyAuctions) [![Discord](https://img.shields.io/discord/330850307607363585?logo=discord)](https://discord.gg/qmnDsSD)
 
 PiggyAuctions is an open-sourced auction house plugin for [PocketMine-MP](https://github.com/pmmp/PocketMine-MP) allowing players to place auctions and bid on items.
 
