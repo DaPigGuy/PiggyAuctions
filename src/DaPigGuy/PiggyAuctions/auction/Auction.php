@@ -169,7 +169,7 @@ class Auction
                 $stats->incrementStatistic("money_earned", $ev->getAmount());
                 if ($stats->getStatistic("highest_held") < $ev->getAmount()) $stats->setStatistic("highest_held", $ev->getAmount());
                 PiggyAuctions::getInstance()->getEconomyProvider()->giveMoney($player, $ev->getAmount());
-                $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.claim.auctioneer-money-success", ["{ITEM}" => $this->getItem()->getName(), "{MONEY}" => $this->getTopBid()->getBidAmount()]));
+                $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.claim.auctioneer-money-success", ["{ITEM}" => $this->getItem()->getName(), "{TOPBIDDER}" => $this->getTopBid()->getBidder(), "{MONEY}" => $this->getTopBid()->getBidAmount()]));
             }
         }
         $this->claimed = true;

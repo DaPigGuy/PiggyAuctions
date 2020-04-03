@@ -84,11 +84,11 @@ auction:
     auctioneer-item: "{RESET}{GOLD}Collect Auction\n{GRAY}No one has bid on your item.\n{GREEN}You may pick it up.\n\n{YELLOW}Click to pickup item!"
     auctioneer-item-success: "{YELLOW}You claimed {WHITE}{ITEM}{RESET} {YELLOW}back from your expired auction!"
     auctioneer-money: "{RESET}{GOLD}Collect Auction\n\n{GRAY}Item sold to {PLAYER}\nfor a splendid {GOLD}${MONEY}!\n\n{YELLOW}Click to collect coins!"
-    auctioneer-money-success: "{YELLOW}Collected an auction for {GOLD}${MONEY}"
+    auctioneer-money-success: "{YELLOW}You collected {GOLD}${MONEY} {YELLOW}from selling {WHIE}{ITEM} {YELLOW}to {GRAY}{TOPBIDDER} {YELLOW}in an auction!"
   bid:
     already-top-bid: "{GREEN}You already have the highest bid on this auction!"
     cant-afford: "{RED}You don't have enough money to afford this bid!"
     cant-self-bid: "{GREEN}You cannot bid on your own auctions!"
     success: "{YELLOW}Bid of {GOLD}${MONEY} {YELLOW}placed for {WHITE}{ITEM}"
-    bidder: "{PLAYER} {YELLOW}bid {GOLD}${MONEY} {YELLOW}on {WHITE}{ITEM}"
+    bidder: "{YELLOW}{PLAYER} bid {GOLD}${MONEY} {YELLOW}on {WHITE}{ITEM}"
   outbid: "{YELLOW}{PLAYER} outbid you by {GOLD}${DIFFERENCE} {YELLOW}for {WHITE}{ITEM}"
