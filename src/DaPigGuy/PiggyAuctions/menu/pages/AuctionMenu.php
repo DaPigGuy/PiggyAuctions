@@ -174,8 +174,8 @@ class AuctionMenu extends Menu
                     $this->player->removeWindow($action->getInventory());
                     $this->setInventoryCloseListener([$this, "close"]);
                     $form = new CustomForm(function (Player $player, ?array $data = null): void {
-                        if ($data !== null && isset($data[0]) && is_numeric($data[0])) {
-                            $this->bidAmount = (int)$data[0];
+                        if (isset($data[0]) && is_numeric($data[0]) && (int)$data[0] > 0) {
+                            $this->bidAmount = (int)$data[0] > ($limit = PiggyAuctions::getInstance()->getConfig()->getNested("auctions.bid-limit", 2147483647)) ? $limit : (int)$data[0];
                         }
                         $this->render();
                         $this->display();
