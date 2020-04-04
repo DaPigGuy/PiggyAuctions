@@ -37,7 +37,7 @@ class AuctionManagerMenu extends Menu
     public function __construct(Player $player, int $sortType = MenuSort::TYPE_RECENTLY_UPDATED)
     {
         foreach ($player->getEffectivePermissions() as $permission) {
-            $basePermission = "piggyauctions.limits.";
+            $basePermission = "piggyauctions.limit.";
             if (substr($permission->getPermission(), 0, strlen($basePermission)) === $basePermission) {
                 $possibleLimit = substr($permission->getPermission(), strlen($basePermission));
                 if (is_numeric($possibleLimit)) {
