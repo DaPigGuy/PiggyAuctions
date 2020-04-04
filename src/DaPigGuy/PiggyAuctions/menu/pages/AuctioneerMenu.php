@@ -44,6 +44,7 @@ class AuctioneerMenu extends Menu
     public function render(): void
     {
         $this->setName(PiggyAuctions::getInstance()->getMessage("menus.auctioneer-page.title", ["{PLAYER}" => $this->auctioneer]));
+        $this->getInventory()->clearAll(false);
         $auctions = PiggyAuctions::getInstance()->getAuctionManager()->getActiveAuctionsHeldBy($this->auctioneer);
         if (isset(array_values($auctions)[0])) $this->setName(PiggyAuctions::getInstance()->getMessage("menus.auctioneer-page.title", ["{PLAYER}" => array_values($auctions)[0]->getAuctioneer()]));
         MenuUtils::updateDisplayedItems($this, $auctions, 0, 10, 7);

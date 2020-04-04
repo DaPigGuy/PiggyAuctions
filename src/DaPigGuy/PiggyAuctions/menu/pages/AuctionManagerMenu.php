@@ -27,6 +27,8 @@ class AuctionManagerMenu extends Menu
     ];
 
     /** @var int */
+    private $auctionLimit = -1;
+    /** @var int */
     private $sortType;
 
     /** @var TaskHandler */
@@ -34,6 +36,16 @@ class AuctionManagerMenu extends Menu
 
     public function __construct(Player $player, int $sortType = MenuSort::TYPE_RECENTLY_UPDATED)
     {
+        foreach ($player->getEffectivePermissions() as $permission) {
+            $basePermission = "piggyauctions.limits.";
+            if (substr($permission->getPermission(), 0, strlen($basePermission)) === $basePermission) {
+                $possibleLimit = substr($permission->getPermission(), strlen($basePermission));
+                if (is_numeric($possibleLimit)) {
+                    if ((int)$possibleLimit > $this->auctionLimit) $this->auctionLimit = (int)$possibleLimit;
+                }
+            }
+        }
+
         $this->sortType = $sortType;
         $this->taskHandler = PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (): void {
             $this->render();
@@ -44,18 +56,20 @@ class AuctionManagerMenu extends Menu
     public function render(): void
     {
         $this->setName(PiggyAuctions::getInstance()->getMessage("menus.auction-manager.title"));
+        $this->getInventory()->clearAll(false);
+
+        $auctions = array_filter(PiggyAuctions::getInstance()->getAuctionManager()->getAuctionsHeldBy($this->player), static function (Auction $auction): bool {
+            return !$auction->isClaimed();
+        });
 
         $this->getInventory()->setItem(22, ItemFactory::get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
-        $this->getInventory()->setItem(24, ItemFactory::get(ItemIds::GOLDEN_HORSE_ARMOR)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-manager.create-auction")));
+        $this->getInventory()->setItem(24, ItemFactory::get(ItemIds::GOLDEN_HORSE_ARMOR)->setCustomName(PiggyAuctions::getInstance()->getMessage($this->auctionLimit !== -1 && count($auctions) > $this->auctionLimit ? "menus.auction-manager.create-auction-maxed" : "menus.auction-manager.create-auction")));
 
         $sort = ItemFactory::get(ItemIds::HOPPER)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.sorting.sort-type", ["{TYPES}" => implode("\n", array_map(function (string $type, int $index): string {
             return ($index === $this->sortType ? PiggyAuctions::getInstance()->getMessage("menus.sorting.selected") : "") . PiggyAuctions::getInstance()->getMessage("menus.sorting." . $type);
         }, self::SORT_TYPES, array_keys(self::SORT_TYPES)))]));
         $this->getInventory()->setItem(23, $sort);
 
-        $auctions = array_filter(PiggyAuctions::getInstance()->getAuctionManager()->getAuctionsHeldBy($this->player), static function (Auction $auction): bool {
-            return !$auction->isClaimed();
-        });
         MenuUtils::updateDisplayedItems($this, $auctions, 0, 10, 7, null, MenuSort::closureFromType($this->sortType));
     }
 
@@ -72,6 +86,7 @@ class AuctionManagerMenu extends Menu
                 $this->render();
                 break;
             case 24:
+                if ($this->auctionLimit !== -1 && count(PiggyAuctions::getInstance()->getAuctionManager()->getAuctionsHeldBy($this->player)) >= $this->auctionLimit) break;
                 new AuctionCreatorMenu($this->player);
                 break;
             default:

@@ -34,6 +34,8 @@ class BidsMenu extends Menu
     public function render(): void
     {
         $this->setName(PiggyAuctions::getInstance()->getMessage("menus.view-bids.title"));
+        $this->getInventory()->clearAll(false);
+
         $auctions = array_filter(array_map(static function (AuctionBid $bid): ?Auction {
             return $bid->getAuction();
         }, PiggyAuctions::getInstance()->getAuctionManager()->getBidsBy($this->player)), function (?Auction $auction): bool {

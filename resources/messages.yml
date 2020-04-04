@@ -27,6 +27,7 @@ menus:
   auction-manager:
     title: "Auction Manager"
     create-auction: "{RESET}{GREEN}Create Auction\n\n{YELLOW}Click to become rich!"
+    create-auction-maxed: "{RESET}{GREEN}Create Auction\n{GRAY}You reached the maximum number of concurrent auctions!"
   auction-view:
     title: "Auction View"
     item-description: "\n{RESET}{GRAY}Seller: {PLAYER}\n{RESET}{GRAY}Bids: {GREEN}{BIDS} bids\n\n{RESET}{GRAY}Top Bid: {GOLD}${TOPBID}\n{RESET}{GRAY}Bidder: {GOLD}{TOPBIDDER}\n\n{RESET}{STATUS}"
