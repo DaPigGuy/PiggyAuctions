@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace DaPigGuy\PiggyAuctions;
 
+use CortexPE\Commando\exception\HookAlreadyRegistered;
+use CortexPE\Commando\PacketHooker;
 use DaPigGuy\libPiggyEconomy\exceptions\MissingProviderDependencyException;
 use DaPigGuy\libPiggyEconomy\exceptions\UnknownProviderException;
 use DaPigGuy\libPiggyEconomy\libPiggyEconomy;
@@ -40,6 +42,7 @@ class PiggyAuctions extends PluginBase implements Listener
     /**
      * @throws MissingProviderDependencyException
      * @throws UnknownProviderException
+     * @throws HookAlreadyRegistered
      */
     public function onEnable(): void
     {
@@ -65,6 +68,7 @@ class PiggyAuctions extends PluginBase implements Listener
 
         $this->statsManager = new StatisticsManager($this);
 
+        if (!PacketHooker::isRegistered()) PacketHooker::register($this);
         $this->getServer()->getCommandMap()->register("piggyauctions", new AuctionHouseCommand($this, "auctionhouse", "Open the auction house", ["ah"]));
 
         $this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);

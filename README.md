@@ -25,6 +25,7 @@ Why use PiggyAuctions over other competitors?
 | `piggyauctions` | Allows usage of all PiggyAuctions features | `op` |
 | `piggyauctions.command` | Allow usage of all PiggyAuctions commands | `op` |
 | `piggyauctions.command.auctionhouse` | Allow usage of the /auctionhouse command | `true` |
+| `piggyauctions.limit.{NUMBER}` | Imposes a limit on amount of concurrent auctions for a player | `false` |
 
 ## Issue Reporting
 * If you experience an unexpected non-crash behavior with PiggyAuctions, click [here](https://github.com/DaPigGuy/PiggyAuctions/issues/new?assignees=DaPigGuy&labels=bug&template=bug_report.md&title=).
