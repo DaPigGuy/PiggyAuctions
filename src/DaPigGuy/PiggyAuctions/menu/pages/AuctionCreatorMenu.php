@@ -59,7 +59,7 @@ class AuctionCreatorMenu extends Menu
                 $this->setInventoryCloseListener([$this, "close"]);
                 $form = new CustomForm(function (Player $player, ?array $data = null): void {
                     if (isset($data[0]) && is_numeric($data[0]) && (int)$data[0] > 0) {
-                        $this->startingBid = (int)$data[0] > ($limit = PiggyAuctions::getInstance()->getConfig()->getNested("auctions.starting-bid-limit", 2147483647)) ? $limit : (int)$data[0];
+                        $this->startingBid = (int)$data[0] > ($limit = PiggyAuctions::getInstance()->getConfig()->getNested("auctions.limits.starting-bid", 2147483647)) ? $limit : (int)$data[0];
                     }
                     $this->render();
                     $this->display();
@@ -74,7 +74,7 @@ class AuctionCreatorMenu extends Menu
                 $this->setInventoryCloseListener([$this, "close"]);
                 $form = new CustomForm(function (Player $player, ?array $data = null): void {
                     if (isset($data[0]) && is_numeric($data[0]) && (int)$data[0] > 0) {
-                        $this->duration = (int)$data[0] > ($limit = PiggyAuctions::getInstance()->getConfig()->getNested("auctions.duration-limit", 1209600)) ? $limit : (int)$data[0];
+                        $this->duration = (int)$data[0] > ($limit = PiggyAuctions::getInstance()->getConfig()->getNested("auctions.limits.duration", 1209600)) ? $limit : (int)$data[0];
                     }
                     $this->render();
                     $this->display();

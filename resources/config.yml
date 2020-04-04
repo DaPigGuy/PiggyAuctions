@@ -13,6 +13,8 @@ economy:
   # Options: economyapi, multieconomy, xp
   provider: economyapi
 auctions:
-  bid-limit: 2147483647
-  starting-bid-limit: 2147483647
-  duration-limit: 1209600
+  # Maximum value for specific user input
+  limits:
+    bid: 2147483647
+    starting-bid: 2147483647
+    duration: 1209600
