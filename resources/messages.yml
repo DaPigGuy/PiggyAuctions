@@ -17,6 +17,7 @@ menus:
     title: "Auction Browsers"
     previous-page: "{RESET}{GREEN}Previous Page\n{GRAY}({PAGE}/{MAXPAGES})\n\n{YELLOW}Click to turn page!"
     next-page: "{RESET}{GREEN}Next Page\n{GRAY}({PAGE}/{MAXPAGES})\n\n{YELLOW}Click to turn page!"
+  claim-all: "{RESET}{GREEN}Claim All\n{DARK_GRAY}Ended Auctions\n\n{YELLOW}Click to claim!"
   view-bids:
     title: "Your Bids"
   auction-creator:

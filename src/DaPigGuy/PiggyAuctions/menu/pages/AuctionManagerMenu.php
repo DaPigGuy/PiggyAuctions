@@ -61,7 +61,11 @@ class AuctionManagerMenu extends Menu
         $auctions = array_filter(PiggyAuctions::getInstance()->getAuctionManager()->getAuctionsHeldBy($this->player), static function (Auction $auction): bool {
             return !$auction->isClaimed();
         });
+        $claimable = array_filter($auctions, function (Auction $auction): bool {
+            return $auction->hasExpired();
+        });
 
+        if (count($claimable) > 1) $this->getInventory()->setItem(21, ItemFactory::get(ItemIds::CAULDRON)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.claim-all")));
         $this->getInventory()->setItem(22, ItemFactory::get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
         $this->getInventory()->setItem(24, ItemFactory::get(ItemIds::GOLDEN_HORSE_ARMOR)->setCustomName(PiggyAuctions::getInstance()->getMessage($this->auctionLimit !== -1 && count($auctions) > $this->auctionLimit ? "menus.auction-manager.create-auction-maxed" : "menus.auction-manager.create-auction")));
 
@@ -76,6 +80,14 @@ class AuctionManagerMenu extends Menu
     public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool
     {
         switch ($action->getSlot()) {
+            case 21:
+                foreach (PiggyAuctions::getInstance()->getAuctionManager()->getAuctionsHeldBy($this->player) as $auction) {
+                    if ($auction !== null && $auction->hasExpired()) {
+                        $auction->claim($this->player);
+                    }
+                }
+                $this->render();
+                break;
             case 22:
                 new MainMenu($this->player);
                 break;
