@@ -8,10 +8,22 @@ Why use PiggyAuctions over other competitors?
 3. Oink? You're not going to install such an amazing plugin? 🐷
 4. Sloths are scary.
 
-## Supported Economy Plugins
-* [EconomyAPI](https://github.com/onebone/EconomyS/tree/3.x/EconomyAPI) by onebone
-* [MultiEconomy](https://github.com/TwistedAsylumMC/MultiEconomy) by TwistedAsylumMC
-* Or, you can use player experience as a monetary value.
+## Prerequisites
+* Basic knowledge on how to install plugins from Poggit Releases and/or Poggit CI
+* PMMP 3.2.0 or greater
+* mysql & sqlite3 PHP extensions (should already exist within your PHP binaries)
+* Economy type supported by libPiggyEconomy:
+  * [EconomyAPI](https://github.com/onebone/EconomyS/tree/3.x/EconomyAPI) by onebone
+  * [MultiEconomy](https://github.com/TwistedAsylumMC/MultiEconomy) by TwistedAsylumMC
+  * PMMP Player EXP
+ 
+## Installation & Setup
+1. Install the plugin from Poggit.
+2. (Optional) Setup the data provider that PiggyAuctions will be using. By default, PiggyAuctions will use SQLite3 which requires no additional setup. If you would like to use MySQL instead, change `database.type` from `sqlite` to `mysql` & enter your MySQL credentials under `database.mysql`.
+3. (Optional) Setup your economy provider. If using EconomyAPI, this step can be skipped. Otherwise, change `economy.provider` to the name of the economy plugin being used, or `xp` for PMMP Player EXP. If using MultiEconomy, create `economy.multieconomy-currency` with the value being your preferred currency type.
+4. (Optional) Certain user inputs for creating and bidding on auctions can be configured. By default, the duration limit is 14 days, while bid & starting bid limit are the 32 bit integer max. We recommend not allowing values over the 32 bit integer max (2^31 or 2147483648).
+5. (Optional) You may configure messages in the `message.yml` file.
+6. You're done! Start your server and begin auctioning items.
 
 ## Commands
 | Command | Description | Permissions | Aliases |
@@ -36,10 +48,10 @@ Why use PiggyAuctions over other competitors?
 * We do not support any spoons of PocketMine-MP. Anything to do with spoons (Issues or PRs) will be ignored.
   * This includes plugins that modify PocketMine-MP's behavior directly, such as TeaSpoon.
 
-## Information
+## Additional Information
 * We do not support any spoons. Anything to do with spoons (Issues or PRs) will be ignored.
 * We are using the following virions: [Commando](https://github.com/CortexPE/Commando), [InvMenu](https://github.com/Muqsit/InvMenu), [libasynql](https://github.com/poggit/libasynql), [libFormAPI](https://github.com/jojoe77777/FormAPI), and [libPiggyEconomy](https://github.com/DaPigGuy/libPiggyEconomy).
-    * **You MUST use the pre-compiled phar from [Poggit-CI](https://poggit.pmmp.io/ci/DaPigGuy/PiggyAuctions/~) instead of GitHub.**
+    * **Unless you know what you are doing, use the pre-compiled phar from [Poggit-CI](https://poggit.pmmp.io/ci/DaPigGuy/PiggyAuctions/~) and not GitHub.**
     * If you wish to run it via source, check out [DEVirion](https://github.com/poggit/devirion).
 * Check out our [Discord Server](https://discord.gg/qmnDsSD) for additional plugin support.
 
