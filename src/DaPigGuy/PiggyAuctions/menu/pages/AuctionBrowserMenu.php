@@ -80,6 +80,7 @@ class AuctionBrowserMenu extends Menu
             $nextPage = ItemFactory::get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-browser.next-page", ["{PAGE}" => $this->page + 1, "{MAXPAGES}" => ceil(count($activeAuctions) / self::PAGE_LENGTH)]));
             $this->getInventory()->setItem(53, $nextPage);
         }
+        $this->getInventory()->sendContents($this->player);
     }
 
     public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool

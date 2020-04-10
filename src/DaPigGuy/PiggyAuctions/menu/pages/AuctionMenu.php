@@ -89,6 +89,7 @@ class AuctionMenu extends Menu
         $this->getInventory()->setItem(29, $bidItem);
         if (!$this->auction->hasExpired() && $this->auction->getAuctioneer() !== $this->player->getName()) $this->getInventory()->setItem(31, ItemFactory::get(ItemIds::GOLD_INGOT)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bid-amount", ["{MONEY}" => $this->bidAmount])));
         $this->getInventory()->setItem(49, ItemFactory::get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
+        $this->getInventory()->sendContents($this->player);
     }
 
     public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool

@@ -75,6 +75,7 @@ class AuctionManagerMenu extends Menu
         $this->getInventory()->setItem(23, $sort);
 
         MenuUtils::updateDisplayedItems($this, $auctions, 0, 10, 7, null, MenuSort::closureFromType($this->sortType));
+        $this->getInventory()->sendContents($this->player);
     }
 
     public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool

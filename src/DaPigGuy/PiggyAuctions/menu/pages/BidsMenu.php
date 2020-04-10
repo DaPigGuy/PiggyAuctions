@@ -48,6 +48,7 @@ class BidsMenu extends Menu
         MenuUtils::updateDisplayedItems($this, $auctions, 0, 10, 7);
         if (count($claimable) > 1) $this->getInventory()->setItem(21, ItemFactory::get(ItemIds::CAULDRON)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.claim-all")));
         $this->getInventory()->setItem(22, ItemFactory::get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
+        $this->getInventory()->sendContents($this->player);
     }
 
     public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool
