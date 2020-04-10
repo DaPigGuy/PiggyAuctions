@@ -14,6 +14,9 @@ class PlayerStatistics implements \JsonSerializable
     /** @var int[] */
     private $statistics;
 
+    /**
+     * @param int[] $statistics
+     */
     public function __construct(Player $player, array $statistics)
     {
         $this->player = $player;
@@ -38,6 +41,9 @@ class PlayerStatistics implements \JsonSerializable
         PiggyAuctions::getInstance()->getStatsManager()->saveStatistics($this->player);
     }
 
+    /**
+     * @return int[]
+     */
     public function jsonSerialize(): array
     {
         return $this->statistics;

@@ -92,6 +92,9 @@ class AuctionManager
         });
     }
 
+    /**
+     * @return Auction[]
+     */
     public function getActiveAuctions(): array
     {
         return array_filter($this->auctions, static function (Auction $auction): bool {

@@ -33,6 +33,7 @@ class Auction
     public $bids;
 
     /**
+     * @param AuctionBid[] $claimedBids
      * @param AuctionBid[] $bids
      */
     public function __construct(int $id, string $auctioneer, Item $item, int $startDate, int $endDate, bool $claimed, array $claimedBids, int $startingBid, array $bids)
