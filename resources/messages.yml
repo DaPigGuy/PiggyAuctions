@@ -46,6 +46,11 @@ menus:
       submit-cant-afford: "{RESET}{GOLD}Submit Bid\n\n{GRAY}New Bid: {GOLD}${NEWBID}\n{GRAY}Your previous bid: {YELLOW}${PREVIOUSBID}\n\n{GRAY}You pay: {GOLD}${DIFFERENCE}\n\n{RED}Cannot afford bid!"
       top-bid: "{RESET}{GOLD}Submit Bid\n\n{GRAY}New Bid: {GOLD}${NEWBID}\n{GRAY}Your previous bid: {YELLOW}${PREVIOUSBID}\n\n{GREEN}Already top bid"
       own-auction: "{RESET}{GOLD}Submit Bid\n\n{GRAY}New Bid: {GOLD}${NEWBID}\n\n{GREEN}This is your own auction!"
+  auction-confirmation:
+    title: "Confirm Auction"
+    confirm: "{RESET}{GREEN}Confirm\n{GRAY}Auctioning: {AMOUNT}x {WHITE}{ITEM}\n{GRAY}Cost: {GOLD}${MONEY}"
+    cancel: "{RESET}{RED}Cancel"
+    auctioning: "{RESET}{YELLOW}{BOLD}AUCTIONING ITEM:\n\n{RESET}{ITEM}"
   bid-confirmation:
     title: "Confirm Bid"
     confirm: "{RESET}{GREEN}Confirm\n{GRAY}Bidding on: {WHITE}{ITEM}{RESET}\n{GRAY}Cost: {GOLD}${MONEY}"

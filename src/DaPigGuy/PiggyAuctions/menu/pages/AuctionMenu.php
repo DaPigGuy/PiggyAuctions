@@ -115,7 +115,7 @@ class AuctionMenu extends Menu
                         (clone $this->auction->getItem())->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.bidding-on", ["{ITEM}" => ($this->auction->getItem())->getName()])),
                         PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.confirm", ["{ITEM}" => $this->auction->getItem()->getName(), "{MONEY}" => $this->bidAmount]),
                         PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.cancel"),
-                        function (bool $confirmed) {
+                        function (bool $confirmed): void {
                             if ($confirmed) {
                                 if ($this->bidAmount >= $this->auction->getMinimumBidAmount()) {
                                     if (($topBid = $this->auction->getTopBid()) === null || $topBid->getBidder() !== $this->player->getName()) {

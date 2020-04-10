@@ -43,14 +43,29 @@ class AuctionCreatorMenu extends Menu
                 return true;
             case 29:
                 if ($this->item->getId() !== ItemIds::AIR) {
-                    $this->getInventory()->clear(13);
-                    $ev = new AuctionStartEvent($this->player, $this->item, time(), time() + $this->duration, $this->startingBid);
-                    $ev->call();
-                    if (!$ev->isCancelled()) {
-                        PiggyAuctions::getInstance()->getStatsManager()->getStatistics($this->player)->incrementStatistic("auctions_created");
-                        PiggyAuctions::getInstance()->getAuctionManager()->addAuction(...$ev->getAuctionData());
-                        new AuctionManagerMenu($this->player);
-                    }
+                    $this->setInventoryCloseListener(null);
+                    new ConfirmationMenu(
+                        $this->player,
+                        PiggyAuctions::getInstance()->getMessage("menus.auction-confirmation.title"),
+                        (clone $this->item)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-confirmation.auctioning", ["{ITEM}" => $this->item->getName()])),
+                        PiggyAuctions::getInstance()->getMessage("menus.auction-confirmation.confirm", ["{ITEM}" => $this->item->getName(), "{AMOUNT}" => $this->item->getCount(), "{MONEY}" => $this->startingBid]),
+                        PiggyAuctions::getInstance()->getMessage("menus.auction-confirmation.cancel"),
+                        function (bool $confirmed): void {
+                            if ($confirmed) {
+                                $this->getInventory()->clear(13);
+                                $ev = new AuctionStartEvent($this->player, $this->item, time(), time() + $this->duration, $this->startingBid);
+                                $ev->call();
+                                if (!$ev->isCancelled()) {
+                                    PiggyAuctions::getInstance()->getStatsManager()->getStatistics($this->player)->incrementStatistic("auctions_created");
+                                    PiggyAuctions::getInstance()->getAuctionManager()->addAuction(...$ev->getAuctionData());
+                                    new AuctionManagerMenu($this->player);
+                                    return;
+                                }
+                            }
+                            $this->setInventoryCloseListener([$this, "close"]);
+                            $this->display();
+                        }
+                    );
                 }
                 break;
             case 31:
