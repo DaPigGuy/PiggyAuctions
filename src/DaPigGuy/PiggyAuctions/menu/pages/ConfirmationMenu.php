@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace DaPigGuy\PiggyAuctions\menu\pages;
 
 use DaPigGuy\PiggyAuctions\menu\Menu;
+use DaPigGuy\PiggyAuctions\PiggyAuctions;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
 use pocketmine\Player;
+use pocketmine\scheduler\ClosureTask;
 
 class ConfirmationMenu extends Menu
 {
@@ -48,5 +50,13 @@ class ConfirmationMenu extends Menu
             ($this->callback)($action->getSlot() === 11);
         }
         return false;
+    }
+
+    public function close(): void
+    {
+        parent::close();
+        PiggyAuctions::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function (): void {
+            ($this->callback)(false);
+        }), 1);
     }
 }
