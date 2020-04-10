@@ -186,6 +186,11 @@ class Auction
         return $this->bids;
     }
 
+    public function getMinimumBidAmount(): int
+    {
+        return (int)(($topBid = $this->getTopBid()) === null ? $this->startingBid : $topBid->getBidAmount() * (1 + PiggyAuctions::getInstance()->getConfig()->getNested("auctions.bid-increment", 15) / 100));
+    }
+
     public function getTopBid(): ?AuctionBid
     {
         $highestBid = null;

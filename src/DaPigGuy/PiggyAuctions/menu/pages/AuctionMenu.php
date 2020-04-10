@@ -38,7 +38,7 @@ class AuctionMenu extends Menu
     public function __construct(Player $player, Auction $auction, callable $callback)
     {
         $this->auction = $auction;
-        $this->bidAmount = $auction->getTopBid() === null ? $auction->getStartingBid() : (int)($auction->getTopBid()->getBidAmount() * 1.15);
+        $this->bidAmount = $auction->getMinimumBidAmount();
         $this->callback = $callback;
         $this->taskHandler = PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (int $currentTick): void {
             $this->render();
@@ -118,8 +118,8 @@ class AuctionMenu extends Menu
                     $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool {
                         switch ($action->getSlot()) {
                             case 11:
-                                if ((($topBid = $this->auction->getTopBid()) === null && $this->bidAmount >= $this->auction->getStartingBid()) || ($topBid !== null && $this->bidAmount >= (int)($topBid->getBidAmount() * 1.15))) {
-                                    if ($topBid === null || $topBid->getBidder() !== $player->getName()) {
+                                if ($this->bidAmount >= $this->auction->getMinimumBidAmount()) {
+                                    if (($topBid = $this->auction->getTopBid()) === null || $topBid->getBidder() !== $player->getName()) {
                                         $cost = $this->bidAmount - ($this->auction->getTopBidBy($player->getName()) === null ? 0 : $this->auction->getTopBidBy($player->getName())->getBidAmount());
                                         if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($player) >= $cost) {
                                             $bid = new AuctionBid($this->auction->getId(), $player->getName(), $this->bidAmount, time());
