@@ -13,7 +13,6 @@ use DaPigGuy\PiggyAuctions\PiggyAuctions;
 use DaPigGuy\PiggyAuctions\utils\Utils;
 use jojoe77777\FormAPI\CustomForm;
 use muqsit\invmenu\InvMenu;
-use muqsit\invmenu\session\PlayerManager;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
@@ -110,55 +109,45 @@ class AuctionMenu extends Menu
                         return false;
                     }
                     $this->setInventoryCloseListener(null);
-                    $menu = InvMenu::create(InvMenu::TYPE_CHEST);
-                    $menu->setName(PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.title"));
-                    $menu->getInventory()->setItem(11, ItemFactory::get(ItemIds::STAINED_CLAY, 13)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.confirm", ["{ITEM}" => $this->auction->getItem()->getName(), "{MONEY}" => $this->bidAmount])));
-                    $menu->getInventory()->setItem(13, (clone $this->auction->getItem())->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.bidding-on", ["{ITEM}" => ($this->auction->getItem())->getName()])));
-                    $menu->getInventory()->setItem(15, ItemFactory::get(ItemIds::STAINED_CLAY, 14)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.cancel")));
-                    $menu->setListener(function (Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool {
-                        switch ($action->getSlot()) {
-                            case 11:
+                    new ConfirmationMenu(
+                        $this->player,
+                        PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.title"),
+                        (clone $this->auction->getItem())->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.bidding-on", ["{ITEM}" => ($this->auction->getItem())->getName()])),
+                        PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.confirm", ["{ITEM}" => $this->auction->getItem()->getName(), "{MONEY}" => $this->bidAmount]),
+                        PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.cancel"),
+                        function (bool $confirmed) {
+                            if ($confirmed) {
                                 if ($this->bidAmount >= $this->auction->getMinimumBidAmount()) {
-                                    if (($topBid = $this->auction->getTopBid()) === null || $topBid->getBidder() !== $player->getName()) {
-                                        $cost = $this->bidAmount - ($this->auction->getTopBidBy($player->getName()) === null ? 0 : $this->auction->getTopBidBy($player->getName())->getBidAmount());
-                                        if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($player) >= $cost) {
-                                            $bid = new AuctionBid($this->auction->getId(), $player->getName(), $this->bidAmount, time());
+                                    if (($topBid = $this->auction->getTopBid()) === null || $topBid->getBidder() !== $this->player->getName()) {
+                                        $cost = $this->bidAmount - ($this->auction->getTopBidBy($this->player->getName()) === null ? 0 : $this->auction->getTopBidBy($this->player->getName())->getBidAmount());
+                                        if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($this->player) >= $cost) {
+                                            $bid = new AuctionBid($this->auction->getId(), $this->player->getName(), $this->bidAmount, time());
                                             $ev = new AuctionBidEvent($this->auction, $bid);
                                             $ev->call();
                                             if (!$ev->isCancelled()) {
-                                                $cost = $ev->getBid()->getBidAmount() - ($this->auction->getTopBidBy($player->getName()) === null ? 0 : $this->auction->getTopBidBy($player->getName())->getBidAmount());
-                                                PiggyAuctions::getInstance()->getEconomyProvider()->takeMoney($player, $cost);
+                                                $cost = $ev->getBid()->getBidAmount() - ($this->auction->getTopBidBy($this->player->getName()) === null ? 0 : $this->auction->getTopBidBy($this->player->getName())->getBidAmount());
+                                                PiggyAuctions::getInstance()->getEconomyProvider()->takeMoney($this->player, $cost);
                                                 $this->auction->addBid($bid);
 
-                                                $stats = PiggyAuctions::getInstance()->getStatsManager()->getStatistics($player);
+                                                $stats = PiggyAuctions::getInstance()->getStatsManager()->getStatistics($this->player);
                                                 $stats->incrementStatistic("money_spent", $cost);
                                                 $stats->incrementStatistic("bids");
                                                 if ($stats->getStatistic("highest_bid") < $bid->getBidAmount()) {
                                                     $stats->setStatistic("highest_bid", $bid->getBidAmount());
                                                 }
 
-                                                $player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.bid.success", ["{MONEY}" => $ev->getBid()->getBidAmount(), "{ITEM}" => $this->auction->getItem()->getName()]));
-                                                if (($auctioneer = PiggyAuctions::getInstance()->getServer()->getPlayerExact($this->auction->getAuctioneer())) instanceof Player) $auctioneer->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.bid.bidder", ["{PLAYER}" => $player->getName(), "{MONEY}" => $ev->getBid()->getBidAmount(), "{ITEM}" => $this->auction->getItem()->getName()]));
+                                                $this->player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.bid.success", ["{MONEY}" => $ev->getBid()->getBidAmount(), "{ITEM}" => $this->auction->getItem()->getName()]));
+                                                if (($auctioneer = PiggyAuctions::getInstance()->getServer()->getPlayerExact($this->auction->getAuctioneer())) instanceof Player) $auctioneer->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.bid.bidder", ["{PLAYER}" => $this->player->getName(), "{MONEY}" => $ev->getBid()->getBidAmount(), "{ITEM}" => $this->auction->getItem()->getName()]));
                                             }
                                         }
                                     }
                                 }
-                                break;
+                            }
+                            $this->setInventoryCloseListener([$this, "close"]);
+                            $this->render();
+                            $this->display();
                         }
-                        $this->setInventoryCloseListener([$this, "close"]);
-                        $this->render();
-                        $this->display();
-                        return false;
-                    });
-                    if (PlayerManager::get($this->player) !== null) {
-                        $oldMenu = PlayerManager::get($this->player)->getCurrentMenu();
-                        if ($oldMenu !== null) {
-                            $this->player->removeWindow($oldMenu->getInventoryForPlayer($this->player));
-                            Menu::$awaitingInventoryClose[$this->player->getName()] = $menu;
-                        } else {
-                            $menu->send($this->player);
-                        }
-                    }
+                    );
                 } else {
                     if ($this->auction->getAuctioneer() === $this->player->getName()) {
                         $this->auction->claim($this->player);
