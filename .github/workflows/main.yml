@@ -17,7 +17,7 @@ jobs:
       - name: wget virions, libasynql
         uses: wei/wget@v1
         with:
-          args: -O vendor/libasynql.phar https://poggit.pmmp.io/r/75007/libasynql_dev-114.phar
+          args: -O vendor/libasynql.phar https://poggit.pmmp.io/r/81738/libasynql_dev-119.phar
       - name: wget virions, InvMenu
         uses: wei/wget@v1
         with:
