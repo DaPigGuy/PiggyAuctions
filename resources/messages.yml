@@ -75,6 +75,7 @@ forms:
   bid-amount:
     title: "Change Bid Amount"
     bid-amount: "Bid Amount"
+    bid-too-low: "{RED}Your bid must be at least {MINIMUMBID} gold!"
 auction:
   claim:
     did-not-participate: "{RESET}{GOLD}Collect Auction\n{GRAY}You didn't participate in\nthis auction"

@@ -178,7 +178,11 @@ class AuctionMenu extends Menu
                     $this->setInventoryCloseListener([$this, "close"]);
                     $form = new CustomForm(function (Player $player, ?array $data = null): void {
                         if (isset($data[0]) && is_numeric($data[0]) && (int)$data[0] > 0) {
-                            $this->bidAmount = (int)$data[0] > ($limit = PiggyAuctions::getInstance()->getConfig()->getNested("auctions.limits.bid", 2147483647)) ? $limit : (int)$data[0];
+                            if ((int)$data[0] > ($minimumBid = $this->auction->getMinimumBidAmount())) {
+                                $this->bidAmount = (int)$data[0] > ($limit = PiggyAuctions::getInstance()->getConfig()->getNested("auctions.limits.bid", 2147483647)) ? $limit : (int)$data[0];
+                            } else {
+                                $player->sendMessage(PiggyAuctions::getInstance()->getMessage("forms.bid-amount.bid-too-low", ["{MINIMUMBID}" => $minimumBid]));
+                            }
                         }
                         $this->render();
                         $this->display();
