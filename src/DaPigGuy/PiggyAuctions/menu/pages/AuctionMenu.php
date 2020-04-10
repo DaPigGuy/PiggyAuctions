@@ -109,6 +109,7 @@ class AuctionMenu extends Menu
                         $this->player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.bid.cant-afford"));
                         return false;
                     }
+                    $this->setInventoryCloseListener(null);
                     $menu = InvMenu::create(InvMenu::TYPE_CHEST);
                     $menu->setName(PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.title"));
                     $menu->getInventory()->setItem(11, ItemFactory::get(ItemIds::STAINED_CLAY, 13)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.confirm", ["{ITEM}" => $this->auction->getItem()->getName(), "{MONEY}" => $this->bidAmount])));
@@ -144,6 +145,7 @@ class AuctionMenu extends Menu
                                 }
                                 break;
                         }
+                        $this->setInventoryCloseListener([$this, "close"]);
                         $this->render();
                         $this->display();
                         return false;
