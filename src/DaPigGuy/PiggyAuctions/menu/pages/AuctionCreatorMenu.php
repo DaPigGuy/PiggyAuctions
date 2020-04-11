@@ -34,12 +34,16 @@ class AuctionCreatorMenu extends Menu
         parent::__construct($player);
     }
 
+    public function setItem(Item $item): void
+    {
+        $this->item = $item;
+        $this->render();
+    }
+
     public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool
     {
         switch ($action->getSlot()) {
             case 13:
-                $this->item = $itemClickedWith;
-                $this->render();
                 return true;
             case 29:
                 if ($this->item->getId() !== ItemIds::AIR) {

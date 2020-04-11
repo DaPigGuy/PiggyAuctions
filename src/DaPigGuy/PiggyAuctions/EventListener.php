@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace DaPigGuy\PiggyAuctions;
 
 use DaPigGuy\PiggyAuctions\menu\Menu;
+use DaPigGuy\PiggyAuctions\menu\pages\AuctionCreatorMenu;
+use muqsit\invmenu\session\PlayerManager;
 use pocketmine\event\inventory\InventoryTransactionEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerPreLoginEvent;
@@ -52,8 +54,18 @@ class EventListener implements Listener
     {
         $transaction = $event->getTransaction();
         $player = $transaction->getSource();
+        $session = PlayerManager::get($player);
         foreach ($transaction->getActions() as $action) {
-            if ($action instanceof SlotChangeAction && $event->isCancelled()) $action->getInventory()->sendSlot($action->getSlot(), $player);
+            if ($action instanceof SlotChangeAction) {
+                if ($event->isCancelled()) {
+                    $action->getInventory()->sendSlot($action->getSlot(), $player);
+                } else {
+                    if ($session !== null) {
+                        $menu = $session->getCurrentMenu();
+                        if ($action->getSlot() === 13 && $menu instanceof AuctionCreatorMenu) $menu->setItem($action->getTargetItem());
+                    }
+                }
+            }
         }
     }
 }
