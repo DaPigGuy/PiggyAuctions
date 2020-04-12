@@ -129,6 +129,10 @@ class AuctionMenu extends Menu
                                                 PiggyAuctions::getInstance()->getEconomyProvider()->takeMoney($this->player, $cost);
                                                 $this->auction->addBid($bid);
 
+                                                if ($this->auction->getEndDate() - time() <= ($duration = PiggyAuctions::getInstance()->getConfig()->getNested("auctions.anti-snipe-duration", 120))) {
+                                                    $this->auction->setEndDate($this->auction->getEndDate() + $duration - ($this->auction->getEndDate() - time()));
+                                                }
+
                                                 $stats = PiggyAuctions::getInstance()->getStatsManager()->getStatistics($this->player);
                                                 $stats->incrementStatistic("money_spent", $cost);
                                                 $stats->incrementStatistic("bids");

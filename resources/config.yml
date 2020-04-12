@@ -19,3 +19,4 @@ auctions:
     starting-bid: 2147483647
     duration: 1209600
   bid-increment: 15
+  anti-snipe-duration: 120

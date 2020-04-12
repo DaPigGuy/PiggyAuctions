@@ -75,6 +75,12 @@ class Auction
         return $this->endDate;
     }
 
+    public function setEndDate(int $endDate): void
+    {
+        $this->endDate = $endDate;
+        PiggyAuctions::getInstance()->getAuctionManager()->updateAuction($this);
+    }
+
     public function hasExpired(): bool
     {
         $expired = time() > $this->endDate;
