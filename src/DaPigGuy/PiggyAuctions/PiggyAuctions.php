@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DaPigGuy\PiggyAuctions;
 
+use CortexPE\Commando\BaseCommand;
 use CortexPE\Commando\exception\HookAlreadyRegistered;
 use CortexPE\Commando\PacketHooker;
 use DaPigGuy\libPiggyEconomy\exceptions\MissingProviderDependencyException;
@@ -15,6 +16,7 @@ use DaPigGuy\PiggyAuctions\commands\AuctionHouseCommand;
 use DaPigGuy\PiggyAuctions\statistics\StatisticsManager;
 use DaPigGuy\PiggyAuctions\tasks\CheckUpdatesTask;
 use DaPigGuy\PiggyAuctions\utils\Utils;
+use jojoe77777\FormAPI\Form;
 use muqsit\invmenu\InvMenuHandler;
 use pocketmine\event\Listener;
 use pocketmine\plugin\PluginBase;
@@ -46,6 +48,22 @@ class PiggyAuctions extends PluginBase implements Listener
      */
     public function onEnable(): void
     {
+        foreach (
+            [
+                "libasynql" => libasynql::class,
+                "libPiggyEconomy" => libPiggyEconomy::class,
+                "InvMenu" => InvMenuHandler::class,
+                "Commando" => BaseCommand::class,
+                "libformapi" => Form::class
+            ] as $virion => $class
+        ) {
+            if (!class_exists($class)) {
+                $this->getLogger()->error($virion . " virion not found. Please download PiggyAuctions from Poggit-CI or use DEVirion (not recommended).");
+                $this->getServer()->getPluginManager()->disablePlugin($this);
+                return;
+            }
+        }
+
         self::$instance = $this;
 
         if (!InvMenuHandler::isRegistered()) {
