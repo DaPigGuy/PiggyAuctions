@@ -47,6 +47,7 @@ class ConfirmationMenu extends Menu
     public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool
     {
         if ($action->getSlot() === 11 || $action->getSlot() === 15) {
+            $this->setInventoryCloseListener(null);
             ($this->callback)($action->getSlot() === 11);
         }
         return false;
