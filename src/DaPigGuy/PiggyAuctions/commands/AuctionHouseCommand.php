@@ -12,10 +12,12 @@ use DaPigGuy\PiggyAuctions\menu\pages\AuctioneerMenu;
 use DaPigGuy\PiggyAuctions\menu\pages\MainMenu;
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
 use pocketmine\command\CommandSender;
+use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\Player;
+use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat;
 
-class AuctionHouseCommand extends BaseCommand
+class AuctionHouseCommand extends BaseCommand implements PluginIdentifiableCommand
 {
     /** @var PiggyAuctions */
     private $plugin;
@@ -27,6 +29,11 @@ class AuctionHouseCommand extends BaseCommand
     {
         $this->plugin = $plugin;
         parent::__construct($name, $description, $aliases);
+    }
+
+    public function getPlugin(): Plugin
+    {
+        return $this->plugin;
     }
 
     /**
