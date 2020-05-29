@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DaPigGuy\PiggyAuctions\tasks;
 
+use DaPigGuy\PiggyAuctions\PiggyAuctions;
 use Exception;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
@@ -18,6 +19,7 @@ class CheckUpdatesTask extends AsyncTask
 
     public function onCompletion(Server $server): void
     {
+        /** @var PiggyAuctions $plugin */
         $plugin = $server->getPluginManager()->getPlugin("PiggyAuctions");
         try {
             if ($plugin->isEnabled()) {

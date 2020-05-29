@@ -91,7 +91,7 @@ class PiggyAuctions extends PluginBase implements Listener
 
         $this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
 
-        $this->getServer()->getAsyncPool()->submitTask(new CheckUpdatesTask($this->getDescription()->getVersion(), $this->getDescription()->getCompatibleApis()[0]));
+        $this->getServer()->getAsyncPool()->submitTask(new CheckUpdatesTask());
     }
 
     public static function getInstance(): PiggyAuctions
