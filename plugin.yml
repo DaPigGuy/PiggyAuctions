@@ -1,6 +1,6 @@
 name: PiggyAuctions
 main: DaPigGuy\PiggyAuctions\PiggyAuctions
-version: 1.0.5
+version: 1.0.6
 api: 3.2.0
 load: POSTWORLD
 author: DaPigGuy
