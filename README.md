@@ -16,6 +16,9 @@ Why use PiggyAuctions over other competitors?
   * [EconomyAPI](https://github.com/onebone/EconomyS/tree/3.x/EconomyAPI) by onebone
   * [MultiEconomy](https://github.com/TwistedAsylumMC/MultiEconomy) by TwistedAsylumMC
   * PMMP Player EXP
+
+## Notice
+You will need to download the [InvMenuFix](https://poggit.pmmp.io/r/94951/InvCrashFix_dev-1.phar) plugin and update your PiggyAuctions version to 1.0.6 to fix crates crashing your client.
  
 ## Installation & Setup
 1. Install the plugin from Poggit.
