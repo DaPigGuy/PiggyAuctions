@@ -103,10 +103,9 @@ class AuctionManagerMenu extends Menu
                 new AuctionCreatorMenu($this->player);
                 break;
             default:
-                $managerAttributes = [$this->player, $this->sortType];
                 $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($itemClicked->getNamedTagEntry("AuctionID") ?? new IntTag())->getValue());
-                if ($auction !== null) new AuctionMenu($this->player, $auction, static function () use ($managerAttributes) {
-                    new AuctionManagerMenu(...$managerAttributes);
+                if ($auction !== null) new AuctionMenu($this->player, $auction, function () {
+                    new AuctionManagerMenu($this->player, $this->sortType);
                 });
                 break;
         }

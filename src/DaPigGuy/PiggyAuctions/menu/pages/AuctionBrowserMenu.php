@@ -88,9 +88,8 @@ class AuctionBrowserMenu extends Menu
         if ($itemClicked->getNamedTagEntry("AuctionID") !== null) {
             $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($itemClicked->getNamedTagEntry("AuctionID") ?? new IntTag())->getValue());
             if ($auction instanceof Auction) {
-                $browserAttributes = [$this->player, $this->page, $this->search, $this->sortType];
-                new AuctionMenu($this->player, $auction, static function () use ($browserAttributes) {
-                    new AuctionBrowserMenu(...$browserAttributes);
+                new AuctionMenu($this->player, $auction, function () {
+                    new AuctionBrowserMenu($this->player, $this->page, $this->search, $this->sortType);
                 });
             }
         }

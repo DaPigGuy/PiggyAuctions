@@ -20,9 +20,6 @@ class AuctionHouseCommand extends BaseCommand
     /** @var PiggyAuctions */
     protected $plugin;
 
-    /**
-     * @param BaseArgument[] $args
-     */
     public function onRun(CommandSender $sender, string $aliasUsed, array $args): void
     {
         if (!$sender instanceof Player) {
