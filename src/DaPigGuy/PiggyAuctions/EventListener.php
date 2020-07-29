@@ -62,7 +62,7 @@ class EventListener implements Listener
                 } else {
                     if ($session !== null) {
                         $menu = $session->getCurrentMenu();
-                        if ($action->getSlot() === 13 && $menu instanceof AuctionCreatorMenu) $menu->setItem($action->getTargetItem());
+                        if ($action->getSlot() === 13 && $menu instanceof AuctionCreatorMenu && $menu->getInventory() === $action->getInventory()) $menu->setItem($action->getTargetItem());
                     }
                 }
             }
