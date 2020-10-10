@@ -27,7 +27,7 @@ class EventListener implements Listener
 
     public function onDataPacketReceive(DataPacketReceiveEvent $event): void
     {
-        $player = $event->getPlayer();
+        $player = $event->getOrigin()->getPlayer();
         $packet = $event->getPacket();
         if ($packet instanceof ContainerClosePacket) {
             if (isset(Menu::$awaitingInventoryClose[$player->getName()])) {
@@ -58,7 +58,7 @@ class EventListener implements Listener
         foreach ($transaction->getActions() as $action) {
             if ($action instanceof SlotChangeAction) {
                 if ($event->isCancelled()) {
-                    $action->getInventory()->sendSlot($action->getSlot(), $player);
+                    $player->getNetworkSession()->getInvManager()->syncSlot($action->getInventory(), $action->getSlot());
                 } else {
                     if ($session !== null) {
                         $menu = $session->getCurrentMenu();
