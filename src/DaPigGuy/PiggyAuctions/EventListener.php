@@ -9,7 +9,7 @@ use DaPigGuy\PiggyAuctions\menu\pages\AuctionCreatorMenu;
 use muqsit\invmenu\session\PlayerManager;
 use pocketmine\event\inventory\InventoryTransactionEvent;
 use pocketmine\event\Listener;
-use pocketmine\event\player\PlayerPreLoginEvent;
+use pocketmine\event\player\PlayerLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
@@ -27,7 +27,7 @@ class EventListener implements Listener
 
     public function onDataPacketReceive(DataPacketReceiveEvent $event): void
     {
-        $player = $event->getPlayer();
+        $player = $event->getOrigin()->getPlayer();
         $packet = $event->getPacket();
         if ($packet instanceof ContainerClosePacket) {
             if (isset(Menu::$awaitingInventoryClose[$player->getName()])) {
@@ -37,7 +37,7 @@ class EventListener implements Listener
         }
     }
 
-    public function onPreLogin(PlayerPreLoginEvent $event): void
+    public function onPreLogin(PlayerLoginEvent $event): void
     {
         $this->plugin->getStatsManager()->loadStatistics($event->getPlayer());
     }
@@ -58,7 +58,7 @@ class EventListener implements Listener
         foreach ($transaction->getActions() as $action) {
             if ($action instanceof SlotChangeAction) {
                 if ($event->isCancelled()) {
-                    $action->getInventory()->sendSlot($action->getSlot(), $player);
+                    $player->getNetworkSession()->getInvManager()->syncSlot($action->getInventory(), $action->getSlot());
                 } else {
                     if ($session !== null) {
                         $menu = $session->getCurrentMenu();

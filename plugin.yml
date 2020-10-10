@@ -1,7 +1,7 @@
 name: PiggyAuctions
 main: DaPigGuy\PiggyAuctions\PiggyAuctions
 version: 1.0.7
-api: 3.2.0
+api: 4.0.0
 load: POSTWORLD
 author: DaPigGuy
 softdepend: ["EconomyAPI", "MultiEconomy"]

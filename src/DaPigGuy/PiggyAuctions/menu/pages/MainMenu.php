@@ -7,13 +7,14 @@ namespace DaPigGuy\PiggyAuctions\menu\pages;
 use DaPigGuy\PiggyAuctions\menu\Menu;
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
+use pocketmine\inventory\transaction\InventoryTransaction;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
 
 class MainMenu extends Menu
 {
-    public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool
+    public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action, InventoryTransaction $transaction): bool
     {
         switch ($action->getSlot()) {
             case 11:
@@ -40,10 +41,10 @@ class MainMenu extends Menu
     {
         $this->setName(PiggyAuctions::getInstance()->getMessage("menus.main-menu.title"));
         $this->getInventory()->setContents([
-            11 => ItemFactory::get(ItemIds::GOLD_BLOCK)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.main-menu.browse-auctions")),
-            13 => ItemFactory::get(ItemIds::GOLDEN_CARROT)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.main-menu.view-bids")),
-            15 => ItemFactory::get(ItemIds::GOLDEN_HORSE_ARMOR)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.main-menu.manage-auctions")),
-            26 => ItemFactory::get(ItemIds::MAP)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.main-menu.auction-stats"))
+            11 => ItemFactory::getInstance()->get(ItemIds::GOLD_BLOCK)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.main-menu.browse-auctions")),
+            13 => ItemFactory::getInstance()->get(ItemIds::GOLDEN_CARROT)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.main-menu.view-bids")),
+            15 => ItemFactory::getInstance()->get(ItemIds::GOLDEN_HORSE_ARMOR)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.main-menu.manage-auctions")),
+            26 => ItemFactory::getInstance()->get(ItemIds::MAP)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.main-menu.auction-stats"))
         ]);
     }
 }

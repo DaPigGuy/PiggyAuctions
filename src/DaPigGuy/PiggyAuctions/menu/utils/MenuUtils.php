@@ -7,7 +7,7 @@ namespace DaPigGuy\PiggyAuctions\menu\utils;
 use DaPigGuy\PiggyAuctions\auction\Auction;
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
 use DaPigGuy\PiggyAuctions\utils\Utils;
-use muqsit\invmenu\SharedInvMenu;
+use muqsit\invmenu\InvMenu;
 use pocketmine\item\Item;
 use pocketmine\nbt\tag\IntTag;
 
@@ -17,7 +17,7 @@ class MenuUtils
      * @param Auction[] $auctions
      * @return Auction[]
      */
-    public static function updateDisplayedItems(SharedInvMenu $menu, array $auctions, int $arrayOffset, int $offsetSlot, int $displayCount, ?callable $itemIndexFunction = null, ?callable $sortFunction = null): array
+    public static function updateDisplayedItems(InvMenu $menu, array $auctions, int $arrayOffset, int $offsetSlot, int $displayCount, ?callable $itemIndexFunction = null, ?callable $sortFunction = null): array
     {
         $itemIndexFunction = $itemIndexFunction ?? static function ($index) use ($offsetSlot): int {
                 return $index + $offsetSlot;
@@ -41,8 +41,7 @@ class MenuUtils
         $lore = PiggyAuctions::getInstance()->getMessage("menus.auction-view.item-description-no-bid", ["{PLAYER}" => $auction->getAuctioneer(), "{BIDS}" => 0, "{STARTINGBID}" => $auction->getStartingBid(), "{STATUS}" => $status]);
         if ($auction->getTopBid() !== null) $lore = PiggyAuctions::getInstance()->getMessage("menus.auction-view.item-description", ["{PLAYER}" => $auction->getAuctioneer(), "{BIDS}" => count($auction->getBids()), "{TOPBID}" => $auction->getTopBid()->getBidAmount(), "{TOPBIDDER}" => $auction->getTopBid()->getBidder(), "{STATUS}" => $status]);
         $lore = str_replace("{DURATION}", Utils::formatDetailedDuration($auction->getEndDate() - time()), $lore);
-
-        $item->setNamedTagEntry(new IntTag("AuctionID", $auction->getId()));
+        $item->getNamedTag()->setTag("AuctionID", new IntTag($auction->getId()));
         return $item->setLore(array_merge($item->getLore(), explode("\n", $lore)));
     }
 }
