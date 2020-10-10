@@ -35,7 +35,7 @@ class BidsMenu extends Menu
     public function render(): void
     {
         $this->setName(PiggyAuctions::getInstance()->getMessage("menus.view-bids.title"));
-        $this->getInventory()->clearAll(false);
+        $this->getInventory()->clearAll();
 
         $auctions = array_filter(array_map(static function (AuctionBid $bid): ?Auction {
             return $bid->getAuction();
@@ -49,7 +49,7 @@ class BidsMenu extends Menu
         MenuUtils::updateDisplayedItems($this, $auctions, 0, 10, 7);
         if (count($claimable) > 1) $this->getInventory()->setItem(21, ItemFactory::getInstance()->get(ItemIds::CAULDRON)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.claim-all")));
         $this->getInventory()->setItem(22, ItemFactory::getInstance()->get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
-        $this->getInventory()->sendContents($this->player);
+        $this->player->getNetworkSession()->getInvManager()->syncContents($this->getInventory());
     }
 
     public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action, InventoryTransaction $transaction): bool

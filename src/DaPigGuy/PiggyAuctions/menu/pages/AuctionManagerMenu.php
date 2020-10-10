@@ -57,7 +57,7 @@ class AuctionManagerMenu extends Menu
     public function render(): void
     {
         $this->setName(PiggyAuctions::getInstance()->getMessage("menus.auction-manager.title"));
-        $this->getInventory()->clearAll(false);
+        $this->getInventory()->clearAll();
 
         $auctions = array_filter(PiggyAuctions::getInstance()->getAuctionManager()->getAuctionsHeldBy($this->player), static function (Auction $auction): bool {
             return !$auction->isClaimed();
@@ -76,7 +76,7 @@ class AuctionManagerMenu extends Menu
         $this->getInventory()->setItem(23, $sort);
 
         MenuUtils::updateDisplayedItems($this, $auctions, 0, 10, 7, null, MenuSort::closureFromType($this->sortType));
-        $this->getInventory()->sendContents($this->player);
+        $this->player->getNetworkSession()->getInvManager()->syncContents($this->getInventory());
     }
 
     public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action, InventoryTransaction $transaction): bool
