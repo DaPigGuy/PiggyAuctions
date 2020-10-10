@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DaPigGuy\PiggyAuctions\menu\pages;
 
+use Closure;
 use DaPigGuy\PiggyAuctions\auction\Auction;
 use DaPigGuy\PiggyAuctions\menu\Menu;
 use DaPigGuy\PiggyAuctions\menu\utils\MenuSort;
@@ -102,7 +103,7 @@ class AuctionBrowserMenu extends Menu
             case 48:
                 $this->setInventoryCloseListener(null);
                 $this->player->removeWindow($action->getInventory());
-                $this->setInventoryCloseListener([$this, "close"]);
+                $this->setInventoryCloseListener(Closure::fromCallable([$this, "close"]));
                 $form = new CustomForm(function (Player $player, ?array $data): void {
                     $this->search = $data[0] ?? "";
                     $this->render();

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DaPigGuy\PiggyAuctions\menu;
 
+use Closure;
 use muqsit\invmenu\InvMenu;
 use muqsit\invmenu\InvMenuHandler;
 use muqsit\invmenu\session\PlayerManager;
@@ -27,7 +28,7 @@ abstract class Menu extends SharedInvMenu
     {
         parent::__construct(InvMenuHandler::getMenuType($this->inventoryIdentifier));
         $this->player = $player;
-        $this->setInventoryCloseListener([$this, "close"]);
+        $this->setInventoryCloseListener(Closure::fromCallable([$this, "close"]));
 
         $this->render();
         $this->display();

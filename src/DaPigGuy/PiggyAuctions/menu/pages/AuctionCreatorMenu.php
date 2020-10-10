@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DaPigGuy\PiggyAuctions\menu\pages;
 
+use Closure;
 use DaPigGuy\PiggyAuctions\events\AuctionStartEvent;
 use DaPigGuy\PiggyAuctions\menu\Menu;
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
@@ -66,7 +67,7 @@ class AuctionCreatorMenu extends Menu
                                     return;
                                 }
                             }
-                            $this->setInventoryCloseListener([$this, "close"]);
+                            $this->setInventoryCloseListener(Closure::fromCallable([$this, "close"]));
                             $this->display();
                         }
                     );
@@ -75,7 +76,7 @@ class AuctionCreatorMenu extends Menu
             case 31:
                 $this->setInventoryCloseListener(null);
                 $this->player->removeWindow($action->getInventory());
-                $this->setInventoryCloseListener([$this, "close"]);
+                $this->setInventoryCloseListener(Closure::fromCallable([$this, "close"]));
                 $form = new CustomForm(function (Player $player, ?array $data = null): void {
                     if (isset($data[0]) && is_numeric($data[0]) && (int)$data[0] > 0) {
                         $this->startingBid = (int)$data[0] > ($limit = PiggyAuctions::getInstance()->getConfig()->getNested("auctions.limits.starting-bid", 2147483647)) ? $limit : (int)$data[0];
@@ -90,7 +91,7 @@ class AuctionCreatorMenu extends Menu
             case 33:
                 $this->setInventoryCloseListener(null);
                 $this->player->removeWindow($action->getInventory());
-                $this->setInventoryCloseListener([$this, "close"]);
+                $this->setInventoryCloseListener(Closure::fromCallable([$this, "close"]));
                 $form = new CustomForm(function (Player $player, ?array $data = null): void {
                     if (isset($data[0]) && is_numeric($data[0]) && (int)$data[0] > 0) {
                         $this->duration = (int)$data[0] > ($limit = PiggyAuctions::getInstance()->getConfig()->getNested("auctions.limits.duration", 1209600)) ? $limit : (int)$data[0];

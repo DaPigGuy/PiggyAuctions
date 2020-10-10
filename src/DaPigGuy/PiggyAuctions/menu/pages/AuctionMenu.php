@@ -147,7 +147,7 @@ class AuctionMenu extends Menu
                                     }
                                 }
                             }
-                            $this->setInventoryCloseListener([$this, "close"]);
+                            $this->setInventoryCloseListener(Closure::fromCallable([$this, "close"]));
                             $this->render();
                             $this->display();
                         }
@@ -168,7 +168,7 @@ class AuctionMenu extends Menu
                 if ($itemClicked->getId() === Item::GOLD_INGOT) {
                     $this->setInventoryCloseListener(null);
                     $this->player->removeWindow($action->getInventory());
-                    $this->setInventoryCloseListener([$this, "close"]);
+                    $this->setInventoryCloseListener(Closure::fromCallable([$this, "close"]));
                     $form = new CustomForm(function (Player $player, ?array $data = null): void {
                         if (isset($data[0]) && is_numeric($data[0]) && (int)$data[0] > 0) {
                             if ((int)$data[0] > ($minimumBid = $this->auction->getMinimumBidAmount())) {
