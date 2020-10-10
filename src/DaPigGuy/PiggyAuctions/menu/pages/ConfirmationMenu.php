@@ -40,9 +40,9 @@ class ConfirmationMenu extends Menu
     public function render(): void
     {
         $this->setName($this->title);
-        $this->getInventory()->setItem(11, ItemFactory::get(ItemIds::STAINED_CLAY, 13)->setCustomName($this->confirm));
+        $this->getInventory()->setItem(11, ItemFactory::getInstance()->get(ItemIds::STAINED_CLAY, 13)->setCustomName($this->confirm));
         $this->getInventory()->setItem(13, $this->item);
-        $this->getInventory()->setItem(15, ItemFactory::get(ItemIds::STAINED_CLAY, 14)->setCustomName($this->deny));
+        $this->getInventory()->setItem(15, ItemFactory::getInstance()->get(ItemIds::STAINED_CLAY, 14)->setCustomName($this->deny));
     }
 
     public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action, InventoryTransaction $transaction): bool

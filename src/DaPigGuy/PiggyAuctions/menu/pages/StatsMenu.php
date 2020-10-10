@@ -39,9 +39,9 @@ class StatsMenu extends Menu
         }
 
         $this->getInventory()->setContents([
-            11 => ItemFactory::get(ItemIds::EMPTYMAP)->setCustomName($sellerStats),
-            15 => ItemFactory::get(ItemIds::MAP)->setCustomName($buyerStats),
-            22 => ItemFactory::get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back"))
+            11 => ItemFactory::getInstance()->get(ItemIds::EMPTYMAP)->setCustomName($sellerStats),
+            15 => ItemFactory::getInstance()->get(ItemIds::MAP)->setCustomName($buyerStats),
+            22 => ItemFactory::getInstance()->get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back"))
         ]);
     }
 }

@@ -32,7 +32,7 @@ class AuctionCreatorMenu extends Menu
 
     public function __construct(Player $player)
     {
-        $this->item = ItemFactory::get(ItemIds::AIR);
+        $this->item = ItemFactory::getInstance()->get(ItemIds::AIR);
         parent::__construct($player);
     }
 
@@ -118,12 +118,12 @@ class AuctionCreatorMenu extends Menu
     public function render(): void
     {
         $this->setName(PiggyAuctions::getInstance()->getMessage("menus.auction-creator.title"));
-        for ($i = 0; $i < $this->getInventory()->getSize(); $i++) $this->getInventory()->setItem($i, ItemFactory::get(ItemIds::INVISIBLE_BEDROCK)->setCustomName(TextFormat::RESET));
+        for ($i = 0; $i < $this->getInventory()->getSize(); $i++) $this->getInventory()->setItem($i, ItemFactory::getInstance()->get(ItemIds::INVISIBLE_BEDROCK)->setCustomName(TextFormat::RESET));
         $this->getInventory()->setItem(13, $this->item);
-        $this->getInventory()->setItem(29, ItemFactory::get(ItemIds::STAINED_CLAY, $this->item->getId() === Item::AIR ? 14 : 13)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-creator.create-auction", ["{STATUS}" => $this->item->getId() === Item::AIR ? TextFormat::RED : TextFormat::GREEN])));
-        $this->getInventory()->setItem(31, ItemFactory::get(ItemIds::GOLD_INGOT)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-creator.starting-bid", ["{MONEY}" => $this->startingBid])));
-        $this->getInventory()->setItem(33, ItemFactory::get(ItemIds::CLOCK)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-creator.duration", ["{DURATION}" => Utils::formatDuration($this->duration)])));
-        $this->getInventory()->setItem(49, ItemFactory::get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
+        $this->getInventory()->setItem(29, ItemFactory::getInstance()->get(ItemIds::STAINED_CLAY, $this->item->getId() === Item::AIR ? 14 : 13)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-creator.create-auction", ["{STATUS}" => $this->item->getId() === Item::AIR ? TextFormat::RED : TextFormat::GREEN])));
+        $this->getInventory()->setItem(31, ItemFactory::getInstance()->get(ItemIds::GOLD_INGOT)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-creator.starting-bid", ["{MONEY}" => $this->startingBid])));
+        $this->getInventory()->setItem(33, ItemFactory::getInstance()->get(ItemIds::CLOCK)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-creator.duration", ["{DURATION}" => Utils::formatDuration($this->duration)])));
+        $this->getInventory()->setItem(49, ItemFactory::getInstance()->get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
     }
 
     public function close(): void
