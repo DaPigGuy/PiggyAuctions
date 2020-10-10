@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace DaPigGuy\PiggyAuctions\commands;
 
-use CortexPE\Commando\args\BaseArgument;
 use CortexPE\Commando\args\RawStringArgument;
 use CortexPE\Commando\BaseCommand;
 use CortexPE\Commando\exception\ArgumentOrderException;
