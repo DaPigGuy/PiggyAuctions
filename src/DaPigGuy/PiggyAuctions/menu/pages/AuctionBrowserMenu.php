@@ -103,7 +103,7 @@ class AuctionBrowserMenu extends Menu
                 break;
             case 48:
                 $this->setInventoryCloseListener(null);
-                $this->player->removeWindow($action->getInventory());
+                $this->onClose($this->player);
                 $this->setInventoryCloseListener(Closure::fromCallable([$this, "close"]));
                 $form = new CustomForm(function (Player $player, ?array $data): void {
                     $this->search = $data[0] ?? "";

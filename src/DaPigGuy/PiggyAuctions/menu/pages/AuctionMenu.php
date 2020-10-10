@@ -167,9 +167,9 @@ class AuctionMenu extends Menu
                 }
                 break;
             case 31:
-                if ($itemClicked->getId() === Item::GOLD_INGOT) {
+                if ($itemClicked->getId() === ItemIds::GOLD_INGOT) {
                     $this->setInventoryCloseListener(null);
-                    $this->player->removeWindow($action->getInventory());
+                    $this->onClose($this->player);
                     $this->setInventoryCloseListener(Closure::fromCallable([$this, "close"]));
                     $form = new CustomForm(function (Player $player, ?array $data = null): void {
                         if (isset($data[0]) && is_numeric($data[0]) && (int)$data[0] > 0) {
