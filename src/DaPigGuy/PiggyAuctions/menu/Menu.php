@@ -8,8 +8,9 @@ use Closure;
 use muqsit\invmenu\InvMenu;
 use muqsit\invmenu\InvMenuHandler;
 use muqsit\invmenu\session\PlayerManager;
-use muqsit\invmenu\SharedInvMenu;
+use muqsit\invmenu\transaction\InvMenuTransactionResult;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
+use pocketmine\inventory\transaction\InventoryTransaction;
 use pocketmine\item\Item;
 use pocketmine\player\Player;
 
@@ -34,7 +35,7 @@ abstract class Menu extends SharedInvMenu
         $this->display();
     }
 
-    public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool
+    public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action, InventoryTransaction $transaction): bool
     {
         return false;
     }
@@ -57,8 +58,11 @@ abstract class Menu extends SharedInvMenu
         }
     }
 
-    public function handleInventoryTransaction(Player $player, Item $in, Item $out, SlotChangeAction $action): bool
+    public function handleInventoryTransaction(Player $player, Item $out, Item $in, SlotChangeAction $action, InventoryTransaction $transaction): InvMenuTransactionResult
     {
-        return parent::handleInventoryTransaction($player, $in, $out, $action) && $this->handle($in, $out, $action);
+        if (!$this->handle($out, $in, $action, $transaction)) {
+            return new InvMenuTransactionResult(true);
+        }
+        return parent::handleInventoryTransaction($player, $out, $in, $action, $transaction);
     }
 }

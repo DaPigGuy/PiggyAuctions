@@ -12,6 +12,7 @@ use DaPigGuy\PiggyAuctions\utils\Utils;
 use jojoe77777\FormAPI\CustomForm;
 use muqsit\invmenu\InvMenu;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
+use pocketmine\inventory\transaction\InventoryTransaction;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
@@ -41,7 +42,7 @@ class AuctionCreatorMenu extends Menu
         $this->render();
     }
 
-    public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool
+    public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action, InventoryTransaction $transaction): bool
     {
         switch ($action->getSlot()) {
             case 13:
