@@ -14,9 +14,9 @@ use pocketmine\inventory\transaction\InventoryTransaction;
 use pocketmine\item\Item;
 use pocketmine\player\Player;
 
-abstract class Menu extends SharedInvMenu
+abstract class Menu extends InvMenu
 {
-    /** @var SharedInvMenu[] */
+    /** @var InvMenu[] */
     public static $awaitingInventoryClose;
 
     /** @var Player */
