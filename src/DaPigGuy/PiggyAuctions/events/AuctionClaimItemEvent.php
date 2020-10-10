@@ -6,11 +6,14 @@ namespace DaPigGuy\PiggyAuctions\events;
 
 use DaPigGuy\PiggyAuctions\auction\Auction;
 use pocketmine\event\Cancellable;
+use pocketmine\event\CancellableTrait;
 use pocketmine\item\Item;
 use pocketmine\player\Player;
 
 class AuctionClaimItemEvent extends AuctionEvent implements Cancellable
 {
+    use CancellableTrait;
+
     /** @var Player */
     private $player;
     /** @var Item */
