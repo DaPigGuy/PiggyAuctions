@@ -51,7 +51,7 @@ abstract class Menu extends InvMenu
         if (PlayerManager::get($this->player) === null) return;
         $oldMenu = PlayerManager::get($this->player)->getCurrentMenu();
         if ($oldMenu !== null) {
-            $this->player->removeWindow($oldMenu->getInventoryForPlayer($this->player));
+            $this->onClose($this->player);
             Menu::$awaitingInventoryClose[$this->player->getName()] = $this;
         } else {
             $this->send($this->player);
