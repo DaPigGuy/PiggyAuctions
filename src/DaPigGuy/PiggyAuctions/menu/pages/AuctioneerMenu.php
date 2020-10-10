@@ -35,7 +35,7 @@ class AuctioneerMenu extends Menu
     public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action, InventoryTransaction $transaction): bool
     {
         $auctioneer = $this->auctioneer;
-        $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($itemClicked->getNamedTagEntry("AuctionID") ?? new IntTag())->getValue());
+        $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($itemClicked->getNamedTag()->getTag("AuctionID", IntTag::class) ?? new IntTag(0))->getValue());
         if ($auction !== null) new AuctionMenu($this->player, $auction, function () use ($auctioneer) {
             new AuctioneerMenu($this->player, $auctioneer);
         });
