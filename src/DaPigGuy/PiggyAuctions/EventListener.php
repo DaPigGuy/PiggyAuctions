@@ -9,7 +9,7 @@ use DaPigGuy\PiggyAuctions\menu\pages\AuctionCreatorMenu;
 use muqsit\invmenu\session\PlayerManager;
 use pocketmine\event\inventory\InventoryTransactionEvent;
 use pocketmine\event\Listener;
-use pocketmine\event\player\PlayerPreLoginEvent;
+use pocketmine\event\player\PlayerLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
@@ -37,7 +37,7 @@ class EventListener implements Listener
         }
     }
 
-    public function onPreLogin(PlayerPreLoginEvent $event): void
+    public function onPreLogin(PlayerLoginEvent $event): void
     {
         $this->plugin->getStatsManager()->loadStatistics($event->getPlayer());
     }
