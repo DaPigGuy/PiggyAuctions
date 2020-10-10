@@ -7,7 +7,7 @@ namespace DaPigGuy\PiggyAuctions\events;
 use pocketmine\event\Cancellable;
 use pocketmine\event\Event;
 use pocketmine\item\Item;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class AuctionStartEvent extends Event implements Cancellable
 {

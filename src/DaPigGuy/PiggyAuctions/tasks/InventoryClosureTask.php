@@ -7,7 +7,7 @@ namespace DaPigGuy\PiggyAuctions\tasks;
 use Closure;
 use pocketmine\inventory\Inventory;
 use pocketmine\network\mcpe\protocol\types\ContainerIds;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\scheduler\ClosureTask;
 
 class InventoryClosureTask extends ClosureTask
