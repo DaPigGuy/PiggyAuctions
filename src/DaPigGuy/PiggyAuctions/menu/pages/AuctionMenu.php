@@ -41,7 +41,7 @@ class AuctionMenu extends Menu
         $this->auction = $auction;
         $this->bidAmount = $auction->getMinimumBidAmount();
         $this->callback = $callback;
-        $this->taskHandler = PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (int $currentTick): void {
+        $this->taskHandler = PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (): void {
             $this->render();
         }), 20);
         parent::__construct($player);

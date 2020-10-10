@@ -26,7 +26,7 @@ class BidsMenu extends Menu
 
     public function __construct(Player $player)
     {
-        $this->taskHandler = PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (int $currentTick): void {
+        $this->taskHandler = PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (): void {
             $this->render();
         }), 20);
         parent::__construct($player);
