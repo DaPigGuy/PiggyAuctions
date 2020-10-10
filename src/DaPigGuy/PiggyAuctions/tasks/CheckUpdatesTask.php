@@ -17,8 +17,9 @@ class CheckUpdatesTask extends AsyncTask
         $this->setResult([Internet::getURL("https://poggit.pmmp.io/releases.json?name=PiggyAuctions", 10, [], $error), $error]);
     }
 
-    public function onCompletion(Server $server): void
+    public function onCompletion(): void
     {
+        $server = Server::getInstance();
         /** @var PiggyAuctions $plugin */
         $plugin = $server->getPluginManager()->getPlugin("PiggyAuctions");
         try {
