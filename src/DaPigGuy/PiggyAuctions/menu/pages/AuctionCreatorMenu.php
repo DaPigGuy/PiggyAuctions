@@ -115,7 +115,6 @@ class AuctionCreatorMenu extends Menu
                 return $transaction->discard()->then(function (): void {
                     (new AuctionManagerMenu($this->player))->display();
                 });
-                break;
         }
         return $transaction->discard();
     }
