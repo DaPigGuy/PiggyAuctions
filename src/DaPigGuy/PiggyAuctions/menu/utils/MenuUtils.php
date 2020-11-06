@@ -7,7 +7,7 @@ namespace DaPigGuy\PiggyAuctions\menu\utils;
 use DaPigGuy\PiggyAuctions\auction\Auction;
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
 use DaPigGuy\PiggyAuctions\utils\Utils;
-use muqsit\invmenu\SharedInvMenu;
+use muqsit\invmenu\InvMenu;
 use pocketmine\item\Item;
 use pocketmine\nbt\tag\IntTag;
 
@@ -17,7 +17,7 @@ class MenuUtils
      * @param Auction[] $auctions
      * @return Auction[]
      */
-    public static function updateDisplayedItems(SharedInvMenu $menu, array $auctions, int $arrayOffset, int $offsetSlot, int $displayCount, ?callable $itemIndexFunction = null, ?callable $sortFunction = null): array
+    public static function updateDisplayedItems(InvMenu $menu, array $auctions, int $arrayOffset, int $offsetSlot, int $displayCount, ?callable $itemIndexFunction = null, ?callable $sortFunction = null): array
     {
         $itemIndexFunction = $itemIndexFunction ?? static function ($index) use ($offsetSlot): int {
                 return $index + $offsetSlot;

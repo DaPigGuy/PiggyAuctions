@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace DaPigGuy\PiggyAuctions\commands;
 
-use CortexPE\Commando\args\BaseArgument;
 use CortexPE\Commando\args\RawStringArgument;
 use CortexPE\Commando\BaseCommand;
 use CortexPE\Commando\exception\ArgumentOrderException;
@@ -32,10 +31,10 @@ class AuctionHouseCommand extends BaseCommand
                 $sender->sendMessage(PiggyAuctions::getInstance()->getMessage("commands.no-active-auctions", ["{PLAYER}" => $args["player"]]));
                 return;
             }
-            new AuctioneerMenu($sender, $args["player"]);
+            (new AuctioneerMenu($sender, $args["player"]))->display();
             return;
         }
-        new MainMenu($sender);
+        (new MainMenu($sender))->display();
     }
 
     /**

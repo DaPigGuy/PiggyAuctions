@@ -4,16 +4,13 @@ declare(strict_types=1);
 
 namespace DaPigGuy\PiggyAuctions;
 
-use DaPigGuy\PiggyAuctions\menu\Menu;
 use DaPigGuy\PiggyAuctions\menu\pages\AuctionCreatorMenu;
 use muqsit\invmenu\session\PlayerManager;
 use pocketmine\event\inventory\InventoryTransactionEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerPreLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
-use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
-use pocketmine\network\mcpe\protocol\ContainerClosePacket;
 
 class EventListener implements Listener
 {
@@ -23,18 +20,6 @@ class EventListener implements Listener
     public function __construct(PiggyAuctions $plugin)
     {
         $this->plugin = $plugin;
-    }
-
-    public function onDataPacketReceive(DataPacketReceiveEvent $event): void
-    {
-        $player = $event->getPlayer();
-        $packet = $event->getPacket();
-        if ($packet instanceof ContainerClosePacket) {
-            if (isset(Menu::$awaitingInventoryClose[$player->getName()])) {
-                Menu::$awaitingInventoryClose[$player->getName()]->send($player);
-                unset(Menu::$awaitingInventoryClose[$player->getName()]);
-            }
-        }
     }
 
     public function onPreLogin(PlayerPreLoginEvent $event): void

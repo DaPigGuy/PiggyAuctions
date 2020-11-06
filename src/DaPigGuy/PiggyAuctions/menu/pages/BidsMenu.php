@@ -9,6 +9,8 @@ use DaPigGuy\PiggyAuctions\auction\AuctionBid;
 use DaPigGuy\PiggyAuctions\menu\Menu;
 use DaPigGuy\PiggyAuctions\menu\utils\MenuUtils;
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
+use muqsit\invmenu\transaction\InvMenuTransaction;
+use muqsit\invmenu\transaction\InvMenuTransactionResult;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
@@ -51,8 +53,9 @@ class BidsMenu extends Menu
         $this->getInventory()->sendContents($this->player);
     }
 
-    public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool
+    public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action, InvMenuTransaction $transaction): InvMenuTransactionResult
     {
+        $newMenu = null;
         switch ($action->getSlot()) {
             case 21:
                 foreach (PiggyAuctions::getInstance()->getAuctionManager()->getBidsBy($this->player) as $bid) {
@@ -64,16 +67,19 @@ class BidsMenu extends Menu
                 $this->render();
                 break;
             case 22:
-                new MainMenu($this->player);
+                $newMenu = new MainMenu($this->player);
                 break;
             default:
                 $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($itemClicked->getNamedTagEntry("AuctionID") ?? new IntTag())->getValue());
-                if ($auction !== null) new AuctionMenu($this->player, $auction, function () {
-                    new BidsMenu($this->player);
+                if ($auction !== null) $newMenu = new AuctionMenu($this->player, $auction, function () {
+                    (new BidsMenu($this->player))->display();
                 });
                 break;
         }
-        return false;
+        if ($newMenu === null) return $transaction->discard();
+        return $transaction->discard()->then(function () use ($newMenu): void {
+            $newMenu->display();
+        });
     }
 
     public function close(): void

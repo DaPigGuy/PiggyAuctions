@@ -6,6 +6,8 @@ namespace DaPigGuy\PiggyAuctions\menu\pages;
 
 use DaPigGuy\PiggyAuctions\menu\Menu;
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
+use muqsit\invmenu\transaction\InvMenuTransaction;
+use muqsit\invmenu\transaction\InvMenuTransactionResult;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
@@ -44,13 +46,13 @@ class ConfirmationMenu extends Menu
         $this->getInventory()->setItem(15, ItemFactory::get(ItemIds::STAINED_CLAY, 14)->setCustomName($this->deny));
     }
 
-    public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool
+    public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action, InvMenuTransaction $transaction): InvMenuTransactionResult
     {
         if ($action->getSlot() === 11 || $action->getSlot() === 15) {
             $this->setInventoryCloseListener(null);
             ($this->callback)($action->getSlot() === 11);
         }
-        return false;
+        return $transaction->discard();
     }
 
     public function close(): void

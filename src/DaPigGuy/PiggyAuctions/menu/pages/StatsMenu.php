@@ -6,19 +6,24 @@ namespace DaPigGuy\PiggyAuctions\menu\pages;
 
 use DaPigGuy\PiggyAuctions\menu\Menu;
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
+use muqsit\invmenu\transaction\InvMenuTransaction;
+use muqsit\invmenu\transaction\InvMenuTransactionResult;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
+use pocketmine\Player;
 
 class StatsMenu extends Menu
 {
-    public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool
+    public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action, InvMenuTransaction $transaction): InvMenuTransactionResult
     {
         if ($action->getSlot() === 22) {
-            new MainMenu($this->player);
+            return $transaction->discard()->then(function (Player $player): void {
+                (new MainMenu($player))->display();
+            });
         }
-        return false;
+        return $transaction->discard();
     }
 
     public function render(): void

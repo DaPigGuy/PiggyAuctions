@@ -7,6 +7,8 @@ namespace DaPigGuy\PiggyAuctions\menu\pages;
 use DaPigGuy\PiggyAuctions\menu\Menu;
 use DaPigGuy\PiggyAuctions\menu\utils\MenuUtils;
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
+use muqsit\invmenu\transaction\InvMenuTransaction;
+use muqsit\invmenu\transaction\InvMenuTransactionResult;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\item\Item;
 use pocketmine\nbt\tag\IntTag;
@@ -31,14 +33,16 @@ class AuctioneerMenu extends Menu
         parent::__construct($player);
     }
 
-    public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool
+    public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action, InvMenuTransaction $transaction): InvMenuTransactionResult
     {
         $auctioneer = $this->auctioneer;
         $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($itemClicked->getNamedTagEntry("AuctionID") ?? new IntTag())->getValue());
-        if ($auction !== null) new AuctionMenu($this->player, $auction, function () use ($auctioneer) {
-            new AuctioneerMenu($this->player, $auctioneer);
+        if ($auction !== null) return $transaction->discard()->then(function () use ($auction, $auctioneer): void {
+            (new AuctionMenu($this->player, $auction, function () use ($auctioneer) {
+                (new AuctioneerMenu($this->player, $auctioneer))->display();
+            }))->display();
         });
-        return false;
+        return $transaction->discard();
     }
 
     public function render(): void

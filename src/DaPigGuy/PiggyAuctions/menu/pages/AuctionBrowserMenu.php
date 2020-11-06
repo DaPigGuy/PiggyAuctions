@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DaPigGuy\PiggyAuctions\menu\pages;
 
+use Closure;
 use DaPigGuy\PiggyAuctions\auction\Auction;
 use DaPigGuy\PiggyAuctions\menu\Menu;
 use DaPigGuy\PiggyAuctions\menu\utils\MenuSort;
@@ -11,6 +12,8 @@ use DaPigGuy\PiggyAuctions\menu\utils\MenuUtils;
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
 use jojoe77777\FormAPI\CustomForm;
 use muqsit\invmenu\InvMenu;
+use muqsit\invmenu\transaction\InvMenuTransaction;
+use muqsit\invmenu\transaction\InvMenuTransactionResult;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
@@ -83,13 +86,14 @@ class AuctionBrowserMenu extends Menu
         $this->getInventory()->sendContents($this->player);
     }
 
-    public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool
+    public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action, InvMenuTransaction $transaction): InvMenuTransactionResult
     {
+        $newMenu = null;
         if ($itemClicked->getNamedTagEntry("AuctionID") !== null) {
             $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($itemClicked->getNamedTagEntry("AuctionID") ?? new IntTag())->getValue());
             if ($auction instanceof Auction) {
-                new AuctionMenu($this->player, $auction, function () {
-                    new AuctionBrowserMenu($this->player, $this->page, $this->search, $this->sortType);
+                $newMenu = new AuctionMenu($this->player, $auction, function () {
+                    (new AuctionBrowserMenu($this->player, $this->page, $this->search, $this->sortType))->display();
                 });
             }
         }
@@ -102,25 +106,29 @@ class AuctionBrowserMenu extends Menu
             case 48:
                 $this->setInventoryCloseListener(null);
                 $this->player->removeWindow($action->getInventory());
-                $this->setInventoryCloseListener([$this, "close"]);
-                $form = new CustomForm(function (Player $player, ?array $data): void {
-                    $this->search = $data[0] ?? "";
-                    $this->render();
-                    $this->display();
+                $this->setInventoryCloseListener(Closure::fromCallable([$this, "close"]));
+                return $transaction->discard()->then(function (): void {
+                    $form = new CustomForm(function (Player $player, ?array $data): void {
+                        $this->search = $data[0] ?? "";
+                        $this->render();
+                        $this->display();
+                    });
+                    $form->setTitle(PiggyAuctions::getInstance()->getMessage("forms.search.title"));
+                    $form->addInput(PiggyAuctions::getInstance()->getMessage("forms.search.search"));
+                    $this->player->sendForm($form);
                 });
-                $form->setTitle(PiggyAuctions::getInstance()->getMessage("forms.search.title"));
-                $form->addInput(PiggyAuctions::getInstance()->getMessage("forms.search.search"));
-                $this->player->sendForm($form);
-                break;
             case 49:
-                new MainMenu($this->player);
+                $newMenu = new MainMenu($this->player);
                 break;
             case 50:
                 $this->sortType = ($this->sortType + 1) % 4;
                 $this->render();
                 break;
         }
-        return false;
+        if ($newMenu === null) return $transaction->discard();
+        return $transaction->discard()->then(function () use ($newMenu): void {
+            $newMenu->display();
+        });
     }
 
     public function close(): void

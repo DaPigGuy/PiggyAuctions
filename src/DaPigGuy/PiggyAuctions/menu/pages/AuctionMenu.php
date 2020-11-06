@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DaPigGuy\PiggyAuctions\menu\pages;
 
+use Closure;
 use DaPigGuy\PiggyAuctions\auction\Auction;
 use DaPigGuy\PiggyAuctions\auction\AuctionBid;
 use DaPigGuy\PiggyAuctions\events\AuctionBidEvent;
@@ -13,6 +14,8 @@ use DaPigGuy\PiggyAuctions\PiggyAuctions;
 use DaPigGuy\PiggyAuctions\utils\Utils;
 use jojoe77777\FormAPI\CustomForm;
 use muqsit\invmenu\InvMenu;
+use muqsit\invmenu\transaction\InvMenuTransaction;
+use muqsit\invmenu\transaction\InvMenuTransactionResult;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
@@ -91,25 +94,25 @@ class AuctionMenu extends Menu
         $this->getInventory()->sendContents($this->player);
     }
 
-    public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool
+    public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action, InvMenuTransaction $transaction): InvMenuTransactionResult
     {
         switch ($action->getSlot()) {
             case 29:
                 if (!$this->auction->hasExpired()) {
                     if ($this->auction->getAuctioneer() === $this->player->getName()) {
                         $this->player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.bid.cant-self-bid"));
-                        return false;
+                        return $transaction->discard();
                     }
                     if ($this->auction->getTopBid() !== null && $this->auction->getTopBid()->getBidder() === $this->player->getName()) {
                         $this->player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.bid.already-top-bid"));
-                        return false;
+                        return $transaction->discard();
                     }
                     if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($this->player) < $this->bidAmount) {
                         $this->player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.bid.cant-afford"));
-                        return false;
+                        return $transaction->discard();
                     }
                     $this->setInventoryCloseListener(null);
-                    new ConfirmationMenu(
+                    (new ConfirmationMenu(
                         $this->player,
                         PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.title"),
                         (clone $this->auction->getItem())->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.bidding-on", ["{ITEM}" => ($this->auction->getItem())->getName()])),
@@ -147,11 +150,11 @@ class AuctionMenu extends Menu
                                     }
                                 }
                             }
-                            $this->setInventoryCloseListener([$this, "close"]);
+                            $this->setInventoryCloseListener(Closure::fromCallable([$this, "close"]));
                             $this->render();
                             $this->display();
                         }
-                    );
+                    ))->display();
                 } else {
                     if ($this->auction->getAuctioneer() === $this->player->getName()) {
                         $this->auction->claim($this->player);
@@ -168,28 +171,30 @@ class AuctionMenu extends Menu
                 if ($itemClicked->getId() === Item::GOLD_INGOT) {
                     $this->setInventoryCloseListener(null);
                     $this->player->removeWindow($action->getInventory());
-                    $this->setInventoryCloseListener([$this, "close"]);
-                    $form = new CustomForm(function (Player $player, ?array $data = null): void {
-                        if (isset($data[0]) && is_numeric($data[0]) && (int)$data[0] > 0) {
-                            if ((int)$data[0] > ($minimumBid = $this->auction->getMinimumBidAmount())) {
-                                $this->bidAmount = (int)$data[0] > ($limit = PiggyAuctions::getInstance()->getConfig()->getNested("auctions.limits.bid", 2147483647)) ? $limit : (int)$data[0];
-                            } else {
-                                $player->sendMessage(PiggyAuctions::getInstance()->getMessage("forms.bid-amount.bid-too-low", ["{MINIMUMBID}" => $minimumBid]));
+                    $this->setInventoryCloseListener(Closure::fromCallable([$this, "close"]));
+                    return $transaction->discard()->then(function (): void {
+                        $form = new CustomForm(function (Player $player, ?array $data = null): void {
+                            if (isset($data[0]) && is_numeric($data[0]) && (int)$data[0] > 0) {
+                                if ((int)$data[0] > ($minimumBid = $this->auction->getMinimumBidAmount())) {
+                                    $this->bidAmount = (int)$data[0] > ($limit = PiggyAuctions::getInstance()->getConfig()->getNested("auctions.limits.bid", 2147483647)) ? $limit : (int)$data[0];
+                                } else {
+                                    $player->sendMessage(PiggyAuctions::getInstance()->getMessage("forms.bid-amount.bid-too-low", ["{MINIMUMBID}" => $minimumBid]));
+                                }
                             }
-                        }
-                        $this->render();
-                        $this->display();
+                            $this->render();
+                            $this->display();
+                        });
+                        $form->setTitle(PiggyAuctions::getInstance()->getMessage("forms.bid-amount.title"));
+                        $form->addInput(PiggyAuctions::getInstance()->getMessage("forms.bid-amount.bid-amount"));
+                        $this->player->sendForm($form);
                     });
-                    $form->setTitle(PiggyAuctions::getInstance()->getMessage("forms.bid-amount.title"));
-                    $form->addInput(PiggyAuctions::getInstance()->getMessage("forms.bid-amount.bid-amount"));
-                    $this->player->sendForm($form);
                 }
                 break;
             case 49:
                 ($this->callback)();
                 break;
         }
-        return false;
+        return $transaction->discard();
     }
 
     public function close(): void

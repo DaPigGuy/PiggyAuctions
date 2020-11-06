@@ -9,6 +9,8 @@ use DaPigGuy\PiggyAuctions\menu\Menu;
 use DaPigGuy\PiggyAuctions\menu\utils\MenuSort;
 use DaPigGuy\PiggyAuctions\menu\utils\MenuUtils;
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
+use muqsit\invmenu\transaction\InvMenuTransaction;
+use muqsit\invmenu\transaction\InvMenuTransactionResult;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
@@ -78,8 +80,9 @@ class AuctionManagerMenu extends Menu
         $this->getInventory()->sendContents($this->player);
     }
 
-    public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool
+    public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action, InvMenuTransaction $transaction): InvMenuTransactionResult
     {
+        $newMenu = null;
         switch ($action->getSlot()) {
             case 21:
                 foreach (PiggyAuctions::getInstance()->getAuctionManager()->getAuctionsHeldBy($this->player) as $auction) {
@@ -90,7 +93,7 @@ class AuctionManagerMenu extends Menu
                 $this->render();
                 break;
             case 22:
-                new MainMenu($this->player);
+                $newMenu = new MainMenu($this->player);
                 break;
             case 23:
                 /** @var int $key */
@@ -100,16 +103,19 @@ class AuctionManagerMenu extends Menu
                 break;
             case 24:
                 if ($this->auctionLimit !== -1 && count(PiggyAuctions::getInstance()->getAuctionManager()->getAuctionsHeldBy($this->player)) >= $this->auctionLimit) break;
-                new AuctionCreatorMenu($this->player);
+                $newMenu = new AuctionCreatorMenu($this->player);
                 break;
             default:
                 $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($itemClicked->getNamedTagEntry("AuctionID") ?? new IntTag())->getValue());
-                if ($auction !== null) new AuctionMenu($this->player, $auction, function () {
-                    new AuctionManagerMenu($this->player, $this->sortType);
+                if ($auction !== null) $newMenu = new AuctionMenu($this->player, $auction, function () {
+                    (new AuctionManagerMenu($this->player, $this->sortType))->display();
                 });
                 break;
         }
-        return false;
+        if ($newMenu === null) return $transaction->discard();
+        return $transaction->discard()->then(function () use ($newMenu): void {
+            $newMenu->display();
+        });
     }
 
     public function close(): void
