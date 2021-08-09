@@ -17,15 +17,15 @@ jobs:
       - name: wget virions, libasynql
         uses: wei/wget@v1
         with:
-          args: -O vendor/libasynql.phar https://poggit.pmmp.io/r/81738/libasynql_dev-119.phar
+          args: -O vendor/libasynql.phar https://poggit.pmmp.io/r/135147/libasynql_dev-145.phar
       - name: wget virions, InvMenu
         uses: wei/wget@v1
         with:
-          args: -O vendor/InvMenu.phar https://poggit.pmmp.io/r/104428/InvMenu_dev-133.phar
+          args: -O vendor/InvMenu.phar https://poggit.pmmp.io/r/131080/InvMenu_dev-153.phar
       - name: wget virions, FormAPI
         uses: wei/wget@v1
         with:
-          args: -O vendor/FormAPI.phar https://poggit.pmmp.io/r/54589/FormApi_dev-9.phar
+          args: -O vendor/FormAPI.phar https://poggit.pmmp.io/r/101416/libFormAPI_dev-3.phar
       - name: wget virions, libPiggyEconomy
         uses: wei/wget@v1
         with:
@@ -33,8 +33,8 @@ jobs:
       - name: wget virions, Commando
         uses: wei/wget@v1
         with:
-          args: -O vendor/Commando.phar https://poggit.pmmp.io/r/89644/Commando_dev-13.phar
+          args: -O vendor/Commando.phar https://poggit.pmmp.io/r/120160/Commando_dev-24.phar
       - name: Run PHPStan
-        uses: nxtlvlsoftware/pmmp-phpstan-action@3
+        uses: paroxity/pmmp-phpstan-action@3.22.1
         with:
           phpstan-config: phpstan.neon.dist

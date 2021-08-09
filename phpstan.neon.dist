@@ -16,4 +16,4 @@ parameters:
   reportUnmatchedIgnoredErrors: false
   checkMissingIterableValueType: false
   ignoreErrors:
-    - "#Parameter \\#1 $type of method muqsit\\\\invmenu\\\\SharedInvMenu::__construct() expects muqsit\\\\invmenu\\\\metadata\\\\MenuMetadata, muqsit\\\\invmenu\\\\metadata\\\\MenuMetadata|null given.#"
+    - "#Parameter \\#1 $type of method muqsit\\\\invmenu\\\\InvMenu::__construct() expects muqsit\\\\invmenu\\\\metadata\\\\MenuMetadata, muqsit\\\\invmenu\\\\metadata\\\\MenuMetadata|null given.#"
