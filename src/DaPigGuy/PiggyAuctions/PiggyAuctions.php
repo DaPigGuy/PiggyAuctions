@@ -64,11 +64,17 @@ class PiggyAuctions extends PluginBase implements Listener
             }
         }
 
-        self::$instance = $this;
+        if ($this->getServer()->getPluginManager()->getPlugin("InvCrashFix") === null) {
+            $this->getLogger()->error("Missing InvCrashFix plugin. Download here: https://poggit.pmmp.io/r/94956/InvCrashFix_dev-3.phar");
+            $this->getServer()->getPluginManager()->disablePlugin($this);
+            return;
+        }
 
         if (!InvMenuHandler::isRegistered()) {
             InvMenuHandler::register($this);
         }
+
+        self::$instance = $this;
 
         $this->saveResource("messages.yml");
         $this->messages = new Config($this->getDataFolder() . "messages.yml");
