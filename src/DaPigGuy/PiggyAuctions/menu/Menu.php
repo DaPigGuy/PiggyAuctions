@@ -27,7 +27,9 @@ abstract class Menu extends InvMenu
         /** @phpstan-ignore-next-line */
         parent::__construct(InvMenuHandler::getMenuType($this->inventoryIdentifier));
         $this->player = $player;
+
         $this->setInventoryCloseListener(Closure::fromCallable([$this, "close"]));
+
         $this->render();
     }
 
