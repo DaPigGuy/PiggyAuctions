@@ -65,8 +65,9 @@ class PiggyAuctions extends PluginBase implements Listener
         }
 
         if ($this->getServer()->getPluginManager()->getPlugin("InvCrashFix") === null) {
-            $this->getLogger()->error("Missing InvCrashFix plugin. Download here: https://poggit.pmmp.io/r/94956/InvCrashFix_dev-3.phar");
-            $this->getServer()->getPluginManager()->disablePlugin($this);
+            $this->getLogger()->error("Missing InvCrashFix plugin.");
+            $this->getLogger()->error("With Out InvCrashFix There may be errors and crashes Please Download it For The Best Use")
+            $this->getLogger()->error("Download here: https://poggit.pmmp.io/r/94956/InvCrashFix_dev-3.phar")
             return;
         }
 
