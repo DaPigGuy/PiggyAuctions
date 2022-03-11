@@ -1,20 +1,18 @@
 name: PiggyAuctions
 main: DaPigGuy\PiggyAuctions\PiggyAuctions
-version: 1.0.7
+version: 2.0.0
 api: 4.0.0
 load: POSTWORLD
 author: DaPigGuy
-softdepend: ["EconomyAPI", "MultiEconomy"]
+softdepend: [ "EconomyAPI", "MultiEconomy" ]
 website: "https://github.com/DaPigGuy/PiggyAuctions/"
 permissions:
   piggyauctions:
     default: op
     description: "Allow usage of all PiggyAuctions features"
-    children:
-      piggyauctions.command:
-        default: op
-        description: "Allow usage of all PiggyAuctions commands"
-        children:
-          piggyauctions.command.auctionhouse:
-            default: true
-            description: "Allow usage of the /auctionhouse command"
+  piggyauctions.command:
+    default: op
+    description: "Allow usage of all PiggyAuctions commands"
+  piggyauctions.command.auctionhouse:
+    default: true
+    description: "Allow usage of the /auctionhouse command"
