@@ -21,14 +21,10 @@ use pocketmine\utils\TextFormat;
 
 class AuctionCreatorMenu extends Menu
 {
-    /** @var string */
-    protected $inventoryIdentifier = InvMenu::TYPE_DOUBLE_CHEST;
-    /** @var Item */
-    private $item;
-    /** @var int */
-    private $startingBid = 50;
-    /** @var int */
-    private $duration = 7200;
+    protected string $inventoryIdentifier = InvMenu::TYPE_DOUBLE_CHEST;
+    private Item $item;
+    private int $startingBid = 50;
+    private int $duration = 7200;
 
     public function __construct(Player $player)
     {

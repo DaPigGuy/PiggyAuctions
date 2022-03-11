@@ -11,10 +11,10 @@ use DaPigGuy\libPiggyEconomy\exceptions\MissingProviderDependencyException;
 use DaPigGuy\libPiggyEconomy\exceptions\UnknownProviderException;
 use DaPigGuy\libPiggyEconomy\libPiggyEconomy;
 use DaPigGuy\libPiggyEconomy\providers\EconomyProvider;
+use DaPigGuy\libPiggyUpdateChecker\libPiggyUpdateChecker;
 use DaPigGuy\PiggyAuctions\auction\AuctionManager;
 use DaPigGuy\PiggyAuctions\commands\AuctionHouseCommand;
 use DaPigGuy\PiggyAuctions\statistics\StatisticsManager;
-use DaPigGuy\PiggyAuctions\tasks\CheckUpdatesTask;
 use DaPigGuy\PiggyAuctions\utils\Utils;
 use jojoe77777\FormAPI\Form;
 use muqsit\invmenu\InvMenuHandler;
@@ -26,20 +26,14 @@ use poggit\libasynql\libasynql;
 
 class PiggyAuctions extends PluginBase implements Listener
 {
-    /** @var self */
-    public static $instance;
+    public static self $instance;
 
-    /** @var Config */
-    private $messages;
+    private Config $messages;
 
-    /** @var DataConnector */
-    private $database;
-    /** @var EconomyProvider */
-    private $economyProvider;
-    /** @var AuctionManager */
-    private $auctionManager;
-    /** @var StatisticsManager */
-    private $statsManager;
+    private DataConnector $database;
+    private EconomyProvider $economyProvider;
+    private AuctionManager $auctionManager;
+    private StatisticsManager $statsManager;
 
     /**
      * @throws MissingProviderDependencyException
@@ -91,7 +85,7 @@ class PiggyAuctions extends PluginBase implements Listener
 
         $this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
 
-        $this->getServer()->getAsyncPool()->submitTask(new CheckUpdatesTask());
+        libPiggyUpdateChecker::init($this);
     }
 
     public static function getInstance(): PiggyAuctions

@@ -14,24 +14,8 @@ class AuctionStartEvent extends Event implements Cancellable
 {
     use CancellableTrait;
 
-    /** @var Player */
-    protected $player;
-    /** @var Item */
-    protected $item;
-    /** @var int */
-    protected $timestamp;
-    /** @var int */
-    protected $endDate;
-    /** @var int */
-    protected $startingBid;
-
-    public function __construct(Player $player, Item $item, int $timestamp, int $endDate, int $startingBid)
+    public function __construct(protected Player $player, protected Item $item, protected int $timestamp, protected int $endDate, protected int $startingBid)
     {
-        $this->player = $player;
-        $this->item = $item;
-        $this->timestamp = $timestamp;
-        $this->endDate = $endDate;
-        $this->startingBid = $startingBid;
     }
 
     public function getPlayer(): Player

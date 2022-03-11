@@ -16,27 +16,22 @@ class MenuSort
 
     public static function closureFromType(int $type): \Closure
     {
-        switch ($type) {
-            case self::TYPE_LOWEST_BID:
-                return static function (Auction $a, Auction $b): bool {
-                    return ($a->getTopBid() === null ? $a->getStartingBid() : $a->getTopBid()->getBidAmount()) > ($b->getTopBid() === null ? $b->getStartingBid() : $b->getTopBid()->getBidAmount());
-                };
-            case self::TYPE_ENDING_SOON:
-                return static function (Auction $a, Auction $b): bool {
-                    return $a->getEndDate() > $b->getEndDate();
-                };
-            case self::TYPE_MOST_BIDS:
-                return static function (Auction $a, Auction $b): bool {
-                    return count($a->getBids()) < count($b->getBids());
-                };
-            case self::TYPE_RECENTLY_UPDATED:
-                return static function (Auction $a, Auction $b): bool {
-                    return ($a->hasExpired() ? $a->getEndDate() : ($a->getTopBid() === null ? $a->getStartDate() : $a->getTopBid()->getTimestamp())) < ($b->hasExpired() ? $b->getEndDate() : ($b->getTopBid() === null ? $b->getStartDate() : $b->getTopBid()->getTimestamp()));
-                };
-            default:
-                return static function (Auction $a, Auction $b): bool {
-                    return ($a->getTopBid() === null ? $a->getStartingBid() : $a->getTopBid()->getBidAmount()) < ($b->getTopBid() === null ? $b->getStartingBid() : $b->getTopBid()->getBidAmount());
-                };
-        }
+        return match ($type) {
+            self::TYPE_LOWEST_BID => static function (Auction $a, Auction $b): bool {
+                return ($a->getTopBid() === null ? $a->getStartingBid() : $a->getTopBid()->getBidAmount()) > ($b->getTopBid() === null ? $b->getStartingBid() : $b->getTopBid()->getBidAmount());
+            },
+            self::TYPE_ENDING_SOON => static function (Auction $a, Auction $b): bool {
+                return $a->getEndDate() > $b->getEndDate();
+            },
+            self::TYPE_MOST_BIDS => static function (Auction $a, Auction $b): bool {
+                return count($a->getBids()) < count($b->getBids());
+            },
+            self::TYPE_RECENTLY_UPDATED => static function (Auction $a, Auction $b): bool {
+                return ($a->hasExpired() ? $a->getEndDate() : ($a->getTopBid() === null ? $a->getStartDate() : $a->getTopBid()->getTimestamp())) < ($b->hasExpired() ? $b->getEndDate() : ($b->getTopBid() === null ? $b->getStartDate() : $b->getTopBid()->getTimestamp()));
+            },
+            default => static function (Auction $a, Auction $b): bool {
+                return ($a->getTopBid() === null ? $a->getStartingBid() : $a->getTopBid()->getBidAmount()) < ($b->getTopBid() === null ? $b->getStartingBid() : $b->getTopBid()->getBidAmount());
+            },
+        };
     }
 }

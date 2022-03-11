@@ -13,16 +13,9 @@ class AuctionClaimMoneyEvent extends AuctionEvent implements Cancellable
 {
     use CancellableTrait;
 
-    /** @var Player */
-    private $player;
-    /** @var int */
-    private $amount;
-
-    public function __construct(Auction $auction, Player $player, int $amount)
+    public function __construct(Auction $auction, private Player $player, private int $amount)
     {
         parent::__construct($auction);
-        $this->player = $player;
-        $this->amount = $amount;
     }
 
     public function getPlayer(): Player

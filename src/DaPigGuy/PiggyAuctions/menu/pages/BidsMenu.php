@@ -21,8 +21,7 @@ use pocketmine\scheduler\TaskHandler;
 
 class BidsMenu extends Menu
 {
-    /** @var TaskHandler */
-    private $taskHandler;
+    private TaskHandler $taskHandler;
 
     public function __construct(Player $player)
     {

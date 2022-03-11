@@ -17,15 +17,10 @@ use pocketmine\scheduler\TaskHandler;
 
 class AuctioneerMenu extends Menu
 {
-    /** @var string */
-    private $auctioneer;
+    private TaskHandler $taskHandler;
 
-    /** @var TaskHandler */
-    private $taskHandler;
-
-    public function __construct(Player $player, string $auctioneer)
+    public function __construct(Player $player, private string $auctioneer)
     {
-        $this->auctioneer = $auctioneer;
         $this->taskHandler = PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (): void {
             $this->render();
         }), 20);

@@ -17,18 +17,13 @@ use pocketmine\player\Player;
 abstract class Menu extends InvMenu
 {
     /** @var InvMenu[] */
-    public static $awaitingInventoryClose;
+    public static array $awaitingInventoryClose;
 
-    /** @var Player */
-    protected $player;
+    protected string $inventoryIdentifier = InvMenu::TYPE_CHEST;
 
-    /** @var string */
-    protected $inventoryIdentifier = InvMenu::TYPE_CHEST;
-
-    public function __construct(Player $player)
+    public function __construct(protected Player $player)
     {
         parent::__construct(InvMenuHandler::getMenuType($this->inventoryIdentifier));
-        $this->player = $player;
         $this->setInventoryCloseListener(Closure::fromCallable([$this, "close"]));
 
         $this->render();

@@ -27,15 +27,11 @@ class AuctionManagerMenu extends Menu
         MenuSort::TYPE_MOST_BIDS => "most-bids"
     ];
 
-    /** @var int */
-    private $auctionLimit = -1;
-    /** @var int */
-    private $sortType;
+    private int $auctionLimit = -1;
 
-    /** @var TaskHandler */
-    private $taskHandler;
+    private TaskHandler $taskHandler;
 
-    public function __construct(Player $player, int $sortType = MenuSort::TYPE_RECENTLY_UPDATED)
+    public function __construct(Player $player, private int $sortType = MenuSort::TYPE_RECENTLY_UPDATED)
     {
         foreach ($player->getEffectivePermissions() as $permission) {
             $basePermission = "piggyauctions.limit.";
@@ -47,7 +43,6 @@ class AuctionManagerMenu extends Menu
             }
         }
 
-        $this->sortType = $sortType;
         $this->taskHandler = PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (): void {
             $this->render();
         }), 20);
