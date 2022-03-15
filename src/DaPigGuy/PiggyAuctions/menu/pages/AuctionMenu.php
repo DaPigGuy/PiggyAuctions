@@ -30,6 +30,7 @@ class AuctionMenu extends Menu
 {
     protected string $inventoryIdentifier = InvMenuTypeIds::TYPE_DOUBLE_CHEST;
     private int $bidAmount;
+    private TaskHandler $partialTaskHandler;
     private TaskHandler $taskHandler;
 
     /**
@@ -38,13 +39,16 @@ class AuctionMenu extends Menu
     public function __construct(Player $player, private Auction $auction, private $callback)
     {
         $this->bidAmount = $auction->getMinimumBidAmount();
+        $this->partialTaskHandler = PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (): void {
+            $this->partialRender();
+        }), 20);
         $this->taskHandler = PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (): void {
             $this->render();
-        }), 20);
+        }), 200);
         parent::__construct($player);
     }
 
-    public function render(): void
+    private function partialRender(): void
     {
         $this->setName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.title"));
 
@@ -52,7 +56,11 @@ class AuctionMenu extends Menu
         $this->getInventory()->setItem(33, ItemFactory::getInstance()->get(ItemIds::MAP)->setCustomName(count($this->auction->getBids()) === 0 ? PiggyAuctions::getInstance()->getMessage("menus.auction-view.no-bids") : PiggyAuctions::getInstance()->getMessage("menus.auction-view.bid-history", ["{BIDS}" => count($this->auction->getBids()), "{HISTORY}" => implode("\n", array_map(static function (AuctionBid $auctionBid): string {
             return PiggyAuctions::getInstance()->getMessage("menus.auction-view.bid-history-entry", ["{MONEY}" => $auctionBid->getBidAmount(), "{PLAYER}" => $auctionBid->getBidder(), "{DURATION}" => Utils::formatDuration(time() - $auctionBid->getTimestamp())]);
         }, array_reverse($this->auction->getBids())))])));
+    }
 
+    public function render(): void
+    {
+        $this->partialRender();
         PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($this->player, function (float|int $balance) {
             $bidItem = VanillaItems::POISONOUS_POTATO();
             if ($this->auction->hasExpired()) {
@@ -106,7 +114,6 @@ class AuctionMenu extends Menu
                     PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($this->player, function (float|int $balance) use ($transaction) {
                         if ($balance < $this->bidAmount) {
                             $this->player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.bid.cant-afford"));
-                            return $transaction->discard();
                         }
                         $this->setInventoryCloseListener(null);
                         (new ConfirmationMenu(
@@ -158,8 +165,8 @@ class AuctionMenu extends Menu
                                 $this->display();
                             }
                         ))->display();
-                        return $transaction;
                     });
+                    return $transaction->discard();
                 } else {
                     if ($this->auction->getAuctioneer() === $this->player->getName()) {
                         $this->auction->claim($this->player);
@@ -205,6 +212,7 @@ class AuctionMenu extends Menu
     public function close(): void
     {
         parent::close();
+        $this->partialTaskHandler->cancel();
         $this->taskHandler->cancel();
     }
 }
