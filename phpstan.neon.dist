@@ -2,18 +2,18 @@ parameters:
   paths:
     - /source/src
   level: 8
-  autoload_files:
+  bootstrapFiles:
     - phar:///pocketmine/PocketMine-MP.phar/vendor/autoload.php
-  autoload_directories:
+  scanDirectories:
     - /source/src
     - phar:///source/vendor/Commando.phar/src/
     - phar:///source/vendor/FormAPI.phar/src/
     - phar:///source/vendor/InvMenu.phar/src/
     - phar:///source/vendor/libasynql.phar/src/
     - phar:///source/vendor/libPiggyEconomy.phar/src/
-  excludes_analyse:
-    - source/vendor
+    - phar:///source/vendor/libPiggyUpdateChecker.phar/src/
+  excludePaths:
+    analyse:
+     - source/vendor
   reportUnmatchedIgnoredErrors: false
   checkMissingIterableValueType: false
-  ignoreErrors:
-    - "#Parameter \\#1 $type of method muqsit\\\\invmenu\\\\SharedInvMenu::__construct() expects muqsit\\\\invmenu\\\\metadata\\\\MenuMetadata, muqsit\\\\invmenu\\\\metadata\\\\MenuMetadata|null given.#"

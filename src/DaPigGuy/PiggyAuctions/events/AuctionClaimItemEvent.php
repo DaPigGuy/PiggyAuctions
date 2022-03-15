@@ -14,16 +14,9 @@ class AuctionClaimItemEvent extends AuctionEvent implements Cancellable
 {
     use CancellableTrait;
 
-    /** @var Player */
-    private $player;
-    /** @var Item */
-    private $item;
-
-    public function __construct(Auction $auction, Player $player, Item $item)
+    public function __construct(Auction $auction, private Player $player, private Item $item)
     {
         parent::__construct($auction);
-        $this->player = $player;
-        $this->item = $item;
     }
 
     public function getPlayer(): Player

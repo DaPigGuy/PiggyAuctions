@@ -12,17 +12,12 @@ use pocketmine\player\Player;
 
 class AuctionManager
 {
-    /** @var PiggyAuctions */
-    private $plugin;
-
     /** @var Auction[] */
-    private $auctions = [];
-    /** @var bool */
-    private $auctionsLoaded = false;
+    private array $auctions = [];
+    private bool $auctionsLoaded = false;
 
-    public function __construct(PiggyAuctions $plugin)
+    public function __construct(private PiggyAuctions $plugin)
     {
-        $this->plugin = $plugin;
     }
 
     public function init(): void
@@ -69,10 +64,9 @@ class AuctionManager
     }
 
     /**
-     * @param Player|string $player
      * @return Auction[]
      */
-    public function getAuctionsHeldBy($player): array
+    public function getAuctionsHeldBy(Player|string $player): array
     {
         if ($player instanceof Player) $player = $player->getName();
         return array_filter($this->auctions, static function (Auction $auction) use ($player): bool {
@@ -81,10 +75,9 @@ class AuctionManager
     }
 
     /**
-     * @param Player|string $player
      * @return Auction[]
      */
-    public function getActiveAuctionsHeldBy($player): array
+    public function getActiveAuctionsHeldBy(Player|string $player): array
     {
         if ($player instanceof Player) $player = $player->getName();
         return array_filter($this->auctions, static function (Auction $auction) use ($player): bool {
@@ -113,10 +106,9 @@ class AuctionManager
     }
 
     /**
-     * @param string|Player $player
      * @return AuctionBid[]
      */
-    public function getBidsBy($player): array
+    public function getBidsBy(Player|string $player): array
     {
         if ($player instanceof Player) $player = $player->getName();
         return array_filter($this->getBids(), static function (AuctionBid $bid) use ($player): bool {

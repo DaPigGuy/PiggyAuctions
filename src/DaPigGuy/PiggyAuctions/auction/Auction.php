@@ -12,41 +12,12 @@ use pocketmine\player\Player;
 
 class Auction
 {
-    /** @var int */
-    public $id;
-
-    /** @var string */
-    public $auctioneer;
-    /** @var Item */
-    public $item;
-    /** @var int */
-    public $startDate;
-    /** @var int */
-    public $endDate;
-    /** @var bool */
-    public $claimed;
-    /** @var array|AuctionBid[] */
-    public $claimedBids;
-    /** @var int */
-    public $startingBid;
-    /** @var array|AuctionBid[] */
-    public $bids;
-
     /**
      * @param AuctionBid[] $claimedBids
      * @param AuctionBid[] $bids
      */
-    public function __construct(int $id, string $auctioneer, Item $item, int $startDate, int $endDate, bool $claimed, array $claimedBids, int $startingBid, array $bids)
+    public function __construct(public int $id, public string $auctioneer, public Item $item, public int $startDate, public int $endDate, public bool $claimed, public array $claimedBids, public int $startingBid, public array $bids)
     {
-        $this->id = $id;
-        $this->auctioneer = $auctioneer;
-        $this->item = $item;
-        $this->startDate = $startDate;
-        $this->endDate = $endDate;
-        $this->claimed = $claimed;
-        $this->claimedBids = $claimedBids;
-        $this->startingBid = $startingBid;
-        $this->bids = $bids;
     }
 
     public function getId(): int

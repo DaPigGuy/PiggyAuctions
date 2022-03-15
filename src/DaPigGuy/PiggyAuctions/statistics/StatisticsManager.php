@@ -9,14 +9,11 @@ use pocketmine\player\Player;
 
 class StatisticsManager
 {
-    /** @var PiggyAuctions */
-    private $plugin;
     /** @var PlayerStatistics[] */
-    private $statistics;
+    private array $statistics;
 
-    public function __construct(PiggyAuctions $plugin)
+    public function __construct(private PiggyAuctions $plugin)
     {
-        $this->plugin = $plugin;
         $this->plugin->getDatabase()->executeGeneric("piggyauctions.statistics.init");
     }
 

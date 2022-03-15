@@ -13,13 +13,9 @@ class AuctionBidEvent extends AuctionEvent implements Cancellable
 {
     use CancellableTrait;
 
-    /** @var AuctionBid */
-    protected $bid;
-
-    public function __construct(Auction $auction, AuctionBid $bid)
+    public function __construct(Auction $auction, protected AuctionBid $bid)
     {
         parent::__construct($auction);
-        $this->bid = $bid;
     }
 
     public function getBid(): AuctionBid

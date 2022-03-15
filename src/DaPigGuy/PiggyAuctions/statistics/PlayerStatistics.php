@@ -9,18 +9,11 @@ use pocketmine\player\Player;
 
 class PlayerStatistics implements \JsonSerializable
 {
-    /** @var Player */
-    private $player;
-    /** @var int[] */
-    private $statistics;
-
     /**
      * @param int[] $statistics
      */
-    public function __construct(Player $player, array $statistics)
+    public function __construct(private Player $player, private array $statistics)
     {
-        $this->player = $player;
-        $this->statistics = $statistics;
     }
 
     public function getStatistic(string $name): int

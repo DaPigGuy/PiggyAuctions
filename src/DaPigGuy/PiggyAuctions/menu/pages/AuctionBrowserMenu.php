@@ -27,22 +27,11 @@ class AuctionBrowserMenu extends Menu
     const PAGE_LENGTH = self::PAGE_ROW_LENGTH * 4;
     const PAGE_ROW_LENGTH = 7;
 
-    /** @var string */
-    protected $inventoryIdentifier = InvMenu::TYPE_DOUBLE_CHEST;
-    /** @var int */
-    private $page;
-    /** @var string */
-    private $search;
-    /** @var int */
-    private $sortType;
-    /** @var TaskHandler */
-    private $taskHandler;
+    protected string $inventoryIdentifier = InvMenu::TYPE_DOUBLE_CHEST;
+    private TaskHandler $taskHandler;
 
-    public function __construct(Player $player, int $page = 1, string $search = "", int $sortType = MenuSort::TYPE_HIGHEST_BID)
+    public function __construct(Player $player, private int $page = 1, private string $search = "", private int $sortType = MenuSort::TYPE_HIGHEST_BID)
     {
-        $this->page = $page;
-        $this->search = $search;
-        $this->sortType = $sortType;
         $this->taskHandler = PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (): void {
             $this->render();
         }), 20);

@@ -25,22 +25,16 @@ use pocketmine\scheduler\TaskHandler;
 
 class AuctionMenu extends Menu
 {
-    /** @var string */
-    protected $inventoryIdentifier = InvMenu::TYPE_DOUBLE_CHEST;
-    /** @var Auction */
-    private $auction;
-    /** @var int */
-    private $bidAmount;
-    /** @var callable */
-    private $callback;
-    /** @var TaskHandler */
-    private $taskHandler;
+    protected string $inventoryIdentifier = InvMenu::TYPE_DOUBLE_CHEST;
+    private int $bidAmount;
+    private TaskHandler $taskHandler;
 
-    public function __construct(Player $player, Auction $auction, callable $callback)
+    /**
+     * @param callable $callback
+     */
+    public function __construct(Player $player, private Auction $auction, private $callback)
     {
-        $this->auction = $auction;
         $this->bidAmount = $auction->getMinimumBidAmount();
-        $this->callback = $callback;
         $this->taskHandler = PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (): void {
             $this->render();
         }), 20);

@@ -17,12 +17,8 @@ use pocketmine\network\mcpe\protocol\ContainerClosePacket;
 
 class EventListener implements Listener
 {
-    /** @var PiggyAuctions */
-    private $plugin;
-
-    public function __construct(PiggyAuctions $plugin)
+    public function __construct(private PiggyAuctions $plugin)
     {
-        $this->plugin = $plugin;
     }
 
     public function onDataPacketReceive(DataPacketReceiveEvent $event): void

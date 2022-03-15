@@ -8,21 +8,8 @@ use DaPigGuy\PiggyAuctions\PiggyAuctions;
 
 class AuctionBid
 {
-    /** @var int */
-    public $auctionID;
-    /** @var string */
-    public $bidder;
-    /** @var int */
-    public $bidAmount;
-    /** @var int */
-    public $timestamp;
-
-    public function __construct(int $auctionID, string $bidder, int $bidAmount, int $timestamp)
+    public function __construct(public int $auctionID, public string $bidder, public int $bidAmount, public int $timestamp)
     {
-        $this->auctionID = $auctionID;
-        $this->bidder = $bidder;
-        $this->bidAmount = $bidAmount;
-        $this->timestamp = $timestamp;
     }
 
     public function getAuction(): ?Auction

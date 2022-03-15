@@ -12,21 +12,11 @@ use pocketmine\scheduler\ClosureTask;
 
 class InventoryClosureTask extends ClosureTask
 {
-    /** @var Player */
-    private $player;
-    /** @var Inventory */
-    private $inventory;
-    /** @var Closure */
-    protected $closure;
+    private bool $inventoryOpen = false;
 
-    /** @var bool */
-    private $inventoryOpen = false;
-
-    public function __construct(Player $player, Inventory $inventory, Closure $closure)
+    public function __construct(private Player $player, private Inventory $inventory, Closure $closure)
     {
         parent::__construct($closure);
-        $this->player = $player;
-        $this->inventory = $inventory;
     }
 
     public function onRun(): void
