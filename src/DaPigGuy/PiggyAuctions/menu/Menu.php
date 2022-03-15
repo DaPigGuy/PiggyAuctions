@@ -40,10 +40,7 @@ abstract class Menu extends InvMenu
 
     public function display(): void
     {
-        if (!$this->player->isOnline()) return;
-        $menu = InvMenuHandler::getPlayerManager()->get($this->player)->getCurrent()?->menu;
-        if ($menu instanceof Menu) $menu->player->removeCurrentWindow();
-        $this->send($this->player);
+        if ($this->player->isOnline()) $this->send($this->player);
     }
 
     public function handleInventoryTransaction(Player $player, Item $out, Item $in, SlotChangeAction $action, InventoryTransaction $transaction): InvMenuTransactionResult
