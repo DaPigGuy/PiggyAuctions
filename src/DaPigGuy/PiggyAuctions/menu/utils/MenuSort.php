@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DaPigGuy\PiggyAuctions\menu\utils;
 
+use Closure;
 use DaPigGuy\PiggyAuctions\auction\Auction;
 
 class MenuSort
@@ -14,7 +15,7 @@ class MenuSort
     const TYPE_MOST_BIDS = 3;
     const TYPE_RECENTLY_UPDATED = 5;
 
-    public static function closureFromType(int $type): \Closure
+    public static function closureFromType(int $type): Closure
     {
         return match ($type) {
             self::TYPE_LOWEST_BID => static function (Auction $a, Auction $b): bool {

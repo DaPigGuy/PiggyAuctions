@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace DaPigGuy\PiggyAuctions\statistics;
 
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
+use JsonSerializable;
 use pocketmine\player\Player;
 
-class PlayerStatistics implements \JsonSerializable
+class PlayerStatistics implements JsonSerializable
 {
     /**
      * @param int[] $statistics

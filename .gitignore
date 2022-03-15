@@ -19,3 +19,4 @@ $RECYCLE.BIN/
 
 # JetBrains IDE
 \.idea/
+.dependencies
