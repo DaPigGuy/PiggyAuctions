@@ -18,12 +18,12 @@ class EventListener implements Listener
     {
     }
 
-    public function onLogin(PlayerLoginEvent $event): void
+    public function onPlayerLogin(PlayerLoginEvent $event): void
     {
         $this->plugin->getStatsManager()->loadStatistics($event->getPlayer());
     }
 
-    public function onQuit(PlayerQuitEvent $event): void
+    public function onPlayerQuit(PlayerQuitEvent $event): void
     {
         $this->plugin->getStatsManager()->unloadStatistics($event->getPlayer());
     }
@@ -35,13 +35,12 @@ class EventListener implements Listener
     {
         $transaction = $event->getTransaction();
         $player = $transaction->getSource();
-        $session = InvMenuHandler::getPlayerManager()->get($player);
         foreach ($transaction->getActions() as $action) {
             if ($action instanceof SlotChangeAction) {
                 if ($event->isCancelled()) {
                     $player->getNetworkSession()->getInvManager()?->syncSlot($action->getInventory(), $action->getSlot());
                 } else {
-                    $menu = $session->getCurrent()?->menu;
+                    $menu = InvMenuHandler::getPlayerManager()->get($player)->getCurrent()?->menu;
                     if ($action->getSlot() === 13 && $menu instanceof AuctionCreatorMenu && $menu->getInventory() === $action->getInventory()) {
                         $menu->setItem($action->getTargetItem());
                     }
