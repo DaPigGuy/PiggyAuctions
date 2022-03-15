@@ -122,7 +122,7 @@ class AuctionCreatorMenu extends Menu
         $this->setName(PiggyAuctions::getInstance()->getMessage("menus.auction-creator.title"));
         for ($i = 0; $i < $this->getInventory()->getSize(); $i++) $this->getInventory()->setItem($i, VanillaBlocks::INVISIBLE_BEDROCK()->asItem()->setCustomName(TextFormat::RESET));
         $this->getInventory()->setItem(13, $this->item);
-        $this->getInventory()->setItem(29, VanillaBlocks::STAINED_CLAY()->setColor($this->item->getId() === ItemIds::AIR ? DyeColor::RED() : DyeColor::GREEN())->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-creator.create-auction", ["{STATUS}" => $this->item->getId() === ItemIds::AIR ? TextFormat::RED : TextFormat::GREEN])));
+        $this->getInventory()->setItem(29, VanillaBlocks::STAINED_CLAY()->setColor($this->item->getId() === ItemIds::AIR ? DyeColor::RED() : DyeColor::GREEN())->asItem()->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-creator.create-auction", ["{STATUS}" => $this->item->getId() === ItemIds::AIR ? TextFormat::RED : TextFormat::GREEN])));
         $this->getInventory()->setItem(31, VanillaItems::GOLD_INGOT()->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-creator.starting-bid", ["{MONEY}" => $this->startingBid])));
         $this->getInventory()->setItem(33, VanillaItems::CLOCK()->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-creator.duration", ["{DURATION}" => Utils::formatDuration($this->duration)])));
         $this->getInventory()->setItem(49, VanillaItems::ARROW()->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
