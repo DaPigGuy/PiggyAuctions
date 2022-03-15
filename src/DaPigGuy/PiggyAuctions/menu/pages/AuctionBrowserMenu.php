@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DaPigGuy\PiggyAuctions\menu\pages;
 
+use Closure;
 use DaPigGuy\PiggyAuctions\auction\Auction;
 use DaPigGuy\PiggyAuctions\menu\Menu;
 use DaPigGuy\PiggyAuctions\menu\utils\MenuSort;
@@ -71,7 +72,7 @@ class AuctionBrowserMenu extends Menu
             $nextPage = ItemFactory::getInstance()->get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-browser.next-page", ["{PAGE}" => $this->page + 1, "{MAXPAGES}" => ceil(count($activeAuctions) / self::PAGE_LENGTH)]));
             $this->getInventory()->setItem(53, $nextPage);
         }
-        $this->player->getNetworkSession()->getInvManager()->syncContents($this->getInventory());
+        $this->player->getNetworkSession()->getInvManager()?->syncContents($this->getInventory());
     }
 
     public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action, InvMenuTransaction $transaction): InvMenuTransactionResult
@@ -94,7 +95,7 @@ class AuctionBrowserMenu extends Menu
             case 48:
                 $this->setInventoryCloseListener(null);
                 $this->onClose($this->player);
-                $this->setInventoryCloseListener($this->close(...));
+                $this->setInventoryCloseListener(Closure::fromCallable([$this, "close"]));
                 return $transaction->discard()->then(function (): void {
                     $form = new CustomForm(function (Player $player, ?array $data): void {
                         $this->search = $data[0] ?? "";

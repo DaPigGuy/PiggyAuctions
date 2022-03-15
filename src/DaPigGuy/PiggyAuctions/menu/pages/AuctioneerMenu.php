@@ -47,7 +47,7 @@ class AuctioneerMenu extends Menu
         $auctions = PiggyAuctions::getInstance()->getAuctionManager()->getActiveAuctionsHeldBy($this->auctioneer);
         if (isset(array_values($auctions)[0])) $this->setName(PiggyAuctions::getInstance()->getMessage("menus.auctioneer-page.title", ["{PLAYER}" => array_values($auctions)[0]->getAuctioneer()]));
         MenuUtils::updateDisplayedItems($this, $auctions, 0, 10, 7);
-        $this->player->getNetworkSession()->getInvManager()->syncContents($this->getInventory());
+        $this->player->getNetworkSession()->getInvManager()?->syncContents($this->getInventory());
     }
 
     public function close(): void

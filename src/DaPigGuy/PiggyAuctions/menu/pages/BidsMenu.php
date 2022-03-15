@@ -49,7 +49,7 @@ class BidsMenu extends Menu
         MenuUtils::updateDisplayedItems($this, $auctions, 0, 10, 7);
         if (count($claimable) > 1) $this->getInventory()->setItem(21, ItemFactory::getInstance()->get(ItemIds::CAULDRON)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.claim-all")));
         $this->getInventory()->setItem(22, ItemFactory::getInstance()->get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
-        $this->player->getNetworkSession()->getInvManager()->syncContents($this->getInventory());
+        $this->player->getNetworkSession()->getInvManager()?->syncContents($this->getInventory());
     }
 
     public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action, InvMenuTransaction $transaction): InvMenuTransactionResult
@@ -69,7 +69,7 @@ class BidsMenu extends Menu
                 $newMenu = new MainMenu($this->player);
                 break;
             default:
-                $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($itemClicked->getNamedTag()->getTag("AuctionID", IntTag::class) ?? new IntTag(0))->getValue());
+                $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($itemClicked->getNamedTag()->getTag("AuctionID") ?? new IntTag(0))->getValue());
                 if ($auction !== null) $newMenu = new AuctionMenu($this->player, $auction, function () {
                     (new BidsMenu($this->player))->display();
                 });

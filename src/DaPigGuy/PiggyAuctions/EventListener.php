@@ -39,9 +39,9 @@ class EventListener implements Listener
         foreach ($transaction->getActions() as $action) {
             if ($action instanceof SlotChangeAction) {
                 if ($event->isCancelled()) {
-                    $player->getNetworkSession()->getInvManager()->syncSlot($action->getInventory(), $action->getSlot());
+                    $player->getNetworkSession()->getInvManager()?->syncSlot($action->getInventory(), $action->getSlot());
                 } else {
-                    $menu = $session->getCurrent()->menu;
+                    $menu = $session->getCurrent()?->menu;
                     if ($action->getSlot() === 13 && $menu instanceof AuctionCreatorMenu && $menu->getInventory() === $action->getInventory()) {
                         $menu->setItem($action->getTargetItem());
                     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DaPigGuy\PiggyAuctions\menu;
 
+use Closure;
 use muqsit\invmenu\InvMenu;
 use muqsit\invmenu\InvMenuHandler;
 use muqsit\invmenu\transaction\InvMenuTransaction;
@@ -21,7 +22,7 @@ abstract class Menu extends InvMenu
     public function __construct(protected Player $player)
     {
         parent::__construct(InvMenuHandler::getTypeRegistry()->get($this->inventoryIdentifier));
-        $this->setInventoryCloseListener($this->close(...));
+        $this->setInventoryCloseListener(Closure::fromCallable([$this, "close"]));
         $this->render();
     }
 

@@ -74,7 +74,7 @@ class AuctionManagerMenu extends Menu
         $this->getInventory()->setItem(23, $sort);
 
         MenuUtils::updateDisplayedItems($this, $auctions, 0, 10, 7, null, MenuSort::closureFromType($this->sortType));
-        $this->player->getNetworkSession()->getInvManager()->syncContents($this->getInventory());
+        $this->player->getNetworkSession()->getInvManager()?->syncContents($this->getInventory());
     }
 
     public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action, InvMenuTransaction $transaction): InvMenuTransactionResult

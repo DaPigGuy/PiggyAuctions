@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DaPigGuy\PiggyAuctions\menu\pages;
 
+use Closure;
 use DaPigGuy\PiggyAuctions\events\AuctionStartEvent;
 use DaPigGuy\PiggyAuctions\menu\Menu;
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
@@ -64,7 +65,7 @@ class AuctionCreatorMenu extends Menu
                                     return;
                                 }
                             }
-                            $this->setInventoryCloseListener($this->close(...));
+                            $this->setInventoryCloseListener(Closure::fromCallable([$this, "close"]));
                             $this->display();
                         }
                     ))->display();
@@ -73,7 +74,7 @@ class AuctionCreatorMenu extends Menu
             case 31:
                 $this->setInventoryCloseListener(null);
                 $this->onClose($this->player);
-                $this->setInventoryCloseListener($this->close(...));
+                $this->setInventoryCloseListener(Closure::fromCallable([$this, "close"]));
                 return $transaction->discard()->then(function (): void {
                     $form = new CustomForm(function (Player $player, ?array $data = null): void {
                         if (isset($data[0]) && is_numeric($data[0]) && (int)$data[0] > 0) {
@@ -89,7 +90,7 @@ class AuctionCreatorMenu extends Menu
             case 33:
                 $this->setInventoryCloseListener(null);
                 $this->onClose($this->player);
-                $this->setInventoryCloseListener($this->close(...));
+                $this->setInventoryCloseListener(Closure::fromCallable([$this, "close"]));
                 return $transaction->discard()->then(function (): void {
                     $form = new CustomForm(function (Player $player, ?array $data = null): void {
                         if (isset($data[0]) && is_numeric($data[0]) && (int)$data[0] > 0) {

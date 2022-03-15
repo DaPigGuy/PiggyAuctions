@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DaPigGuy\PiggyAuctions\menu\pages;
 
+use Closure;
 use DaPigGuy\PiggyAuctions\auction\Auction;
 use DaPigGuy\PiggyAuctions\auction\AuctionBid;
 use DaPigGuy\PiggyAuctions\events\AuctionBidEvent;
@@ -84,7 +85,7 @@ class AuctionMenu extends Menu
         $this->getInventory()->setItem(29, $bidItem);
         if (!$this->auction->hasExpired() && $this->auction->getAuctioneer() !== $this->player->getName()) $this->getInventory()->setItem(31, ItemFactory::getInstance()->get(ItemIds::GOLD_INGOT)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bid-amount", ["{MONEY}" => $this->bidAmount])));
         $this->getInventory()->setItem(49, ItemFactory::getInstance()->get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
-        $this->player->getNetworkSession()->getInvManager()->syncContents($this->getInventory());
+        $this->player->getNetworkSession()->getInvManager()?->syncContents($this->getInventory());
     }
 
     public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action, InvMenuTransaction $transaction): InvMenuTransactionResult
@@ -143,7 +144,7 @@ class AuctionMenu extends Menu
                                     }
                                 }
                             }
-                            $this->setInventoryCloseListener($this->close(...));
+                            $this->setInventoryCloseListener(Closure::fromCallable([$this, "close"]));
                             $this->render();
                             $this->display();
                         }
@@ -164,7 +165,7 @@ class AuctionMenu extends Menu
                 if ($itemClicked->getId() === ItemIds::GOLD_INGOT) {
                     $this->setInventoryCloseListener(null);
                     $this->onClose($this->player);
-                    $this->setInventoryCloseListener($this->close(...));
+                    $this->setInventoryCloseListener(Closure::fromCallable([$this, "close"]));
                     return $transaction->discard()->then(function (): void {
                         $form = new CustomForm(function (Player $player, ?array $data = null): void {
                             if (isset($data[0]) && is_numeric($data[0]) && (int)$data[0] > 0) {
