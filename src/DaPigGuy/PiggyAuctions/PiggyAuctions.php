@@ -52,7 +52,7 @@ class PiggyAuctions extends PluginBase implements Listener
             ] as $virion => $class
         ) {
             if (!class_exists($class)) {
-                $this->getLogger()->error($virion . " virion not found. Please download PiggyAuctions from Poggit-CI or use DEVirion (not recommended).");
+                $this->getLogger()->error($virion . " virion not found. Download PiggyAuctions at https://poggit.pmmp.io/p/PiggyAuctions.");
                 $this->getServer()->getPluginManager()->disablePlugin($this);
                 return;
             }

@@ -51,41 +51,41 @@ class AuctionMenu extends Menu
             return PiggyAuctions::getInstance()->getMessage("menus.auction-view.bid-history-entry", ["{MONEY}" => $auctionBid->getBidAmount(), "{PLAYER}" => $auctionBid->getBidder(), "{DURATION}" => Utils::formatDuration(time() - $auctionBid->getTimestamp())]);
         }, array_reverse($this->auction->getBids())))])));
 
-        $bidItem = ItemFactory::getInstance()->get(ItemIds::POISONOUS_POTATO);
-        if ($this->auction->hasExpired()) {
-            $bidItem = ItemFactory::getInstance()->get(ItemIds::GOLD_NUGGET);
-            if ($this->auction->getAuctioneer() === $this->player->getName()) {
-                $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("auction.claim.auctioneer-item"));
-                if (($overallTopBid = $this->auction->getTopBid()) !== null) $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("auction.claim.auctioneer-money", ["{MONEY}" => $overallTopBid->getBidAmount(), "{PLAYER}" => $overallTopBid->getBidder()]));
-            } elseif (($topBid = $this->auction->getTopBidBy($this->player->getName())) !== null) {
-                /** @var AuctionBid $overallTopBid */
-                $overallTopBid = $this->auction->getTopBid();
-                $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("auction.claim.bidder-money", ["{BID}" => $topBid->getBidAmount(), "{TOPBID}" => $overallTopBid->getBidAmount(), "{TOPBIDDER}" => $overallTopBid->getBidder()]));
-                if ($topBid === $this->auction->getTopBid()) $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("auction.claim.bidder-item", ["{MONEY}" => $topBid->getBidAmount()]));
+        PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($this->player, function (float|int $balance) {
+            $bidItem = ItemFactory::getInstance()->get(ItemIds::POISONOUS_POTATO);
+            if ($this->auction->hasExpired()) {
+                $bidItem = ItemFactory::getInstance()->get(ItemIds::GOLD_NUGGET);
+                if ($this->auction->getAuctioneer() === $this->player->getName()) {
+                    $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("auction.claim.auctioneer-item"));
+                    if (($overallTopBid = $this->auction->getTopBid()) !== null) $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("auction.claim.auctioneer-money", ["{MONEY}" => $overallTopBid->getBidAmount(), "{PLAYER}" => $overallTopBid->getBidder()]));
+                } else if (($topBid = $this->auction->getTopBidBy($this->player->getName())) !== null) {
+                    /** @var AuctionBid $overallTopBid */
+                    $overallTopBid = $this->auction->getTopBid();
+                    $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("auction.claim.bidder-money", ["{BID}" => $topBid->getBidAmount(), "{TOPBID}" => $overallTopBid->getBidAmount(), "{TOPBIDDER}" => $overallTopBid->getBidder()]));
+                    if ($topBid === $this->auction->getTopBid()) $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("auction.claim.bidder-item", ["{MONEY}" => $topBid->getBidAmount()]));
+                } else {
+                    $bidItem = ItemFactory::getInstance()->get(ItemIds::POTATO);
+                    $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("auction.claim.did-not-participate"));
+                }
+            } else if ($this->auction->getAuctioneer() === $this->player->getName()) {
+                $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.own-auction", ["{NEWBID}" => $this->bidAmount]));
+            } else if (($topBid = $this->auction->getTopBidBy($this->player->getName())) === null) {
+                $bidItem = ItemFactory::getInstance()->get(ItemIds::GOLD_NUGGET);
+                $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.submit-first", ["{NEWBID}" => $this->bidAmount]));
+                if ($balance < $this->bidAmount) $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.submit-first-cant-afford", ["{NEWBID}" => $this->bidAmount]));
+            } else if ($balance < ($this->bidAmount - $topBid->getBidAmount())) {
+                $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.submit-cant-afford", ["{NEWBID}" => $this->bidAmount, "{PREVIOUSBID}" => $topBid->getBidAmount(), "{DIFFERENCE}" => $this->bidAmount - $topBid->getBidAmount()]));
+            } else if ($topBid === $this->auction->getTopBid()) {
+                $bidItem = ItemFactory::getInstance()->get(ItemIds::GOLD_BLOCK);
+                $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.top-bid", ["{NEWBID}" => $this->bidAmount, "{PREVIOUSBID}" => $topBid->getBidAmount()]));
             } else {
-                $bidItem = ItemFactory::getInstance()->get(ItemIds::POTATO);
-                $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("auction.claim.did-not-participate"));
+                $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.submit", ["{NEWBID}" => $this->bidAmount, "{PREVIOUSBID}" => $topBid->getBidAmount(), "{DIFFERENCE}" => $this->bidAmount - $topBid->getBidAmount()]));
             }
-        } else if ($this->auction->getAuctioneer() === $this->player->getName()) {
-            $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.own-auction", ["{NEWBID}" => $this->bidAmount]));
-        } else if (($topBid = $this->auction->getTopBidBy($this->player->getName())) === null) {
-            $bidItem = ItemFactory::getInstance()->get(ItemIds::GOLD_NUGGET);
-            $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.submit-first", ["{NEWBID}" => $this->bidAmount]));
-            if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($this->player) < $this->bidAmount) {
-                $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.submit-first-cant-afford", ["{NEWBID}" => $this->bidAmount]));
-            }
-        } else if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($this->player) < ($this->bidAmount - $topBid->getBidAmount())) {
-            $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.submit-cant-afford", ["{NEWBID}" => $this->bidAmount, "{PREVIOUSBID}" => $topBid->getBidAmount(), "{DIFFERENCE}" => $this->bidAmount - $topBid->getBidAmount()]));
-        } else if ($topBid === $this->auction->getTopBid()) {
-            $bidItem = ItemFactory::getInstance()->get(ItemIds::GOLD_BLOCK);
-            $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.top-bid", ["{NEWBID}" => $this->bidAmount, "{PREVIOUSBID}" => $topBid->getBidAmount()]));
-        } else {
-            $bidItem->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bidding.submit", ["{NEWBID}" => $this->bidAmount, "{PREVIOUSBID}" => $topBid->getBidAmount(), "{DIFFERENCE}" => $this->bidAmount - $topBid->getBidAmount()]));
-        }
-        $this->getInventory()->setItem(29, $bidItem);
-        if (!$this->auction->hasExpired() && $this->auction->getAuctioneer() !== $this->player->getName()) $this->getInventory()->setItem(31, ItemFactory::getInstance()->get(ItemIds::GOLD_INGOT)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bid-amount", ["{MONEY}" => $this->bidAmount])));
-        $this->getInventory()->setItem(49, ItemFactory::getInstance()->get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
-        $this->player->getNetworkSession()->getInvManager()?->syncContents($this->getInventory());
+            $this->getInventory()->setItem(29, $bidItem);
+            if (!$this->auction->hasExpired() && $this->auction->getAuctioneer() !== $this->player->getName()) $this->getInventory()->setItem(31, ItemFactory::getInstance()->get(ItemIds::GOLD_INGOT)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-view.bid-amount", ["{MONEY}" => $this->bidAmount])));
+            $this->getInventory()->setItem(49, ItemFactory::getInstance()->get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
+            $this->player->getNetworkSession()->getInvManager()?->syncContents($this->getInventory());
+        });
     }
 
     public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action, InvMenuTransaction $transaction): InvMenuTransactionResult
@@ -101,54 +101,63 @@ class AuctionMenu extends Menu
                         $this->player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.bid.already-top-bid"));
                         return $transaction->discard();
                     }
-                    if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($this->player) < $this->bidAmount) {
-                        $this->player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.bid.cant-afford"));
-                        return $transaction->discard();
-                    }
-                    $this->setInventoryCloseListener(null);
-                    (new ConfirmationMenu(
-                        $this->player,
-                        PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.title"),
-                        (clone $this->auction->getItem())->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.bidding-on", ["{ITEM}" => ($this->auction->getItem())->getName()])),
-                        PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.confirm", ["{ITEM}" => $this->auction->getItem()->getName(), "{MONEY}" => $this->bidAmount]),
-                        PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.cancel"),
-                        function (bool $confirmed): void {
-                            if ($confirmed) {
-                                if ($this->bidAmount >= $this->auction->getMinimumBidAmount()) {
-                                    if (($topBid = $this->auction->getTopBid()) === null || $topBid->getBidder() !== $this->player->getName()) {
-                                        $cost = $this->bidAmount - ($this->auction->getTopBidBy($this->player->getName()) === null ? 0 : $this->auction->getTopBidBy($this->player->getName())->getBidAmount());
-                                        if (PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($this->player) >= $cost) {
-                                            $bid = new AuctionBid($this->auction->getId(), $this->player->getName(), $this->bidAmount, time());
-                                            $ev = new AuctionBidEvent($this->auction, $bid);
-                                            $ev->call();
-                                            if (!$ev->isCancelled()) {
-                                                $cost = $ev->getBid()->getBidAmount() - ($this->auction->getTopBidBy($this->player->getName()) === null ? 0 : $this->auction->getTopBidBy($this->player->getName())->getBidAmount());
-                                                PiggyAuctions::getInstance()->getEconomyProvider()->takeMoney($this->player, $cost);
-                                                $this->auction->addBid($bid);
+                    PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($this->player, function (float|int $balance) use ($transaction) {
+                        if ($balance < $this->bidAmount) {
+                            $this->player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.bid.cant-afford"));
+                            return $transaction->discard();
+                        }
+                        $this->setInventoryCloseListener(null);
+                        (new ConfirmationMenu(
+                            $this->player,
+                            PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.title"),
+                            (clone $this->auction->getItem())->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.bidding-on", ["{ITEM}" => ($this->auction->getItem())->getName()])),
+                            PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.confirm", ["{ITEM}" => $this->auction->getItem()->getName(), "{MONEY}" => $this->bidAmount]),
+                            PiggyAuctions::getInstance()->getMessage("menus.bid-confirmation.cancel"),
+                            function (bool $confirmed) use ($balance): void {
+                                if ($confirmed) {
+                                    if ($this->bidAmount >= $this->auction->getMinimumBidAmount()) {
+                                        if (($topBid = $this->auction->getTopBid()) === null || $topBid->getBidder() !== $this->player->getName()) {
+                                            $cost = $this->bidAmount - ($this->auction->getTopBidBy($this->player->getName()) === null ? 0 : $this->auction->getTopBidBy($this->player->getName())->getBidAmount());
+                                            if ($balance >= $cost) {
+                                                $bid = new AuctionBid($this->auction->getId(), $this->player->getName(), $this->bidAmount, time());
+                                                $ev = new AuctionBidEvent($this->auction, $bid);
+                                                $ev->call();
+                                                if (!$ev->isCancelled()) {
+                                                    $cost = $ev->getBid()->getBidAmount() - ($this->auction->getTopBidBy($this->player->getName()) === null ? 0 : $this->auction->getTopBidBy($this->player->getName())->getBidAmount());
+                                                    PiggyAuctions::getInstance()->getEconomyProvider()->takeMoney($this->player, $cost, function (bool $success) use ($ev, $bid, $cost) {
+                                                        if (!$success) {
+                                                            $this->player->sendMessage(PiggyAuctions::getInstance()->getMessage("generic-error"));
+                                                            return;
+                                                        }
 
-                                                if ($this->auction->getEndDate() - time() <= ($duration = PiggyAuctions::getInstance()->getConfig()->getNested("auctions.anti-snipe-duration", 120))) {
-                                                    $this->auction->setEndDate($this->auction->getEndDate() + $duration - ($this->auction->getEndDate() - time()));
+                                                        $this->auction->addBid($bid);
+
+                                                        if ($this->auction->getEndDate() - time() <= ($duration = PiggyAuctions::getInstance()->getConfig()->getNested("auctions.anti-snipe-duration", 120))) {
+                                                            $this->auction->setEndDate($this->auction->getEndDate() + $duration - ($this->auction->getEndDate() - time()));
+                                                        }
+
+                                                        $stats = PiggyAuctions::getInstance()->getStatsManager()->getStatistics($this->player);
+                                                        $stats->incrementStatistic("money_spent", $cost);
+                                                        $stats->incrementStatistic("bids");
+                                                        if ($stats->getStatistic("highest_bid") < $bid->getBidAmount()) $stats->setStatistic("highest_bid", $bid->getBidAmount());
+
+                                                        $this->player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.bid.success", ["{MONEY}" => $ev->getBid()->getBidAmount(), "{ITEM}" => $this->auction->getItem()->getName()]));
+                                                        if (($auctioneer = PiggyAuctions::getInstance()->getServer()->getPlayerExact($this->auction->getAuctioneer())) instanceof Player) {
+                                                            $auctioneer->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.bid.bidder", ["{PLAYER}" => $this->player->getName(), "{MONEY}" => $ev->getBid()->getBidAmount(), "{ITEM}" => $this->auction->getItem()->getName()]));
+                                                        }
+                                                    });
                                                 }
-
-                                                $stats = PiggyAuctions::getInstance()->getStatsManager()->getStatistics($this->player);
-                                                $stats->incrementStatistic("money_spent", $cost);
-                                                $stats->incrementStatistic("bids");
-                                                if ($stats->getStatistic("highest_bid") < $bid->getBidAmount()) {
-                                                    $stats->setStatistic("highest_bid", $bid->getBidAmount());
-                                                }
-
-                                                $this->player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.bid.success", ["{MONEY}" => $ev->getBid()->getBidAmount(), "{ITEM}" => $this->auction->getItem()->getName()]));
-                                                if (($auctioneer = PiggyAuctions::getInstance()->getServer()->getPlayerExact($this->auction->getAuctioneer())) instanceof Player) $auctioneer->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.bid.bidder", ["{PLAYER}" => $this->player->getName(), "{MONEY}" => $ev->getBid()->getBidAmount(), "{ITEM}" => $this->auction->getItem()->getName()]));
                                             }
                                         }
                                     }
                                 }
+                                $this->setInventoryCloseListener(Closure::fromCallable([$this, "close"]));
+                                $this->render();
+                                $this->display();
                             }
-                            $this->setInventoryCloseListener(Closure::fromCallable([$this, "close"]));
-                            $this->render();
-                            $this->display();
-                        }
-                    ))->display();
+                        ))->display();
+                        return $transaction;
+                    });
                 } else {
                     if ($this->auction->getAuctioneer() === $this->player->getName()) {
                         $this->auction->claim($this->player);

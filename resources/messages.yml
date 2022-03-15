@@ -1,3 +1,4 @@
+generic-error: "{RED}An unexpected error has occurred."
 commands:
   no-active-auctions: "{RED}{PLAYER} does not exist or has no active auctions"
 menus:
