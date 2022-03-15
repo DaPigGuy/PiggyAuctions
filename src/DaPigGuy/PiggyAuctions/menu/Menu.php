@@ -9,6 +9,7 @@ use muqsit\invmenu\InvMenu;
 use muqsit\invmenu\InvMenuHandler;
 use muqsit\invmenu\transaction\InvMenuTransaction;
 use muqsit\invmenu\transaction\InvMenuTransactionResult;
+use muqsit\invmenu\transaction\SimpleInvMenuTransaction;
 use muqsit\invmenu\type\InvMenuTypeIds;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\inventory\transaction\InventoryTransaction;
@@ -44,9 +45,7 @@ abstract class Menu extends InvMenu
 
     public function handleInventoryTransaction(Player $player, Item $out, Item $in, SlotChangeAction $action, InventoryTransaction $transaction): InvMenuTransactionResult
     {
-        if (!$this->handle($out, $in, $action, $transaction)) {
-            return new InvMenuTransactionResult(true);
-        }
-        return parent::handleInventoryTransaction($player, $out, $in, $action, $transaction);
+        $invMenuTransaction = new SimpleInvMenuTransaction($player, $out, $in, $action, $transaction);
+        return $this->handle($out, $in, $action, $invMenuTransaction);
     }
 }

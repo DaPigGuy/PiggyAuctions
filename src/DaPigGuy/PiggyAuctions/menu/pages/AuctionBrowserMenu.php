@@ -78,8 +78,8 @@ class AuctionBrowserMenu extends Menu
     public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action, InvMenuTransaction $transaction): InvMenuTransactionResult
     {
         $newMenu = null;
-        if ($itemClicked->getNamedTag()->getTag("AuctionID") !== null) {
-            $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($itemClicked->getNamedTag()->getTag("AuctionID") ?? new IntTag(0))->getValue());
+        if (($auctionTag = $itemClicked->getNamedTag()->getTag("AuctionID")) !== null) {
+            $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction($auctionTag->getValue());
             if ($auction instanceof Auction) {
                 $newMenu = new AuctionMenu($this->player, $auction, function () {
                     (new AuctionBrowserMenu($this->player, $this->page, $this->search, $this->sortType))->display();
