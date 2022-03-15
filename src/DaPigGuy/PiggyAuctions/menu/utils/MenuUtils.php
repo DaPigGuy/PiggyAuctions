@@ -22,8 +22,10 @@ class MenuUtils
         $itemIndexFunction = $itemIndexFunction ?? static function ($index) use ($offsetSlot): int {
                 return $index + $offsetSlot;
             };
-        $sortFunction = $sortFunction ?? static function (Auction $a, Auction $b): bool {
-                return $a->getEndDate() > $b->getEndDate();
+        $sortFunction = $sortFunction ?? static function (Auction $a, Auction $b): int {
+                $endDateA = $a->getEndDate();
+                $endDateB = $b->getEndDate();
+                return $endDateA === $endDateB ? 0 : ($a->getEndDate() > $b->getEndDate() ? 1 : -1);
             };
         uasort($auctions, $sortFunction);
         foreach (array_slice($auctions, $arrayOffset, $displayCount) as $index => $auction) {

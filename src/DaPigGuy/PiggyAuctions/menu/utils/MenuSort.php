@@ -15,24 +15,30 @@ class MenuSort
     const TYPE_MOST_BIDS = 3;
     const TYPE_RECENTLY_UPDATED = 5;
 
+    /** @var Closure[] */
+    private static array $closures;
+
     public static function closureFromType(int $type): Closure
     {
-        return match ($type) {
-            self::TYPE_LOWEST_BID => static function (Auction $a, Auction $b): bool {
-                return ($a->getTopBid() === null ? $a->getStartingBid() : $a->getTopBid()->getBidAmount()) > ($b->getTopBid() === null ? $b->getStartingBid() : $b->getTopBid()->getBidAmount());
-            },
-            self::TYPE_ENDING_SOON => static function (Auction $a, Auction $b): bool {
-                return $a->getEndDate() > $b->getEndDate();
-            },
-            self::TYPE_MOST_BIDS => static function (Auction $a, Auction $b): bool {
-                return count($a->getBids()) < count($b->getBids());
-            },
-            self::TYPE_RECENTLY_UPDATED => static function (Auction $a, Auction $b): bool {
-                return ($a->hasExpired() ? $a->getEndDate() : ($a->getTopBid() === null ? $a->getStartDate() : $a->getTopBid()->getTimestamp())) < ($b->hasExpired() ? $b->getEndDate() : ($b->getTopBid() === null ? $b->getStartDate() : $b->getTopBid()->getTimestamp()));
-            },
-            default => static function (Auction $a, Auction $b): bool {
-                return ($a->getTopBid() === null ? $a->getStartingBid() : $a->getTopBid()->getBidAmount()) < ($b->getTopBid() === null ? $b->getStartingBid() : $b->getTopBid()->getBidAmount());
-            },
+        if (!isset(self::$closures)) {
+            self::$closures = [
+                self::TYPE_LOWEST_BID => self::sortFunction(fn(Auction $a) => $a->getTopBid()?->getBidAmount() ?? $a->getStartingBid()),
+                self::TYPE_HIGHEST_BID => self::sortFunction(fn(Auction $a) => $a->getTopBid()?->getBidAmount() ?? $a->getStartingBid(), true),
+                self::TYPE_ENDING_SOON => self::sortFunction(fn(Auction $a) => $a->getEndDate()),
+                self::TYPE_MOST_BIDS => self::sortFunction(fn(Auction $a) => count($a->getBids()), true),
+                self::TYPE_RECENTLY_UPDATED => self::sortFunction(fn(Auction $a) => $a->hasExpired() ? $a->getEndDate() : ($a->getTopBid()?->getTimestamp() ?? $a->getStartDate()), true)
+            ];
+        }
+        return self::$closures[$type];
+    }
+
+    private static function sortFunction(Closure $closure, bool $descending = false): Closure
+    {
+        return static function (Auction $a, Auction $b) use ($closure, $descending): int {
+            $valueA = $closure($a);
+            $valueB = $closure($b);
+            if ($valueA === $valueB) return 0;
+            return ($valueA < $valueB ? -1 : 1) * ($descending ? -1 : 1);
         };
     }
 }
