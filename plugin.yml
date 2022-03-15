@@ -4,7 +4,7 @@ version: 2.0.0
 api: 4.0.0
 load: POSTWORLD
 author: DaPigGuy
-softdepend: [ "EconomyAPI", "MultiEconomy" ]
+softdepend: [ "EconomyAPI", "BedrockEconomy" ]
 website: "https://github.com/DaPigGuy/PiggyAuctions/"
 permissions:
   piggyauctions:
