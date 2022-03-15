@@ -111,7 +111,7 @@ class AuctionMenu extends Menu
                         $this->player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.bid.already-top-bid"));
                         return $transaction->discard();
                     }
-                    PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($this->player, function (float|int $balance) use ($transaction) {
+                    PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($this->player, function (float|int $balance) {
                         if ($balance < $this->bidAmount) {
                             $this->player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.bid.cant-afford"));
                         }
