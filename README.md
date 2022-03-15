@@ -10,7 +10,7 @@ Why use PiggyAuctions over other competitors?
 
 ## Prerequisites
 * Basic knowledge on how to install plugins from Poggit Releases and/or Poggit CI
-* PMMP 3.2.0 or greater
+* PMMP 3.22.1+
 * mysql & sqlite3 PHP extensions (should already exist within your PHP binaries)
 * Economy type supported by libPiggyEconomy:
   * [EconomyAPI](https://github.com/onebone/EconomyS/tree/3.x/EconomyAPI) by onebone
@@ -18,7 +18,7 @@ Why use PiggyAuctions over other competitors?
   * PMMP Player EXP
 
 ## Notice
-You will need to download the [InvMenuFix](https://poggit.pmmp.io/r/94951/InvCrashFix_dev-1.phar) plugin and update your PiggyAuctions version to 1.0.6 to fix crates crashing your client.
+You will need to download the [InvMenuFix](https://poggit.pmmp.io/r/94956/InvCrashFix_dev-3.phar) plugin and update your PiggyAuctions version to 1.0.9 to fix crates crashing your client.
  
 ## Installation & Setup
 1. Install the plugin from Poggit.

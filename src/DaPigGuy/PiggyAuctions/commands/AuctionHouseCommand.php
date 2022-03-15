@@ -31,10 +31,10 @@ class AuctionHouseCommand extends BaseCommand
                 $sender->sendMessage(PiggyAuctions::getInstance()->getMessage("commands.no-active-auctions", ["{PLAYER}" => $args["player"]]));
                 return;
             }
-            new AuctioneerMenu($sender, $args["player"]);
+            (new AuctioneerMenu($sender, $args["player"]))->display();
             return;
         }
-        new MainMenu($sender);
+        (new MainMenu($sender))->display();
     }
 
     /**

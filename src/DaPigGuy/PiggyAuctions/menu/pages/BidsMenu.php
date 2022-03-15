@@ -9,23 +9,25 @@ use DaPigGuy\PiggyAuctions\auction\AuctionBid;
 use DaPigGuy\PiggyAuctions\menu\Menu;
 use DaPigGuy\PiggyAuctions\menu\utils\MenuUtils;
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
+use muqsit\invmenu\transaction\InvMenuTransaction;
+use muqsit\invmenu\transaction\InvMenuTransactionResult;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
-use pocketmine\inventory\transaction\InventoryTransaction;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
 use pocketmine\nbt\tag\IntTag;
-use pocketmine\player\Player;
+use pocketmine\Player;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\scheduler\TaskHandler;
 
 class BidsMenu extends Menu
 {
-    private TaskHandler $taskHandler;
+    /** @var TaskHandler */
+    private $taskHandler;
 
     public function __construct(Player $player)
     {
-        $this->taskHandler = PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (): void {
+        $this->taskHandler = PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (int $currentTick): void {
             $this->render();
         }), 20);
         parent::__construct($player);
@@ -34,7 +36,7 @@ class BidsMenu extends Menu
     public function render(): void
     {
         $this->setName(PiggyAuctions::getInstance()->getMessage("menus.view-bids.title"));
-        $this->getInventory()->clearAll();
+        $this->getInventory()->clearAll(false);
 
         $auctions = array_filter(array_map(static function (AuctionBid $bid): ?Auction {
             return $bid->getAuction();
@@ -46,13 +48,14 @@ class BidsMenu extends Menu
         });
 
         MenuUtils::updateDisplayedItems($this, $auctions, 0, 10, 7);
-        if (count($claimable) > 1) $this->getInventory()->setItem(21, ItemFactory::getInstance()->get(ItemIds::CAULDRON)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.claim-all")));
-        $this->getInventory()->setItem(22, ItemFactory::getInstance()->get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
-        $this->player->getNetworkSession()->getInvManager()->syncContents($this->getInventory());
+        if (count($claimable) > 1) $this->getInventory()->setItem(21, ItemFactory::get(ItemIds::CAULDRON)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.claim-all")));
+        $this->getInventory()->setItem(22, ItemFactory::get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
+        $this->getInventory()->sendContents($this->player);
     }
 
-    public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action, InventoryTransaction $transaction): bool
+    public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action, InvMenuTransaction $transaction): InvMenuTransactionResult
     {
+        $newMenu = null;
         switch ($action->getSlot()) {
             case 21:
                 foreach (PiggyAuctions::getInstance()->getAuctionManager()->getBidsBy($this->player) as $bid) {
@@ -64,16 +67,19 @@ class BidsMenu extends Menu
                 $this->render();
                 break;
             case 22:
-                new MainMenu($this->player);
+                $newMenu = new MainMenu($this->player);
                 break;
             default:
-                $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($itemClicked->getNamedTag()->getTag("AuctionID", IntTag::class) ?? new IntTag(0))->getValue());
-                if ($auction !== null) new AuctionMenu($this->player, $auction, function () {
-                    new BidsMenu($this->player);
+                $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($itemClicked->getNamedTagEntry("AuctionID") ?? new IntTag())->getValue());
+                if ($auction !== null) $newMenu = new AuctionMenu($this->player, $auction, function () {
+                    (new BidsMenu($this->player))->display();
                 });
                 break;
         }
-        return false;
+        if ($newMenu === null) return $transaction->discard();
+        return $transaction->discard()->then(function () use ($newMenu): void {
+            $newMenu->display();
+        });
     }
 
     public function close(): void
