@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace DaPigGuy\PiggyAuctions\commands;
 
-use CortexPE\Commando\args\BaseArgument;
 use CortexPE\Commando\args\RawStringArgument;
 use CortexPE\Commando\BaseCommand;
 use CortexPE\Commando\exception\ArgumentOrderException;
@@ -12,7 +11,7 @@ use DaPigGuy\PiggyAuctions\menu\pages\AuctioneerMenu;
 use DaPigGuy\PiggyAuctions\menu\pages\MainMenu;
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class AuctionHouseCommand extends BaseCommand

@@ -7,9 +7,12 @@ namespace DaPigGuy\PiggyAuctions\events;
 use DaPigGuy\PiggyAuctions\auction\Auction;
 use DaPigGuy\PiggyAuctions\auction\AuctionBid;
 use pocketmine\event\Cancellable;
+use pocketmine\event\CancellableTrait;
 
 class AuctionBidEvent extends AuctionEvent implements Cancellable
 {
+    use CancellableTrait;
+
     /** @var AuctionBid */
     protected $bid;
 

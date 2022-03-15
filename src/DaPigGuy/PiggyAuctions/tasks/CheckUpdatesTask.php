@@ -6,6 +6,7 @@ namespace DaPigGuy\PiggyAuctions\tasks;
 
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
 use Exception;
+use pocketmine\plugin\ApiVersion;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
 use pocketmine\utils\Internet;
@@ -17,8 +18,9 @@ class CheckUpdatesTask extends AsyncTask
         $this->setResult([Internet::getURL("https://poggit.pmmp.io/releases.json?name=PiggyAuctions", 10, [], $error), $error]);
     }
 
-    public function onCompletion(Server $server): void
+    public function onCompletion(): void
     {
+        $server = Server::getInstance();
         /** @var PiggyAuctions $plugin */
         $plugin = $server->getPluginManager()->getPlugin("PiggyAuctions");
         try {
@@ -30,7 +32,7 @@ class CheckUpdatesTask extends AsyncTask
 
                 $data = json_decode($results[0], true);
                 if (version_compare($plugin->getDescription()->getVersion(), $data[0]["version"]) === -1) {
-                    if ($server->getPluginManager()->isCompatibleApi($data[0]["api"][0]["from"])) {
+                    if (ApiVersion::isCompatible($server->getApiVersion(), $data[0]["api"][0]["from"])) {
                         $plugin->getLogger()->info("PiggyAuctions v" . $data[0]["version"] . " is available for download at " . $data[0]["artifact_url"] . "/PiggyAuctions.phar");
                     }
                 }

@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace DaPigGuy\PiggyAuctions\menu;
 
+use Closure;
 use muqsit\invmenu\InvMenu;
 use muqsit\invmenu\InvMenuHandler;
 use muqsit\invmenu\session\PlayerManager;
-use muqsit\invmenu\SharedInvMenu;
+use muqsit\invmenu\transaction\InvMenuTransactionResult;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
+use pocketmine\inventory\transaction\InventoryTransaction;
 use pocketmine\item\Item;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
-abstract class Menu extends SharedInvMenu
+abstract class Menu extends InvMenu
 {
-    /** @var SharedInvMenu[] */
+    /** @var InvMenu[] */
     public static $awaitingInventoryClose;
 
     /** @var Player */
@@ -27,13 +29,13 @@ abstract class Menu extends SharedInvMenu
     {
         parent::__construct(InvMenuHandler::getMenuType($this->inventoryIdentifier));
         $this->player = $player;
-        $this->setInventoryCloseListener([$this, "close"]);
+        $this->setInventoryCloseListener(Closure::fromCallable([$this, "close"]));
 
         $this->render();
         $this->display();
     }
 
-    public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action): bool
+    public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action, InventoryTransaction $transaction): bool
     {
         return false;
     }
@@ -49,15 +51,18 @@ abstract class Menu extends SharedInvMenu
         if (PlayerManager::get($this->player) === null) return;
         $oldMenu = PlayerManager::get($this->player)->getCurrentMenu();
         if ($oldMenu !== null) {
-            $this->player->removeWindow($oldMenu->getInventoryForPlayer($this->player));
+            $this->onClose($this->player);
             Menu::$awaitingInventoryClose[$this->player->getName()] = $this;
         } else {
             $this->send($this->player);
         }
     }
 
-    public function handleInventoryTransaction(Player $player, Item $in, Item $out, SlotChangeAction $action): bool
+    public function handleInventoryTransaction(Player $player, Item $out, Item $in, SlotChangeAction $action, InventoryTransaction $transaction): InvMenuTransactionResult
     {
-        return parent::handleInventoryTransaction($player, $in, $out, $action) && $this->handle($in, $out, $action);
+        if (!$this->handle($out, $in, $action, $transaction)) {
+            return new InvMenuTransactionResult(true);
+        }
+        return parent::handleInventoryTransaction($player, $out, $in, $action, $transaction);
     }
 }

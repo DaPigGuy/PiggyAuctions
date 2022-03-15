@@ -8,7 +8,7 @@ use DaPigGuy\PiggyAuctions\events\AuctionExpireEvent;
 use DaPigGuy\PiggyAuctions\events\AuctionLoadEvent;
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
 use pocketmine\item\Item;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class AuctionManager
 {
