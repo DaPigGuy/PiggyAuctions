@@ -15,6 +15,7 @@ use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
+use pocketmine\item\VanillaItems;
 use pocketmine\nbt\tag\IntTag;
 use pocketmine\player\Player;
 use pocketmine\scheduler\ClosureTask;
@@ -48,7 +49,7 @@ class BidsMenu extends Menu
 
         MenuUtils::updateDisplayedItems($this, $auctions, 0, 10, 7);
         if (count($claimable) > 1) $this->getInventory()->setItem(21, ItemFactory::getInstance()->get(ItemIds::CAULDRON)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.claim-all")));
-        $this->getInventory()->setItem(22, ItemFactory::getInstance()->get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
+        $this->getInventory()->setItem(22, VanillaItems::ARROW()->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
         $this->player->getNetworkSession()->getInvManager()?->syncContents($this->getInventory());
     }
 

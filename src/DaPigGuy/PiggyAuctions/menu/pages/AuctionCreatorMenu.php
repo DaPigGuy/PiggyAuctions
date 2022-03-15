@@ -13,10 +13,12 @@ use jojoe77777\FormAPI\CustomForm;
 use muqsit\invmenu\transaction\InvMenuTransaction;
 use muqsit\invmenu\transaction\InvMenuTransactionResult;
 use muqsit\invmenu\type\InvMenuTypeIds;
+use pocketmine\block\utils\DyeColor;
+use pocketmine\block\VanillaBlocks;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\item\Item;
-use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
+use pocketmine\item\VanillaItems;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
@@ -29,7 +31,7 @@ class AuctionCreatorMenu extends Menu
 
     public function __construct(Player $player)
     {
-        $this->item = ItemFactory::getInstance()->get(ItemIds::AIR);
+        $this->item = VanillaItems::AIR();
         parent::__construct($player);
     }
 
@@ -118,12 +120,12 @@ class AuctionCreatorMenu extends Menu
     public function render(): void
     {
         $this->setName(PiggyAuctions::getInstance()->getMessage("menus.auction-creator.title"));
-        for ($i = 0; $i < $this->getInventory()->getSize(); $i++) $this->getInventory()->setItem($i, ItemFactory::getInstance()->get(ItemIds::INVISIBLE_BEDROCK)->setCustomName(TextFormat::RESET));
+        for ($i = 0; $i < $this->getInventory()->getSize(); $i++) $this->getInventory()->setItem($i, VanillaBlocks::INVISIBLE_BEDROCK()->asItem()->setCustomName(TextFormat::RESET));
         $this->getInventory()->setItem(13, $this->item);
-        $this->getInventory()->setItem(29, ItemFactory::getInstance()->get(ItemIds::STAINED_CLAY, $this->item->getId() === ItemIds::AIR ? 14 : 13)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-creator.create-auction", ["{STATUS}" => $this->item->getId() === ItemIds::AIR ? TextFormat::RED : TextFormat::GREEN])));
-        $this->getInventory()->setItem(31, ItemFactory::getInstance()->get(ItemIds::GOLD_INGOT)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-creator.starting-bid", ["{MONEY}" => $this->startingBid])));
-        $this->getInventory()->setItem(33, ItemFactory::getInstance()->get(ItemIds::CLOCK)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-creator.duration", ["{DURATION}" => Utils::formatDuration($this->duration)])));
-        $this->getInventory()->setItem(49, ItemFactory::getInstance()->get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
+        $this->getInventory()->setItem(29, VanillaBlocks::STAINED_CLAY()->setColor($this->item->getId() === ItemIds::AIR ? DyeColor::RED() : DyeColor::GREEN())->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-creator.create-auction", ["{STATUS}" => $this->item->getId() === ItemIds::AIR ? TextFormat::RED : TextFormat::GREEN])));
+        $this->getInventory()->setItem(31, VanillaItems::GOLD_INGOT()->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-creator.starting-bid", ["{MONEY}" => $this->startingBid])));
+        $this->getInventory()->setItem(33, VanillaItems::CLOCK()->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-creator.duration", ["{DURATION}" => Utils::formatDuration($this->duration)])));
+        $this->getInventory()->setItem(49, VanillaItems::ARROW()->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
     }
 
     public function close(): void

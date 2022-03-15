@@ -11,10 +11,12 @@ use DaPigGuy\PiggyAuctions\menu\utils\MenuUtils;
 use DaPigGuy\PiggyAuctions\PiggyAuctions;
 use muqsit\invmenu\transaction\InvMenuTransaction;
 use muqsit\invmenu\transaction\InvMenuTransactionResult;
+use pocketmine\block\VanillaBlocks;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
+use pocketmine\item\VanillaItems;
 use pocketmine\nbt\tag\IntTag;
 use pocketmine\player\Player;
 use pocketmine\scheduler\ClosureTask;
@@ -65,10 +67,10 @@ class AuctionManagerMenu extends Menu
         });
 
         if (count($claimable) > 1) $this->getInventory()->setItem(21, ItemFactory::getInstance()->get(ItemIds::CAULDRON)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.claim-all")));
-        $this->getInventory()->setItem(22, ItemFactory::getInstance()->get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
+        $this->getInventory()->setItem(22, VanillaItems::ARROW()->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
         $this->getInventory()->setItem(24, ItemFactory::getInstance()->get(ItemIds::GOLDEN_HORSE_ARMOR)->setCustomName(PiggyAuctions::getInstance()->getMessage($this->auctionLimit !== -1 && count($auctions) > $this->auctionLimit ? "menus.auction-manager.create-auction-maxed" : "menus.auction-manager.create-auction")));
 
-        $sort = ItemFactory::getInstance()->get(ItemIds::HOPPER)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.sorting.sort-type", ["{TYPES}" => implode("\n", array_map(function (string $type, int $index): string {
+        $sort = VanillaBlocks::HOPPER()->asItem()->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.sorting.sort-type", ["{TYPES}" => implode("\n", array_map(function (string $type, int $index): string {
             return ($index === $this->sortType ? PiggyAuctions::getInstance()->getMessage("menus.sorting.selected") : "") . PiggyAuctions::getInstance()->getMessage("menus.sorting." . $type);
         }, self::SORT_TYPES, array_keys(self::SORT_TYPES)))]));
         $this->getInventory()->setItem(23, $sort);

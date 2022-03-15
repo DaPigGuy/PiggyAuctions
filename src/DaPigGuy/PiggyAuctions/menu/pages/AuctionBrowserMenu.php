@@ -14,11 +14,12 @@ use jojoe77777\FormAPI\CustomForm;
 use muqsit\invmenu\transaction\InvMenuTransaction;
 use muqsit\invmenu\transaction\InvMenuTransactionResult;
 use muqsit\invmenu\type\InvMenuTypeIds;
+use pocketmine\block\VanillaBlocks;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
-use pocketmine\nbt\tag\IntTag;
+use pocketmine\item\VanillaItems;
 use pocketmine\player\Player;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\scheduler\TaskHandler;
@@ -52,10 +53,10 @@ class AuctionBrowserMenu extends Menu
             return (int)($index + 10 + floor($index / self::PAGE_ROW_LENGTH) * 2);
         }, MenuSort::closureFromType($this->sortType));
 
-        $searchItem = ItemFactory::getInstance()->get(ItemIds::SIGN)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.search.search", ["{FILTERED}" => empty($this->search) ? "" : PiggyAuctions::getInstance()->getMessage("menus.search.filter", ["{FILTERED}" => $this->search])]));
+        $searchItem = VanillaBlocks::OAK_SIGN()->asItem()->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.search.search", ["{FILTERED}" => empty($this->search) ? "" : PiggyAuctions::getInstance()->getMessage("menus.search.filter", ["{FILTERED}" => $this->search])]));
         $this->getInventory()->setItem(48, $searchItem);
 
-        $backArrow = ItemFactory::getInstance()->get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back"));
+        $backArrow = VanillaItems::ARROW()->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back"));
         $this->getInventory()->setItem(49, $backArrow);
 
         $types = ["highest-bid", "lowest-bid", "ending-soon", "most-bids"];
@@ -65,11 +66,11 @@ class AuctionBrowserMenu extends Menu
         $this->getInventory()->setItem(50, $sort);
 
         if ($this->page > 1) {
-            $previousPage = ItemFactory::getInstance()->get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-browser.previous-page", ["{PAGE}" => $this->page - 1, "{MAXPAGES}" => ceil(count($activeAuctions) / self::PAGE_LENGTH)]));
+            $previousPage = VanillaItems::ARROW()->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-browser.previous-page", ["{PAGE}" => $this->page - 1, "{MAXPAGES}" => ceil(count($activeAuctions) / self::PAGE_LENGTH)]));
             $this->getInventory()->setItem(45, $previousPage);
         }
         if ($this->page < ceil(count($activeAuctions) / self::PAGE_LENGTH)) {
-            $nextPage = ItemFactory::getInstance()->get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-browser.next-page", ["{PAGE}" => $this->page + 1, "{MAXPAGES}" => ceil(count($activeAuctions) / self::PAGE_LENGTH)]));
+            $nextPage = VanillaItems::ARROW()->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.auction-browser.next-page", ["{PAGE}" => $this->page + 1, "{MAXPAGES}" => ceil(count($activeAuctions) / self::PAGE_LENGTH)]));
             $this->getInventory()->setItem(53, $nextPage);
         }
         $this->player->getNetworkSession()->getInvManager()?->syncContents($this->getInventory());
