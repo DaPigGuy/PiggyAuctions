@@ -58,6 +58,10 @@ class PiggyAuctions extends PluginBase implements Listener
             }
         }
 
+        if ($this->getServer()->getPluginManager()->getPlugin("InvCrashFix") === null) {
+            $this->getLogger()->error("Missing InvCrashFix plugin. Menus may not work as intended. Download: https://poggit.pmmp.io/r/139694/InvCrashFix_dev-4.phar");
+        }
+
         if (!InvMenuHandler::isRegistered()) {
             InvMenuHandler::register($this);
         }
