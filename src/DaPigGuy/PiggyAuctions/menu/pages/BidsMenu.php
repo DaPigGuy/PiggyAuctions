@@ -15,19 +15,19 @@ use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
+use pocketmine\item\VanillaItems;
 use pocketmine\nbt\tag\IntTag;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\scheduler\TaskHandler;
 
 class BidsMenu extends Menu
 {
-    /** @var TaskHandler */
-    private $taskHandler;
+    private TaskHandler $taskHandler;
 
     public function __construct(Player $player)
     {
-        $this->taskHandler = PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (int $currentTick): void {
+        $this->taskHandler = PiggyAuctions::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (): void {
             $this->render();
         }), 20);
         parent::__construct($player);
@@ -36,7 +36,7 @@ class BidsMenu extends Menu
     public function render(): void
     {
         $this->setName(PiggyAuctions::getInstance()->getMessage("menus.view-bids.title"));
-        $this->getInventory()->clearAll(false);
+        $this->getInventory()->clearAll();
 
         $auctions = array_filter(array_map(static function (AuctionBid $bid): ?Auction {
             return $bid->getAuction();
@@ -48,9 +48,9 @@ class BidsMenu extends Menu
         });
 
         MenuUtils::updateDisplayedItems($this, $auctions, 0, 10, 7);
-        if (count($claimable) > 1) $this->getInventory()->setItem(21, ItemFactory::get(ItemIds::CAULDRON)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.claim-all")));
-        $this->getInventory()->setItem(22, ItemFactory::get(ItemIds::ARROW)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
-        $this->getInventory()->sendContents($this->player);
+        if (count($claimable) > 1) $this->getInventory()->setItem(21, ItemFactory::getInstance()->get(ItemIds::CAULDRON)->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.claim-all")));
+        $this->getInventory()->setItem(22, VanillaItems::ARROW()->setCustomName(PiggyAuctions::getInstance()->getMessage("menus.back")));
+        $this->player->getNetworkSession()->getInvManager()?->syncContents($this->getInventory());
     }
 
     public function handle(Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action, InvMenuTransaction $transaction): InvMenuTransactionResult
@@ -70,7 +70,7 @@ class BidsMenu extends Menu
                 $newMenu = new MainMenu($this->player);
                 break;
             default:
-                $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($itemClicked->getNamedTagEntry("AuctionID") ?? new IntTag())->getValue());
+                $auction = PiggyAuctions::getInstance()->getAuctionManager()->getAuction(($itemClicked->getNamedTag()->getTag("AuctionID") ?? new IntTag(0))->getValue());
                 if ($auction !== null) $newMenu = new AuctionMenu($this->player, $auction, function () {
                     (new BidsMenu($this->player))->display();
                 });

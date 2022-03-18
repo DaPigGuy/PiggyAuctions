@@ -6,20 +6,16 @@ namespace DaPigGuy\PiggyAuctions\events;
 
 use DaPigGuy\PiggyAuctions\auction\Auction;
 use pocketmine\event\Cancellable;
-use pocketmine\Player;
+use pocketmine\event\CancellableTrait;
+use pocketmine\player\Player;
 
 class AuctionClaimMoneyEvent extends AuctionEvent implements Cancellable
 {
-    /** @var Player */
-    private $player;
-    /** @var int */
-    private $amount;
+    use CancellableTrait;
 
-    public function __construct(Auction $auction, Player $player, int $amount)
+    public function __construct(Auction $auction, private Player $player, private int $amount)
     {
         parent::__construct($auction);
-        $this->player = $player;
-        $this->amount = $amount;
     }
 
     public function getPlayer(): Player

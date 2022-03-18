@@ -10,8 +10,8 @@ database:
     schema: "piggyauctions"
   worker-limit: 1
 economy:
-  # Options: economyapi, multieconomy, xp
-  provider: economyapi
+  # Options: economyapi, bedrockeconomy, xp
+  provider: bedrockeconomy
 auctions:
   # Maximum value for specific user input
   limits:

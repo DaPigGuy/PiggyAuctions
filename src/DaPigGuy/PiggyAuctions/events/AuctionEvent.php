@@ -9,12 +9,8 @@ use pocketmine\event\Event;
 
 class AuctionEvent extends Event
 {
-    /** @var Auction */
-    protected $auction;
-
-    public function __construct(Auction $auction)
+    public function __construct(protected Auction $auction)
     {
-        $this->auction = $auction;
     }
 
     public function getAuction(): Auction

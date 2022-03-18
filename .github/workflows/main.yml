@@ -1,6 +1,6 @@
 name: PHPStan
 
-on: [push, pull_request]
+on: [ push, pull_request ]
 
 jobs:
   phpstan:
@@ -10,31 +10,16 @@ jobs:
         with:
           ref: ${{ github.ref }}
       - name: Create Vendor Directory
+        run: mkdir vendor
+      - name: Download Virion Dependencies
         run: |
-          echo Making directory...
-          mkdir vendor
-          echo Directory made.
-      - name: wget virions, libasynql
-        uses: wei/wget@v1
-        with:
-          args: -O vendor/libasynql.phar https://poggit.pmmp.io/r/135147/libasynql_dev-145.phar
-      - name: wget virions, InvMenu
-        uses: wei/wget@v1
-        with:
-          args: -O vendor/InvMenu.phar https://poggit.pmmp.io/r/131080/InvMenu_dev-153.phar
-      - name: wget virions, FormAPI
-        uses: wei/wget@v1
-        with:
-          args: -O vendor/FormAPI.phar https://poggit.pmmp.io/r/101416/libFormAPI_dev-3.phar
-      - name: wget virions, libPiggyEconomy
-        uses: wei/wget@v1
-        with:
-          args: -O vendor/libPiggyEconomy.phar https://poggit.pmmp.io/r/86214/libPiggyEconomy_dev-9.phar
-      - name: wget virions, Commando
-        uses: wei/wget@v1
-        with:
-          args: -O vendor/Commando.phar https://poggit.pmmp.io/r/120160/Commando_dev-24.phar
+          wget -O vendor/libasynql.phar https://poggit.pmmp.io/r/159125/libasynql_dev-174.phar
+          wget -O vendor/InvMenu.phar https://poggit.pmmp.io/r/157357/InvMenu_dev-165.phar
+          wget -O vendor/FormAPI.phar https://poggit.pmmp.io/r/163460/FormAPI_dev-2.phar
+          wget -O vendor/libPiggyEconomy.phar https://poggit.pmmp.io/r/163250/libPiggyEconomy_dev-12.phar
+          wget -O vendor/Commando.phar https://poggit.pmmp.io/r/162923/Commando_dev-30.phar
+          wget -O vendor/libPiggyUpdateChecker.phar https://poggit.pmmp.io/r/163495/libPiggyUpdateChecker_dev-1.phar
       - name: Run PHPStan
-        uses: paroxity/pmmp-phpstan-action@3.22.1
+        uses: paroxity/pmmp-phpstan-action@4.2.0
         with:
           phpstan-config: phpstan.neon.dist

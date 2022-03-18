@@ -11,10 +11,10 @@ use DaPigGuy\libPiggyEconomy\exceptions\MissingProviderDependencyException;
 use DaPigGuy\libPiggyEconomy\exceptions\UnknownProviderException;
 use DaPigGuy\libPiggyEconomy\libPiggyEconomy;
 use DaPigGuy\libPiggyEconomy\providers\EconomyProvider;
+use DaPigGuy\libPiggyUpdateChecker\libPiggyUpdateChecker;
 use DaPigGuy\PiggyAuctions\auction\AuctionManager;
 use DaPigGuy\PiggyAuctions\commands\AuctionHouseCommand;
 use DaPigGuy\PiggyAuctions\statistics\StatisticsManager;
-use DaPigGuy\PiggyAuctions\tasks\CheckUpdatesTask;
 use DaPigGuy\PiggyAuctions\utils\Utils;
 use jojoe77777\FormAPI\Form;
 use muqsit\invmenu\InvMenuHandler;
@@ -26,20 +26,14 @@ use poggit\libasynql\libasynql;
 
 class PiggyAuctions extends PluginBase implements Listener
 {
-    /** @var self */
-    public static $instance;
+    public static self $instance;
 
-    /** @var Config */
-    private $messages;
+    private Config $messages;
 
-    /** @var DataConnector */
-    private $database;
-    /** @var EconomyProvider */
-    private $economyProvider;
-    /** @var AuctionManager */
-    private $auctionManager;
-    /** @var StatisticsManager */
-    private $statsManager;
+    private DataConnector $database;
+    private EconomyProvider $economyProvider;
+    private AuctionManager $auctionManager;
+    private StatisticsManager $statsManager;
 
     /**
      * @throws MissingProviderDependencyException
@@ -50,22 +44,23 @@ class PiggyAuctions extends PluginBase implements Listener
     {
         foreach (
             [
-                "libasynql" => libasynql::class,
-                "libPiggyEconomy" => libPiggyEconomy::class,
-                "InvMenu" => InvMenuHandler::class,
                 "Commando" => BaseCommand::class,
-                "libformapi" => Form::class
+                "InvMenu" => InvMenuHandler::class,
+                "libasynql" => libasynql::class,
+                "libformapi" => Form::class,
+                "libPiggyEconomy" => libPiggyEconomy::class,
+                "libPiggyUpdateChecker" => libPiggyUpdateChecker::class
             ] as $virion => $class
         ) {
             if (!class_exists($class)) {
-                $this->getLogger()->error($virion . " virion not found. Please download PiggyAuctions from Poggit-CI or use DEVirion (not recommended).");
+                $this->getLogger()->error($virion . " virion not found. Download PiggyAuctions at https://poggit.pmmp.io/p/PiggyAuctions.");
                 $this->getServer()->getPluginManager()->disablePlugin($this);
                 return;
             }
         }
 
         if ($this->getServer()->getPluginManager()->getPlugin("InvCrashFix") === null) {
-            $this->getLogger()->error("Missing InvCrashFix plugin. Menus may not work as intended. Download: https://poggit.pmmp.io/r/94956/InvCrashFix_dev-3.phar");
+            $this->getLogger()->error("Missing InvCrashFix plugin. Menus may not work as intended. Download: https://poggit.pmmp.io/r/139694/InvCrashFix_dev-4.phar");
         }
 
         if (!InvMenuHandler::isRegistered()) {
@@ -95,7 +90,7 @@ class PiggyAuctions extends PluginBase implements Listener
 
         $this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
 
-        $this->getServer()->getAsyncPool()->submitTask(new CheckUpdatesTask());
+        libPiggyUpdateChecker::init($this);
     }
 
     public static function getInstance(): PiggyAuctions
