@@ -114,6 +114,7 @@ class AuctionMenu extends Menu
                     PiggyAuctions::getInstance()->getEconomyProvider()->getMoney($this->player, function (float|int $balance) {
                         if ($balance < $this->bidAmount) {
                             $this->player->sendMessage(PiggyAuctions::getInstance()->getMessage("auction.bid.cant-afford"));
+                            return;
                         }
                         $this->setInventoryCloseListener(null);
                         (new ConfirmationMenu(
