@@ -13,6 +13,10 @@ Why use PiggyAuctions over other competitors?
 * PMMP 4.0.0+
 * mysql & sqlite3 PHP extensions (should already exist within your PHP binaries)
 
+## InvCrashFix is still needed!
+
+- Menus may not work without InvCrashFix. [Download here](https://poggit.pmmp.io/r/139694/InvCrashFix_dev-4.phar)
+
 ## Supported Economy Providers
 
 * [EconomyAPI](https://poggit.pmmp.io/p/EconomyAPI) by onebone/poggit-orphanage
