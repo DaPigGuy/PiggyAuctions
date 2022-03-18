@@ -44,11 +44,12 @@ class PiggyAuctions extends PluginBase implements Listener
     {
         foreach (
             [
-                "libasynql" => libasynql::class,
-                "libPiggyEconomy" => libPiggyEconomy::class,
-                "InvMenu" => InvMenuHandler::class,
                 "Commando" => BaseCommand::class,
-                "libformapi" => Form::class
+                "InvMenu" => InvMenuHandler::class,
+                "libasynql" => libasynql::class,
+                "libformapi" => Form::class,
+                "libPiggyEconomy" => libPiggyEconomy::class,
+                "libPiggyUpdateChecker" => libPiggyUpdateChecker::class
             ] as $virion => $class
         ) {
             if (!class_exists($class)) {
