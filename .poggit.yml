@@ -10,7 +10,7 @@ projects:
       - src: poggit/libasynql/libasynql
         version: ^3.4.0
       - src: muqsit/InvMenu/InvMenu
-        version: ^4.3.8
+        version: ^4.4.1
       - src: DaPigGuy/FormAPI-4.0.0/libFormAPI
         version: ^2.1.0
       - src: DaPigGuy/libPiggyEconomy/libPiggyEconomy
