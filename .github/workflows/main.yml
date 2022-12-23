@@ -14,7 +14,7 @@ jobs:
       - name: Download Virion Dependencies
         run: |
           wget -O vendor/libasynql.phar https://poggit.pmmp.io/r/159125/libasynql_dev-174.phar
-          wget -O vendor/InvMenu.phar https://poggit.pmmp.io/r/157357/InvMenu_dev-165.phar
+          wget -O vendor/InvMenu.phar https://poggit.pmmp.io/r/186359/InvMenu_dev-179.phar
           wget -O vendor/FormAPI.phar https://poggit.pmmp.io/r/163460/FormAPI_dev-2.phar
           wget -O vendor/libPiggyEconomy.phar https://poggit.pmmp.io/r/177191/libPiggyEconomy_dev-18.phar
           wget -O vendor/Commando.phar https://poggit.pmmp.io/r/162923/Commando_dev-30.phar
