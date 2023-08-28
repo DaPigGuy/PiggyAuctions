@@ -18,9 +18,10 @@ class Utils
 
     public static function formatDetailedDuration(int $duration): string
     {
+        $duration = round($duration);
         $days = floor($duration / 86400);
-        $hours = floor($duration / 3600 % 24);
-        $minutes = floor($duration / 60 % 60);
+        $hours = floor(($duration % 86400) / 3600);
+        $minutes = floor(($duration % 3600) / 60);
         $seconds = floor($duration % 60);
 
         if ($days >= 1) {
